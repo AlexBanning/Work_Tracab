@@ -29,7 +29,7 @@ home = sports_event[0].contents[3].contents[1].contents[1]["full"].encode("latin
 away = sports_event[0].contents[5].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
 
 # Get stadium
-stadium = sports_event[0].contents[1].contents[1].contents[1].contents[1]["full"]
+stadium = sports_event[0].contents[1].contents[1].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
 
 # Get date and KO time
 # year = sports_event[0].contents[1]["start-date-time"][0:4]
@@ -71,11 +71,11 @@ for i, round in enumerate(rounds):
         matchId = match.contents[1]["event-key"]
         home = match.contents[3].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
         away = match.contents[5].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
-        stadium = match.contents[1].contents[1].contents[1].contents[1]["full"]
+        stadium = match.contents[1].contents[1].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
         date = match.contents[1]["start-date-time"][0:4] + "-" \
                + match.contents[1]["start-date-time"][4:6] + "-" \
                + match.contents[1]["start-date-time"][6:8]
-        date = match.contents[1]["start-date-time"][0:4] + "-" \
+        ko = match.contents[1]["start-date-time"][0:4] + "-" \
                + match.contents[1]["start-date-time"][4:6] + "-" \
                + match.contents[1]["start-date-time"][6:8]
         KO_date = date + " " + ko
