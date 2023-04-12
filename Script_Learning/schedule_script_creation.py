@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 import pandas as pd
+from datetime import datetime, timedelta
 
 
-with open('C:\\Users\\tracab.CHYRONHEGO\\Documents\\PythonFun\\Script_Learning\\schedule.xml') as fp:
+with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\Script_Learning\\schedule.xml') as fp:
     data = BeautifulSoup(fp, 'xml')
 
 
@@ -75,7 +76,7 @@ for i, round in enumerate(rounds):
         date = match.contents[1]["start-date-time"][0:4] + "-" \
                + match.contents[1]["start-date-time"][4:6] + "-" \
                + match.contents[1]["start-date-time"][6:8]
-        ko = match.contents[1]["start-date-time"][0:4] + "-" \
+        date = match.contents[1]["start-date-time"][0:4] + "-" \
                + match.contents[1]["start-date-time"][4:6] + "-" \
                + match.contents[1]["start-date-time"][6:8]
         KO_date = date + " " + ko
@@ -86,3 +87,12 @@ for i, round in enumerate(rounds):
     season = season.append(md_df)
 
 
+
+
+#### Testing
+
+time_change = datetime.strptime('2023-03-26 02:00', '%Y-%m-%d %H:%M')
+new_date = datetime.strptime(KO_date, '%Y-%m-%d %H:%M')
+new_date = new_date + timedelta(hours=2)
+
+new_date < time_change
