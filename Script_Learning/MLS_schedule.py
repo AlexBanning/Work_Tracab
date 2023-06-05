@@ -45,11 +45,11 @@ for i, match in enumerate(fixtures):
     else:
         ko_date_object = ko_date_object + timedelta(hours=1)
     kickoff = ko_date_object.strftime('%Y-%m-%d %H:%M')
-    home = match["HomeTeamName"]
-    away = match["GuestTeamName"]
+    home = match["HomeTeamName"].encode("latin").decode("utf-8")
+    away = match["GuestTeamName"].encode("latin").decode("utf-8")
     match_id = match["DlProviderId"]
     matchday = match["MatchDay"]
-    stadium = match["StadiumName"]
+    stadium = match["StadiumName"].encode("latin").decode("utf-8")
 
     match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": kickoff, "Home": home, "Away": away,
                   "League": league, "Stadium": stadium}
