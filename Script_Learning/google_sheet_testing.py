@@ -85,7 +85,7 @@ def Create_Service(client_secret_file, api_service_name, api_version, *scopes):
 
 
 # change 'my_json_file.json' by your downloaded JSON file.
-Create_Service('C:\\Users\\tracab.CHYRONHEGO\\Documents\\PythonFun\\Script_Learning\\google_creds.json',
+Create_Service('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\Script_Learning\\google_creds.json',
                'sheets', 'v4', ['https://www.googleapis.com/auth/spreadsheets'])
 
 
