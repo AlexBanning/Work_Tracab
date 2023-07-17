@@ -1,5 +1,12 @@
 import pandas as pd
+from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
+import gspread
+import gamestats_functions as gf
+import os
+
+
 # Create a schedule DF
 schedule = pd.read_excel(
     'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\schedule.xlsx')
@@ -97,3 +104,69 @@ with open("test.xml", "wb") as f:
     f.write(ET.tostring(data))
 
 a = ET.XML(test)
+
+
+# Tests for FIFA WWC
+# Create a schedule for FIFA WWC
+with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
+    data = BeautifulSoup(fp, 'xml')
+
+rounds = data.find_all('tournament-round')
+
+# Create empty DF
+schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "hID", "aID", "League", "Stadium"])
+# Get info for all matches and update DF
+for j, round in enumerate(rounds):
+    matchday = round['round-key']
+    fixtures = round.find_all("sports-event")
+    for i, match in enumerate(fixtures):
+        date = match.find('event-metadata')["start-date-time"][0:10]
+        time = match.find('event-metadata')["start-date-time"][11:16]
+        # Adjust kickoff time from GMT to CET summer time
+        ko_date = (datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M') + timedelta(hours=2)).strftime('%Y-%m-%d %H:%M')
+        home = match.find_all('team')[0].find('team-metadata').find('name')["nickname"].encode("latin").decode("utf-8")
+        home_id = match.find_all('team')[0].find('team-metadata')["team-key"]
+        away = match.find_all('team')[1].find('team-metadata').find('name')["nickname"].encode("latin").decode("utf-8")
+        away_id = match.find_all('team')[1].find('team-metadata')["team-key"]
+        match_id = match.find('event-metadata')["event-key"]
+        stadium = match.find('event-metadata').find('site').find('site-metadata').find('name')['full'].encode("latin").decode("utf-8")
+
+        match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
+                      "hID": home_id, "aID": away_id, "League": league, "Stadium": stadium}
+
+        schedule = schedule.append(pd.DataFrame([match_info]))
+
+# Push the schedule to the schedule sheet
+gc = gspread.oauth(credentials_filename=
+                   'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\Script_Learning\\google_creds.json'
+                   )
+
+dispo_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
+worksheet = dispo_sheet.worksheet("FIFA WWC")
+worksheet.update([schedule.columns.values.tolist()] + schedule.values.tolist())
+
+# Create a DF with all players from all teams
+players = pd.read_excel(
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_players.xlsx')
+players = players[['Team', 'Shirt Nr', 'Last Name as in Passport', 'First Name as in Passport', 'IFES Player ID']]
+
+# Create list of series with all players from a team
+home_team = 'Argentina'
+away_team = 'Germany'
+
+hteam_players = [x[1] for x in players.iterrows() if x[1]['Team'] == home_team]
+ateam_players = [x[1] for x in players.iterrows() if x[1]['Team'] == away_team]
+
+
+# Function to write schedule DF, player DF and gamestats for all scheduled matches
+
+league = 'FIFA WWC'
+os.chdir('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA WWC')
+schedule = gf.get_schedule(file=
+                'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml',
+                league='FIFA WWC')
+players = gf.get_players(file=
+               'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_players.xlsx')
+os.chdir('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\' + league)
+gf.write_gamestats(schedule=schedule, players=players, comp_iD='285026', season_iD='2023', vendor_iD='15')
+
