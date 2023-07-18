@@ -32,3 +32,6 @@ with ftputil.FTPHost(server, user, password) as ftp_host:
         ftp_host.download(filename, filename)
 
 
+fifa_path = "FIFA/285026"
+
+

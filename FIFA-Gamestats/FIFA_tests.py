@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import gspread
 import gamestats_functions as gf
 import os
-
+import ftputil
 
 # Create a schedule DF
 schedule = pd.read_excel(
@@ -107,10 +107,32 @@ a = ET.XML(test)
 
 
 # Tests for FIFA WWC
-# Create a schedule for FIFA WWC
+
+
+# Get schedule xml from FTP
+server = "213.168.127.130"
+user = "AlexTest"
+password = "RobberyandLahm5%"
+filename = '285026_schedule.xml'
+f = open(filename, "w")
+with ftputil.FTPHost(server, user, password) as ftp_host:
+    ftp_host.chdir('FIFA/285026')
+    ftp_host.open(filename)
+    if ftp_host.path.isfile(filename):
+        ftp_host.download(filename, filename)
+
+# Create schedule for google sheet for FIFA WWC
+# Path on home computer
 with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
     data = BeautifulSoup(fp, 'xml')
 
+# Path on laptop
+with open(
+        'C:\\Users\\tracab.CHYRONHEGO\\Documents\\PythonFun\\285026_schedule.xml') as fp:
+    data = BeautifulSoup(fp, 'xml')
+
+
+# Get all rounds of tournament
 rounds = data.find_all('tournament-round')
 
 # Create empty DF
@@ -132,7 +154,7 @@ for j, round in enumerate(rounds):
         stadium = match.find('event-metadata').find('site').find('site-metadata').find('name')['full'].encode("latin").decode("utf-8")
 
         match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
-                      "hID": home_id, "aID": away_id, "League": league, "Stadium": stadium}
+                      "hID": home_id, "aID": away_id, "League": "FIFA WWC", "Stadium": stadium}
 
         schedule = schedule.append(pd.DataFrame([match_info]))
 
@@ -159,7 +181,6 @@ ateam_players = [x[1] for x in players.iterrows() if x[1]['Team'] == away_team]
 
 
 # Function to write schedule DF, player DF and gamestats for all scheduled matches
-
 league = 'FIFA WWC'
 os.chdir('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA WWC')
 schedule = gf.get_schedule(file=
