@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 import gspread
-import gamestats_functions as gf
+from TracabModules import gamestatsFunctions as gf
 import os
 import ftputil
 
