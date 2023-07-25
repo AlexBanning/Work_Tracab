@@ -23,15 +23,15 @@ import ftputil
 server = "213.168.127.130"
 user = "AlexTest"
 password = "RobberyandLahm5%"
-filename = 'schedule.xml'
+filename = 'Feed_01_06_basedata_fixtures_MLS-COM-000006.xml'
 f = open(filename, "w")
 with ftputil.FTPHost(server, user, password) as ftp_host:
-    ftp_host.chdir('deltatre/MatchInfo/51/2022/schedule')
+    ftp_host.chdir('D3_MLS/MatchInfo')
     ftp_host.open(filename)
     if ftp_host.path.isfile(filename):
         ftp_host.download(filename, filename)
 
-
+leagues_cup_schedule = "Feed_01_06_basedata_fixtures_MLS-COM-000006.xml"
 fifa_path = "FIFA/285026"
-
+mls_path = 'D3_MLS/MatchInfo'
 
