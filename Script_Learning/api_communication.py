@@ -8,7 +8,7 @@ import TracabModules.apiFunctions as af
 
 login_url = 'https://stagingdata.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
-
+match_id = '161783'
 line_up_url = 'https://stagingdata.voetbaldatacentre.nl/bv/api/match_lineup/161783'
 token = af.get_token(login_url, creds)
 lineups = af.get_both_lineups(token, '161783')
@@ -44,4 +44,14 @@ away_gs = pd.DataFrame(
          data.find('Hego').find_all('Team')[1].find('Roster').find_all('Player'))]
 ).sort_values(by=['jerseyNumber'],axis=0, ascending=True)
 
+# Tests with production environment
+
+login_url = 'https://data.voetbaldatacentre.nl/api/login'
+creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
+token = af.get_token(login_url, creds)
+headers = CaseInsensitiveDict()
+headers['accept'] = 'application/json'
+headers['Authorization'] = "Bearer " + token
+comp_info_url = 'https://data.voetbaldatacentre.nl/av/api/competitions'
+comp_info =  requests.get(comp_info_url, headers=headers).json()
 
