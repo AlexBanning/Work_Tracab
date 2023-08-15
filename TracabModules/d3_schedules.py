@@ -17,11 +17,10 @@ comp_id = input()
 print('Which season do you want to update?')
 
 season_id = input()
-# Workaround due to raised (unknown) error when downloading files from ftp
-try:
-    sf.get_schedule_xml(comp_id, season_id, vendor='deltatre')
-except:
-    pass
+
+
+sf.get_schedule_xml(comp_id, season_id, vendor='deltatre')
+
 
 filename = 'schedule.xml'
 
