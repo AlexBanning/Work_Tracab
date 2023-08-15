@@ -9,9 +9,9 @@ import lxml
 # Import schedule.xml from FTP
 os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
 server = "213.168.127.130"
-user = "AlexTest"
+user = "Alex_Test"
 password = "RobberyandLahm5%"
-filename = '../285026_schedule.xml'
+filename = '/285026_schedule.xml'
 f = open(filename, "w")
 with ftputil.FTPHost(server, user, password) as ftp_host:
     ftp_host.chdir('FIFA/285026')
