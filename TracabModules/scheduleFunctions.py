@@ -6,7 +6,7 @@ import gspread
 import os
 
 
-def get_schedule_xml(comp_id, season_id, vendor):
+def get_schedule_xml(comp_id, vendor, **kwargs):
     """
 
     :param comp_id:
@@ -18,6 +18,7 @@ def get_schedule_xml(comp_id, season_id, vendor):
     server = "213.168.127.130"
     user = "Alex_Test"
     password = "RobberyandLahm5%"
+    season_id = kwargs.get("season_id", None)
 
     if vendor == 'deltatre':
         filename = 'schedule.xml'
@@ -92,17 +93,19 @@ def get_fifa_schedule(filename):
             stadium = match.find("event-metadata").find("site").find("site-metadata").find("name")["full"].encode(
                 "latin").decode("utf-8")
 
-            match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
-                          "League": "FIFA Women WC", "Stadium": stadium}
+            match_info = pd.DataFrame(
+                {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
+                      "League": "FIFA Women WC", "Stadium": stadium}, index=[0])
 
-            schedule = schedule.append(pd.DataFrame([match_info]))
+            schedule = pd.concat([schedule, match_info])
 
     return schedule
 
 
-def get_d3_schedule(filename):
+def get_d3_schedule(comp_id, filename):
     """
     Parse the schedule.xml of the deltatre tournament into a pd.DataFrame that can be pushed to the Google Sheet.
+    :param comp_id:
     :param filename:
     :return:
     """
@@ -111,7 +114,10 @@ def get_d3_schedule(filename):
         data = BeautifulSoup(fp, 'xml')
 
     # Get division
-    league = data.find_all("sports-content-code")[1]["code-name"]
+    if comp_id == 51:
+        league = "1.Bundesliga"
+    else:
+        league = data.find_all("sports-content-code")[1]["code-name"]
     # division = data.find("tournament-division-metadata")["division-key"]
     # league = division + "." + league_name
 
@@ -181,10 +187,11 @@ def get_d3_mls_schedule(filename):
         matchday = match["MatchDay"]
         stadium = match["StadiumName"].encode("latin").decode("utf-8")
 
-        match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": kickoff, "Home": home, "Away": away,
-                      "League": league, "Stadium": stadium}
+        match_info = pd.DataFrame(
+            {"Matchday": matchday, "MatchID": match_id, "KickOff": kickoff, "Home": home, "Away": away,
+             "League": league, "Stadium": stadium}, index=[0])
 
-        schedule = schedule.append(pd.DataFrame([match_info]))
+        schedule = pd.concat([schedule, match_info])
 
     return schedule
 
@@ -223,7 +230,8 @@ def get_opta_schedule(schedule_filename, squad_filename):
     away_teams = [team_dict[x.find_all('TeamData')[1]['TeamRef']] for x in matches]
     league = ['Eredivisie' for i in range(0, 306)]
 
-    schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)))
+    schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)),
+                            columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
 
     return schedule
 
@@ -239,11 +247,11 @@ def get_keytoq_schedule(filename):
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
 
-    matches = [x.find_all('match') for x in schedule_data.find_all('round').content()]
+    matches = [x.find_all('match') for x in schedule_data.find_all('round')]
 
-    schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
+    schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League"])
     for i, md in enumerate(matches):
-        ko_date = [x['date'] + '' + x['time'] for x in md]
+        ko_date = [x['date'] + ' ' + x['time'] for x in md]
         home = [x['team_a'] for x in md]
         away = [x['team_b'] for x in md]
         matchId = [x['id'] for x in md]
@@ -260,9 +268,11 @@ def get_keytoq_schedule(filename):
 
 def push_to_google(schedule, league):
     """
-
-    :param schedule:
-    :param league:
+    Takes in a pd.DataFrame and pushes it into the Google Sheet '23/24 Schedule'.
+    :param schedule: pd.DataFrame
+        pd.DataFrame that contains the relevant schedule
+    :param league: str
+        Name of the league and therefore of the worksheet that needs to be updated
     :return:
     """
 
@@ -272,10 +282,11 @@ def push_to_google(schedule, league):
                        )
 
     schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
-    if schedule_sheet.worksheet(league) is False:
-        worksheet = schedule_sheet.add_worksheet(title=league, rows=1000, cols=20)
-    else:
+    try:
         worksheet = schedule_sheet.worksheet(league)
+    except gspread.WorksheetNotFound:
+        schedule_sheet.add_worksheet(title=league, rows=1000, cols=15)
+    worksheet = schedule_sheet.worksheet(league)
     worksheet.update([schedule.columns.values.tolist()] + schedule.values.tolist())
 
     return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "23/24 Schedule"')

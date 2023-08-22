@@ -19,13 +19,13 @@ print('Which season do you want to update?')
 season_id = input()
 
 
-sf.get_schedule_xml(comp_id, season_id, vendor='deltatre')
+sf.get_schedule_xml(comp_id, vendor='deltatre', season_id=season_id)
 
 
 filename = 'schedule.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-schedule = sf.get_d3_schedule(filename)
+schedule = sf.get_d3_schedule(comp_id, filename)
 
 # Push schedule to Google Sheets
 sf.push_to_google(schedule, league= schedule['League'].iloc[0] + '_Test')
