@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+from IPython.display import display
 from requests.structures import CaseInsensitiveDict
 import TracabModules.apiFunctions as af
 
@@ -10,7 +11,7 @@ token = af.get_token(login_url, creds)
 lineups = af.get_both_lineups(token, 'M335374348')
 
 test = pd.concat([lineups[0], lineups[1]], axis=1)
-print(lineups[0])
+display(test.to_string())
 
 # Tests with production environment
 
@@ -25,7 +26,7 @@ headers['Authorization'] = "Bearer " + token
 comp_info_url = 'https://data.voetbaldatacentre.nl/av/api/competitions'
 comp_info = requests.get(comp_info_url, headers=headers).json()
 
-# Get matchinfo for all matches of current matchday (or of an previous MD using the calendar week
+# Get matchinfo for all matches of current matchday (or of a previous MD using the calendar week)
 matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/33'
 md_info = requests.get(matchday_url, headers=headers).json()
 
@@ -57,4 +58,6 @@ for lineups in enumerate(lineup_info):
                          zip(lineups[1]['awayTeam']['players'], lineups[1]['awayTeam']['players'],
                              lineups[1]['awayTeam']['players'])])
 
-    test = pd.concat([test, home, away])
+    test = pd.concat([test, home, away], ignore_index=True)
+
+

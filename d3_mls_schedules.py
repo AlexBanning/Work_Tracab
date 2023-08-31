@@ -22,4 +22,4 @@ filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
 schedule = sf.get_d3_mls_schedule(filename)
 
 # Push schedule to Google Sheets
-sf.push_to_google(schedule, league= schedule['League'].iloc[0] + '_Test')
+sf.push_to_google(schedule, league= schedule['League'].iloc[0])

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from datetime import timedelta, datetime
 import gspread
 import os
-
+import xml.etree.ElementTree as ET
 
 def get_schedule_xml(comp_id, vendor, **kwargs):
     """
@@ -32,6 +32,7 @@ def get_schedule_xml(comp_id, vendor, **kwargs):
         ftp_dir = 'Opta/MatchInfo'
     if vendor == 'd3_mls':
         filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
+        # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
         ftp_dir = 'D3_MLS/MatchInfo/'
     if vendor == 'keytoq':
         comp_id = '55'
@@ -39,6 +40,8 @@ def get_schedule_xml(comp_id, vendor, **kwargs):
         ftp_dir = 'Keytoq/MatchInfo/'
 
     # Try statement as workaround due to raised (unknown) error when downloading files from ftp
+    # Change directory so the schedules are downloaded into the MatchInfo folder
+    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     try:
         if vendor != 'opta':
             with ftputil.FTPHost(server, user, password) as ftp_host:
@@ -71,6 +74,7 @@ def get_fifa_schedule(filename):
     :return:
     """
 
+    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     with open(filename) as fp:
         data = BeautifulSoup(fp, features='html.parser')
 
@@ -110,43 +114,42 @@ def get_d3_schedule(comp_id, filename):
     :return:
     """
 
-    with open(filename) as fp:
-        data = BeautifulSoup(fp, 'xml')
+    # Parse in the schedule
+    tree = ET.parse("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo\\" + filename)
+    root = tree.getroot()
+    # Get (if available) both halfs (all rounds) of a tournament, e.g. 'Hinrunde', 'Rückrunde'
+    division = [x for x in root[1][1:]]
 
-    # Get division
-    if comp_id == 51:
-        league = "1.Bundesliga"
-    else:
-        league = data.find_all("sports-content-code")[1]["code-name"]
-    # division = data.find("tournament-division-metadata")["division-key"]
-    # league = division + "." + league_name
-
-    # Get all matchdays
-    rounds = data.find_all("tournament-round")
-
-    # Create a DF containing all matches of a complete season
+    # Empty dataframe where each matchday can get added to
     schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
-    # Iterate the whole season
-    for i, round in enumerate(rounds):
-        round_id = i + 1
-        matchday = []
-        # Get match specific information
-        for j, match in enumerate(round.contents[1::2]):
-            matchId = match.contents[1]["event-key"]
-            home = match.contents[3].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
-            away = match.contents[5].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
-            stadium = match.contents[1].contents[1].contents[1].contents[1]["full"].encode("latin").decode("utf-8")
-            date = match.contents[1]["start-date-time"][0:4] + "-" \
-                   + match.contents[1]["start-date-time"][4:6] + "-" \
-                   + match.contents[1]["start-date-time"][6:8]
-            ko = match.contents[1]["start-date-time"][9:11] + ":" \
-                 + match.contents[1]["start-date-time"][11:13]
-            ko_date = date + " " + ko
-            match_info = {"Matchday": round_id, "MatchID": matchId, "KickOff": ko_date, "Home": home, "Away": away,
-                          "League": league, "Stadium": stadium}
-            matchday.append(match_info)
-        md_df = pd.DataFrame(matchday)
-        schedule = pd.concat([schedule, md_df])
+
+    # first level of loop iterating through all 'runden' of the tournament
+    for div in division:
+        mds = [x for x in div[1:]] # all match-days of the round (e.g., 17 in BL1 and BL2)
+
+        # second level of loop iterating through list containing all match-days
+        for md in mds:
+            tournament = root[1][1][1]
+            if comp_id != 51:
+                league = [root[0][1][1].attrib['code-name'].replace(' ', '') for x in md]
+            else:
+                league = ['1.Bundesliga' for x in md]
+            round_id = [md.attrib['round-number'] for x in md]
+            home_teams = [x[1][0][0].attrib['full'] for x in md]
+            away_teams = [x[2][0][0].attrib['full'] for x in md]
+            match_ids = [x[0].attrib['event-key'] for x in md]
+            dates = [x[0].attrib['start-date-time'][0:4] + '-' +
+                     y[0].attrib['start-date-time'][4:6] + '-' +
+                     z[0].attrib['start-date-time'][6:8] + ' ' +
+                     h[0].attrib['start-date-time'][9:11] + ':' +
+                     m[0].attrib['start-date-time'][11:13]
+                     for x, y, z, h, m in zip(md, md, md, md, md)]
+            stadiums = [x[0][0][0][0].attrib['full'] for x in md]
+
+            matchday = pd.DataFrame(list(zip(round_id, match_ids, dates, home_teams, away_teams, league, stadiums)),
+                                columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
+
+            schedule = pd.concat([schedule, matchday])
 
     return schedule
 
@@ -158,11 +161,14 @@ def get_d3_mls_schedule(filename):
     :return:
     """
 
+    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     with open(filename) as fp:
         data = BeautifulSoup(fp, 'xml')
 
     # Get all matches
     fixtures = data.find_all("Fixture")
+    # Current workaround as long as older seasons are also implemented in the schedule.xml
+    fixtures = [x for x in fixtures if x['Season'] == '2023/2024']
     # Define TimeSaving-Dates
     dst_start = datetime.strptime('2023-03-26 02:00', '%Y-%m-%d %H:%M')
     dst_end = datetime.strptime('2023-10-29 03:00', '%Y-%m-%d %H:%M')
@@ -205,6 +211,7 @@ def get_opta_schedule(schedule_filename, squad_filename):
 
     """
 
+    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     with open(schedule_filename,
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
@@ -243,6 +250,7 @@ def get_keytoq_schedule(filename):
     :return:
     """
 
+    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     with open(filename,
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
@@ -278,7 +286,7 @@ def push_to_google(schedule, league):
 
     os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24")
     gc = gspread.oauth(credentials_filename=
-                       '../Matchfacts-3dfad71ae74c.json'
+                       'schedule_push_authentification.json'
                        )
 
     schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")

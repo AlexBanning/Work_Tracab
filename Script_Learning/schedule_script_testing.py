@@ -171,5 +171,8 @@ for i, md in enumerate(matches):
 
 
 
+gs(comp_id= 285026, season_id=2023, vendor='FIFA')
 
+test = "Bayern München"
 
+new = test.encode('latin').decode('latin')
