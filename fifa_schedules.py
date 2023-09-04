@@ -23,7 +23,7 @@ sf.get_schedule_xml(comp_id, vendor='FIFA')
 filename = str(comp_id) + '_schedule.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-schedule = sf.get_fifa_schedule(filename)
+schedule = sf.get_fifa_schedule(comp_id, filename)
 
 # Push schedule to Google Sheets
-sf.push_to_google(schedule, league=schedule['League'].iloc[0] + '_Test')
+sf.push_to_google(schedule, league=schedule['League'].iloc[0])

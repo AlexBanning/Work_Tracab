@@ -30,12 +30,12 @@ choice = int(input())
 match = matches[int(choice) - 1]
 
 home_team = match.split('-')[0][0:-2]
-home, away = af.get_api_lineups(token, md_info[choice - 1]['matchNumber'])
+home, away = af.get_both_lineups(token, md_info[choice - 1]['matchNumber'], home_team=home_team)
 
 print('Home Team')
-display(home.to_string())
+display(home[0].to_string())
 print(' \n \n Away Team')
-display(away.to_string())
+display(away[0].to_string())
 input('Press Enter to Exit;')
 
 # Create a function that can download the gamestats of a single match based on the home team's name

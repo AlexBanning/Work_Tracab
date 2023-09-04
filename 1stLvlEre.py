@@ -10,6 +10,8 @@ import subprocess
 # Version 1.2
 # 2023/08/28: Updated that a message is shown when no lineups are available yet.
 # 2023/08/31: Updated, that players with differences are directly displayed as well
+# 2023/09/04: Updated, that players are not parsed based on their player status anymore. This information is only
+#             available post KO. Now implementing players based on an existing jerseyNumber.
 login_url = 'https://data.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
 token = af.get_token(login_url, creds)
@@ -17,7 +19,7 @@ headers = CaseInsensitiveDict()
 headers['accept'] = 'application/json'
 headers['Authorization'] = "Bearer " + token
 # Select the match of interest
-matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/33'
+matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/35'
 md_info = requests.get(matchday_url, headers=headers).json()
 translation = str.maketrans('', '', string.digits)
 matches = [x['matchDescription'].translate(translation) for x in md_info]
@@ -43,13 +45,13 @@ if not home[0].empty or not away[0].empty:
     home_wrong = np.where(home_check['exists'] == True)
     home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
                                                                        'jerseyNumber': 'Nr. EreInfo',
-                                                                       'Player_y': 'TracabGS',
                                                                        'exists': 'Differences'})
     away_wrong = np.where(away_check['exists'] == True)
     away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
                                                                        'jerseyNumber': 'Nr. EreInfo',
-                                                                       'Player_y': 'TracabGS',
                                                                        'exists': 'Differences'})
+    home_wrong_player = home_wrong_player.drop(['Player_y'], axis=1)
+    away_wrong_player = away_wrong_player.drop(['Player_y'], axis=1)
     if home_wrong_player.empty and away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())
@@ -61,23 +63,23 @@ if not home[0].empty or not away[0].empty:
         display(home[0].to_string())
         print(' \n \nAway Team')
         display(away[0].to_string())
-        print('The following differences in the home team could be detected: \n' +
+        print(' \n \n The following differences in the home team could be detected: \n' +
               home_wrong_player.to_string())
     elif home_wrong_player.empty and not away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())
         print(' \n \nAway Team')
         display(away[0].to_string())
-        print('The following differences in the away team could be detected: \n' +
+        print(' \n \n The following differences in the away team could be detected: \n' +
               away_wrong_player.to_string())
     elif not home_wrong_player.empty and not away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())
         print(' \n \nAway Team')
         display(away[0].to_string())
-        print('The following differences in the home team could be detected: \n' +
+        print(' \n \n The following differences in the home team could be detected: \n' +
               home_wrong_player.to_string())
-        print('The following differences in the away team could be detected: \n' +
+        print(' \n \n The following differences in the away team could be detected: \n' +
               away_wrong_player.to_string())
 elif home[0].empty or away[0].empty:
     print('The lineup information for this match are not available yet!')

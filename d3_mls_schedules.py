@@ -10,7 +10,7 @@ comp_id = input('Which competition do you want to update? \n'
                 '6 - MLS League Cup \n'
                 )
 
-season_id = input('Which season do you want to update?')
+season_id = input('Which season do you want to update? \n')
 
 # Download the xml-file based on comp and season id
 sf.get_schedule_xml(comp_id, vendor='d3_mls', season_id=season_id)

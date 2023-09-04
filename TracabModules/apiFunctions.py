@@ -5,6 +5,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import ftputil
 import subprocess
+from datetime import date
 
 
 def get_token(url, creds):
@@ -55,27 +56,25 @@ def get_both_lineups(token, match_id_ere, home_team):
 
     lineups = api_lineups(token, match_id_ere)
     try:
+        # Changed to now check if a valid matchShirtNumber is available for the player before adding them to the pd.DF
         home = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
                                  lineups['homeTeam']['players'], lineups['homeTeam']['players'])
-                             if y['playerStatus'] == 'BASE_PLAYER' or y['playerStatus'] == 'EXTRA_PLAYER']
+                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
         away = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['awayTeam']['players'], lineups['awayTeam']['players'],
                                  lineups['awayTeam']['players'], lineups['awayTeam']['players'])
-                             if y['playerStatus'] == 'BASE_PLAYER' or y['playerStatus'] == 'EXTRA_PLAYER']
+                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
         # Get Tracab matchID to download and open Tracab gamestats
-        # match_id_trac = get_tracabID(home_team)
-        # subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
-        # with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
-        #     data = BeautifulSoup(fp, features='xml')
-
-        with open('testGamestats.xml') as fp:
+        match_id_trac = get_tracabID(home_team)
+        subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
+        with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
             data = BeautifulSoup(fp, features='xml')
 
         # Create two DFs containing the players available in Tracab gamestats
@@ -186,7 +185,8 @@ def get_tracabID(home_team):
     tId = [x for x, y in team_dict.items() if home_team in y][0]
     # MatchIds of all matches of the home_team
     matches_schedule = schedule_data.find_all('MatchData')
-    today = '2023-08-18'
+    # today = '2023-09-01'
+    today = date.today()
     match_id = [x['uID'][1:] for x in matches_schedule if x.find('MatchInfo').find('Date').text[0:10] == today and
                 str(x.find('TeamData')['TeamRef']) == tId][0]
 

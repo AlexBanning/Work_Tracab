@@ -6,13 +6,14 @@ import gspread
 import os
 import xml.etree.ElementTree as ET
 
+
 def get_schedule_xml(comp_id, vendor, **kwargs):
     """
-
+    Download all required xml-files for the schedule of specified competition
     :param comp_id:
-    :param season_id:
     :param vendor:
-    :return:
+    :param vendor:
+
     """
 
     server = "213.168.127.130"
@@ -67,13 +68,17 @@ def get_schedule_xml(comp_id, vendor, **kwargs):
     return print('The schedule for competition ' + str(comp_id) + ' of ' + str(vendor) + ' has been downloaded')
 
 
-def get_fifa_schedule(filename):
+def get_fifa_schedule(comp_id, filename):
     """
     Parse the schedule.xml of the fifa tournament into a pd.DataFrame that can be pushed to the Google Sheet.
+    :param comp_id:
     :param filename:
     :return:
+        schedule: pd.df
+        Dataframe containing the whole available schedule for the competition
     """
 
+    global league
     os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
     with open(filename) as fp:
         data = BeautifulSoup(fp, features='html.parser')
@@ -84,7 +89,7 @@ def get_fifa_schedule(filename):
     schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
     # Get info for all matches and update DF
     for j, round in enumerate(rounds):
-        matchday = round["round-key"]
+        matchday = int(round["round-key"])
         fixtures = round.find_all("sports-event")
         for i, match in enumerate(fixtures):
             date = match.find("event-metadata")["start-date-time"][0:10]
@@ -96,10 +101,13 @@ def get_fifa_schedule(filename):
             match_id = match.find("event-metadata")["event-key"]
             stadium = match.find("event-metadata").find("site").find("site-metadata").find("name")["full"].encode(
                 "latin").decode("utf-8")
+            # Check which competition to add the accurate league. Info is missing in schedule.xml
+            if comp_id == '285026':
+                league = 'FIFA Women WC'
 
             match_info = pd.DataFrame(
                 {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
-                      "League": "FIFA Women WC", "Stadium": stadium}, index=[0])
+                 "League": league, "Stadium": stadium}, index=[0])
 
             schedule = pd.concat([schedule, match_info])
 
@@ -112,6 +120,8 @@ def get_d3_schedule(comp_id, filename):
     :param comp_id:
     :param filename:
     :return:
+        schedule: pd.df
+        Dataframe containing the whole available schedule for the competition
     """
 
     # Parse in the schedule
@@ -125,7 +135,7 @@ def get_d3_schedule(comp_id, filename):
 
     # first level of loop iterating through all 'runden' of the tournament
     for div in division:
-        mds = [x for x in div[1:]] # all match-days of the round (e.g., 17 in BL1 and BL2)
+        mds = [x for x in div[1:]]  # all match-days of the round (e.g., 17 in BL1 and BL2)
 
         # second level of loop iterating through list containing all match-days
         for md in mds:
@@ -134,7 +144,7 @@ def get_d3_schedule(comp_id, filename):
                 league = [root[0][1][1].attrib['code-name'].replace(' ', '') for x in md]
             else:
                 league = ['1.Bundesliga' for x in md]
-            round_id = [md.attrib['round-number'] for x in md]
+            round_id = [int(md.attrib['round-number']) for x in md]
             home_teams = [x[1][0][0].attrib['full'] for x in md]
             away_teams = [x[2][0][0].attrib['full'] for x in md]
             match_ids = [x[0].attrib['event-key'] for x in md]
@@ -147,7 +157,7 @@ def get_d3_schedule(comp_id, filename):
             stadiums = [x[0][0][0][0].attrib['full'] for x in md]
 
             matchday = pd.DataFrame(list(zip(round_id, match_ids, dates, home_teams, away_teams, league, stadiums)),
-                                columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
+                                    columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
 
             schedule = pd.concat([schedule, matchday])
 
@@ -159,6 +169,8 @@ def get_d3_mls_schedule(filename):
     Parse the schedule.xml of the mls tournament into a pd.DataFrame that can be pushed to the Google Sheet.
     :param filename:
     :return:
+        schedule: pd.df
+        Dataframe containing the whole available schedule for the competition
     """
 
     os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
@@ -190,7 +202,7 @@ def get_d3_mls_schedule(filename):
         home = match["HomeTeamName"].encode("latin").decode("utf-8")
         away = match["GuestTeamName"].encode("latin").decode("utf-8")
         match_id = match["DlProviderId"]
-        matchday = match["MatchDay"]
+        matchday = int(match["MatchDay"])
         stadium = match["StadiumName"].encode("latin").decode("utf-8")
 
         match_info = pd.DataFrame(
@@ -202,12 +214,18 @@ def get_d3_mls_schedule(filename):
     return schedule
 
 
-def get_opta_schedule(schedule_filename, squad_filename):
+def get_opta_schedule(comp_id, schedule_filename, squad_filename):
     """
     Parse the schedule.xml of the opta tournament into a pd.DataFrame that can be pushed to the Google Sheet.
-    :param schedule_filename:
-    :param squad_filename:
+    :param comp_id: Int
+        Individual ID of the competition
+    :param schedule_filename: Str
+        Name of the schedule.xml for the competition
+    :param squad_filename: Str
+        Name of the squad.xml for the competition
     :return:
+        schedule: pd.df
+        Dataframe containing the whole available schedule for the competition
 
     """
 
@@ -229,13 +247,20 @@ def get_opta_schedule(schedule_filename, squad_filename):
 
     # Create schedule
     matches = schedule_data.find_all('MatchData')
-    md = [x.find('MatchInfo')['MatchDay'] for x in matches]
+    md = [int(x.find('MatchInfo')['MatchDay']) for x in matches]
     match_ids = [x['uID'][1:] for x in matches]
-    dates = [x.find('MatchInfo').find('Date').text for x in matches]
+    # dates = [x.find('MatchInfo').find('Date').text[:-3] for x in matches]
+    dates = [datetime.strftime(datetime.strptime(x.find('MatchInfo').find('Date').text[:-3], '%Y-%m-%d %H:%M') +
+                               timedelta(hours=1), '%Y-%m-%d %H:%M') for x in matches]
     stadiums = [x.find('Stat').text for x in matches]
     home_teams = [team_dict[x.find_all('TeamData')[0]['TeamRef']] for x in matches]
     away_teams = [team_dict[x.find_all('TeamData')[1]['TeamRef']] for x in matches]
-    league = ['Eredivisie' for i in range(0, 306)]
+    if int(comp_id) == 9:
+        league = ['Eredivisie' for i in range(0, 306)]
+    elif int(comp_id) == 5:
+        league = ['CL' for i in range(0, 306)]
+    if int(comp_id) == 6:
+        league = ['EL' for i in range(0, 306)]
 
     schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)),
                             columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
@@ -264,7 +289,7 @@ def get_keytoq_schedule(filename):
         away = [x['team_b'] for x in md]
         matchId = [x['id'] for x in md]
         league = ['Ekstraklasa' for x in md]
-        round_id = [str((i + 1)) for x in md]
+        round_id = [(i + 1) for x in md]
 
         match_info = pd.DataFrame(
             {"Matchday": round_id, "MatchID": matchId, "KickOff": ko_date, "Home": home, "Away": away,

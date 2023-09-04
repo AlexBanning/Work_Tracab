@@ -55,7 +55,7 @@ for j, round in enumerate(rounds):
 # Push the schedule to the schedule sheet
 os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24")
 gc = gspread.oauth(credentials_filename=
-                   '../Matchfacts-3dfad71ae74c.json'
+                   'Matchfacts-3dfad71ae74c.json'
                    )
 
 dispo_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")

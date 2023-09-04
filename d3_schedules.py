@@ -14,7 +14,7 @@ print('Which competition do you want to update? \n'
 
 comp_id = input()
 
-print('Which season do you want to update?')
+print('Which season do you want to update? \n')
 
 season_id = input()
 
@@ -28,6 +28,6 @@ filename = 'schedule.xml'
 schedule = sf.get_d3_schedule(comp_id, filename)
 
 # Push schedule to Google Sheets
-sf.push_to_google(schedule, league= schedule['League'].iloc[0] + '_Test')
+sf.push_to_google(schedule, league= schedule['League'].iloc[0])
 
 
