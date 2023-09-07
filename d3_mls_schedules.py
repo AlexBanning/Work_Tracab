@@ -7,7 +7,9 @@ Schedule-Script for all competitions of the MLS and deltatre as info provider
 # Ask the user for the compId and seasonId of the competition which schedule shall be updated
 comp_id = input('Which competition do you want to update? \n'
                 '1 - MLS \n'
+                '2 - PlayOffs \n'
                 '6 - MLS League Cup \n'
+                '7 - Campeones Cup \n'
                 )
 
 season_id = input('Which season do you want to update? \n')
