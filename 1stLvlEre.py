@@ -45,13 +45,22 @@ if not home[0].empty or not away[0].empty:
     home_wrong = np.where(home_check['exists'] == True)
     home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
                                                                        'jerseyNumber': 'Nr. EreInfo',
-                                                                       'exists': 'Differences'})
+                                                                       }
+                                                              ).sort_values(by=['Player'], axis=0)
     away_wrong = np.where(away_check['exists'] == True)
     away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
                                                                        'jerseyNumber': 'Nr. EreInfo',
-                                                                       'exists': 'Differences'})
-    home_wrong_player = home_wrong_player.drop(['Player_y'], axis=1)
-    away_wrong_player = away_wrong_player.drop(['Player_y'], axis=1)
+                                                                       }
+                                                              ).sort_values(by=['Player'], axis=0)
+
+    home_wrong_player = home_wrong_player.drop(['Player_y', 'exists'], axis=1)
+    away_wrong_player = away_wrong_player.drop(['Player_y', 'exists'], axis=1)
+
+    # Get the row for all wrong players in the Tracab-DF
+    home_names = home_wrong_player['Player'].to_list()
+    h = [x.split()[1] for x in home_names]
+    test = pd.concat([home[1][home[1]['Player'].str.contains(x)] for x in h]).sort_values(by=['Player'], axis=0)['jerseyNumber'].to_list()
+    home_wrong_player['Nr. TracabInfo'] = test['jerseyNumber']
     if home_wrong_player.empty and away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())

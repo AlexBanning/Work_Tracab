@@ -74,7 +74,9 @@ def get_both_lineups(token, match_id_ere, home_team):
         # Get Tracab matchID to download and open Tracab gamestats
         match_id_trac = get_tracabID(home_team)
         subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
-        with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
+        # with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
+        #     data = BeautifulSoup(fp, features='xml')
+        with open(str(match_id_trac) + 'Gamestats.xml') as fp:
             data = BeautifulSoup(fp, features='xml')
 
         # Create two DFs containing the players available in Tracab gamestats
@@ -185,8 +187,8 @@ def get_tracabID(home_team):
     tId = [x for x, y in team_dict.items() if home_team in y][0]
     # MatchIds of all matches of the home_team
     matches_schedule = schedule_data.find_all('MatchData')
-    # today = '2023-09-01'
-    today = date.today()
+    today = '2023-09-01'
+    #today = date.today()
     match_id = [x['uID'][1:] for x in matches_schedule if x.find('MatchInfo').find('Date').text[0:10] == today and
                 str(x.find('TeamData')['TeamRef']) == tId][0]
 
