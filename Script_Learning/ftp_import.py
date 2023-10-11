@@ -21,7 +21,7 @@ import ftputil
 # Different option to download files from FTP using FTPutil
 # Need to test if it also works to simply open a file and read the xml-information without downloading it
 server = "213.168.127.130"
-user = "AlexTest"
+user = "Alex_Test"
 password = "RobberyandLahm5%"
 filename = 'Feed_01_06_basedata_fixtures_MLS-COM-000006.xml'
 f = open(filename, "w")
@@ -34,4 +34,5 @@ with ftputil.FTPHost(server, user, password) as ftp_host:
 leagues_cup_schedule = "Feed_01_06_basedata_fixtures_MLS-COM-000006.xml"
 fifa_path = "FIFA/285026"
 mls_path = 'D3_MLS/MatchInfo'
+keytoq_path = 'Keytoq/MatchInfo/'
 

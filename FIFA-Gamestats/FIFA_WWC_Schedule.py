@@ -9,9 +9,9 @@ import lxml
 # Import schedule.xml from FTP
 os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
 server = "213.168.127.130"
-user = "AlexTest"
+user = "Alex_Test"
 password = "RobberyandLahm5%"
-filename = '../285026_schedule.xml'
+filename = '/285026_schedule.xml'
 f = open(filename, "w")
 with ftputil.FTPHost(server, user, password) as ftp_host:
     ftp_host.chdir('FIFA/285026')
@@ -55,7 +55,7 @@ for j, round in enumerate(rounds):
 # Push the schedule to the schedule sheet
 os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24")
 gc = gspread.oauth(credentials_filename=
-                   '../Matchfacts-3dfad71ae74c.json'
+                   'Matchfacts-3dfad71ae74c.json'
                    )
 
 dispo_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
