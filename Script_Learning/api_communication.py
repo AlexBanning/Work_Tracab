@@ -11,7 +11,9 @@ token = af.get_token(login_url, creds)
 lineups = af.get_both_lineups(token, 'M335374348')
 
 test = pd.concat([lineups[0], lineups[1]], axis=1)
-display(test.to_string())
+
+print(lineups[0])
+
 
 # Tests with production environment
 
@@ -26,7 +28,9 @@ headers['Authorization'] = "Bearer " + token
 comp_info_url = 'https://data.voetbaldatacentre.nl/av/api/competitions'
 comp_info = requests.get(comp_info_url, headers=headers).json()
 
-# Get matchinfo for all matches of current matchday (or of a previous MD using the calendar week)
+
+# Get matchinfo for all matches of current matchday (or of an previous MD using the calendar week
+
 matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/33'
 md_info = requests.get(matchday_url, headers=headers).json()
 
@@ -40,11 +44,16 @@ team_matches = requests.get(team_match_url, headers=headers).json()
 lineup_url = 'https://data.voetbaldatacentre.nl/av/api/match/lineup/' + str(team_matches[0]['matchNumber'])
 lineup_info = requests.get(lineup_url, headers=headers).json()
 
+
+
+
 matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/33'
 md_info = requests.get(matchday_url, headers=headers).json()
 
 lineup_url = ['https://data.voetbaldatacentre.nl/av/api/match/lineup/' + str(x['matchNumber']) for x in md_info]
 lineup_info = [requests.get(x, headers=headers).json() for x in lineup_url]
+
+
 
 test = pd.DataFrame()
 for lineups in enumerate(lineup_info):
@@ -57,7 +66,7 @@ for lineups in enumerate(lineup_info):
                           'jerseyNumber': int(z['matchShirtNumber'])} for x, y, z in
                          zip(lineups[1]['awayTeam']['players'], lineups[1]['awayTeam']['players'],
                              lineups[1]['awayTeam']['players'])])
+test = pd.concat([test, home, away], ignore_index=True)
 
-    test = pd.concat([test, home, away], ignore_index=True)
 
-
+ 

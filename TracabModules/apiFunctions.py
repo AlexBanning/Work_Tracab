@@ -147,7 +147,6 @@ def get_tracabID(home_team):
     :param home_team:
     :return:
     """
-
     # Create a function that can download the gamestats of a single match based on the home team's name
     # Download squad xml and schedule xml to be able to map team name and team ID and get the MatchID of their match
     server = "213.168.127.130"
@@ -187,8 +186,8 @@ def get_tracabID(home_team):
     tId = [x for x, y in team_dict.items() if home_team in y][0]
     # MatchIds of all matches of the home_team
     matches_schedule = schedule_data.find_all('MatchData')
-    today = '2023-09-01'
-    #today = date.today()
+    # today = '2023-09-01'
+    today = date.today().strftime('%Y-%m-%d')
     match_id = [x['uID'][1:] for x in matches_schedule if x.find('MatchInfo').find('Date').text[0:10] == today and
                 str(x.find('TeamData')['TeamRef']) == tId][0]
 
