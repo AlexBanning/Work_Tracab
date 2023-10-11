@@ -3,15 +3,16 @@ from requests.structures import CaseInsensitiveDict
 import TracabModules.apiFunctions as af
 import requests
 import string
-import pandas as pd
-import numpy as np
-import subprocess
+
 
 # Version 1.2
 # 2023/08/28: Updated that a message is shown when no lineups are available yet.
 # 2023/08/31: Updated, that players with differences are directly displayed as well
 # 2023/09/04: Updated, that players are not parsed based on their player status anymore. This information is only
 #             available post KO. Now implementing players based on an existing jerseyNumber.
+# 2023/10/11: Updated, wrong_player_function was extracted as a module and now only the function remains in line 39
+#             to shorten the code.
+
 login_url = 'https://data.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
 token = af.get_token(login_url, creds)
@@ -19,7 +20,7 @@ headers = CaseInsensitiveDict()
 headers['accept'] = 'application/json'
 headers['Authorization'] = "Bearer " + token
 # Select the match of interest
-matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/35'
+matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches'
 md_info = requests.get(matchday_url, headers=headers).json()
 translation = str.maketrans('', '', string.digits)
 matches = [x['matchDescription'].translate(translation) for x in md_info]
@@ -30,37 +31,16 @@ print('Please insert the number of the match you want to check:' + ' 1-' + str(l
       )
 choice = int(input())
 match = matches[int(choice) - 1]
-
 home_team = match.split('-')[0][0:-2]
+
+if home_team == 'AFC Ajax':
+    home_team = 'Ajax'
+elif home_team == 'Almere City':
+    home_team = 'Almere City FC'
 home, away = af.get_both_lineups(token, md_info[choice - 1]['matchNumber'], home_team=home_team)
+home_wrong_player, away_wrong_player = af.get_wrong_players(home, away)
 
 if not home[0].empty or not away[0].empty:
-    # Checking whether each player exists in both lineups
-    home_check = pd.merge(home[0], home[1], on=['jerseyNumber'], how='left', indicator='exists')
-    away_check = pd.merge(away[0], away[1], on=['jerseyNumber'], how='left', indicator='exists')
-    # add column to show if each row in first DataFrame exists in second
-    home_check['exists'] = np.where(home_check.exists != 'both', True, False)
-    away_check['exists'] = np.where(away_check.exists != 'both', True, False)
-
-    home_wrong = np.where(home_check['exists'] == True)
-    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
-                                                                       'jerseyNumber': 'Nr. EreInfo',
-                                                                       }
-                                                              ).sort_values(by=['Player'], axis=0)
-    away_wrong = np.where(away_check['exists'] == True)
-    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
-                                                                       'jerseyNumber': 'Nr. EreInfo',
-                                                                       }
-                                                              ).sort_values(by=['Player'], axis=0)
-
-    home_wrong_player = home_wrong_player.drop(['Player_y', 'exists'], axis=1)
-    away_wrong_player = away_wrong_player.drop(['Player_y', 'exists'], axis=1)
-
-    # Get the row for all wrong players in the Tracab-DF
-    home_names = home_wrong_player['Player'].to_list()
-    h = [x.split()[1] for x in home_names]
-    test = pd.concat([home[1][home[1]['Player'].str.contains(x)] for x in h]).sort_values(by=['Player'], axis=0)['jerseyNumber'].to_list()
-    home_wrong_player['Nr. TracabInfo'] = test['jerseyNumber']
     if home_wrong_player.empty and away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())
