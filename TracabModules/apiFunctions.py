@@ -71,13 +71,15 @@ def get_both_lineups(token, match_id_ere, home_team):
                              if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
-        # Get Tracab matchID to download and open Tracab gamestats
+      # Get Tracab matchID to download and open Tracab gamestats
         match_id_trac = get_tracabID(home_team)
-        subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
-        # with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
-        #     data = BeautifulSoup(fp, features='xml')
-        with open(str(match_id_trac) + 'Gamestats.xml') as fp:
+        subprocess.call('C:\\Users\\alexa\\Desktop\\App-CGN-conn.bat')
+        # subprocess.call('C:\\Users\\tracab\\Desktop\\App-CGN-conn.bat')
+        # subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
+        with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:
             data = BeautifulSoup(fp, features='xml')
+        # with open(str(match_id_trac) + 'Gamestats.xml') as fp:
+        #     data = BeautifulSoup(fp, features='xml')
 
         # Create two DFs containing the players available in Tracab gamestats
         home_gs = pd.DataFrame(
@@ -192,3 +194,34 @@ def get_tracabID(home_team):
                 str(x.find('TeamData')['TeamRef']) == tId][0]
 
     return match_id
+
+
+def get_wrong_players(home, away):
+    """
+
+    :param home:
+    :param away:
+    :return:
+    """
+
+    home_check = pd.merge(home[0], home[1], on=['jerseyNumber'], how='left', indicator='exists')
+    away_check = pd.merge(away[0], away[1], on=['jerseyNumber'], how='left', indicator='exists')
+    # add column to show if each row in first DataFrame exists in second
+    home_check['exists'] = np.where(home_check.exists != 'both', True, False)
+    away_check['exists'] = np.where(away_check.exists != 'both', True, False)
+
+    home_wrong = np.where(home_check['exists'] == True)
+    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
+                                                                       'jerseyNumber': 'Nr. EreInfo'
+                                                                       }
+                                                              ).sort_values(by=['Player'], axis=0)
+    away_wrong = np.where(away_check['exists'] == True)
+    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
+                                                                       'jerseyNumber': 'Nr. EreInfo'
+                                                                       }
+                                                              ).sort_values(by=['Player'], axis=0)
+
+    home_wrong_player = home_wrong_player.drop(['Player_y', 'exists'], axis=1)
+    away_wrong_player = away_wrong_player.drop(['Player_y', 'exists'], axis=1)
+
+    return home_wrong_player, away_wrong_player
