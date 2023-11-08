@@ -21,7 +21,7 @@ sf.get_schedule_xml(comp_id, vendor='d3_mls', season_id=season_id)
 filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-schedule = sf.get_d3_mls_schedule(filename)
+schedule = sf.get_d3_mls_schedule(int(comp_id), filename)
 
 # Push schedule to Google Sheets
 sf.push_to_google(schedule, league= schedule['League'].iloc[0])

@@ -13,9 +13,9 @@ import glob, os, shutil
 
 # Create a team dict to have 3LCs for all MLS teams available and map them with their full name
 # Currently only PlayOff teams!
-teams = {'RBNY': 'New York Red Bulls', 'CLT': 'Charlotte FC', 'SKC': 'Sporting Kansas City',
+teams = {'NYRB': 'New York Red Bulls', 'CLT': 'Charlotte FC', 'SKC': 'Sporting Kansas City',
          'SJ': 'San Jose Earthquakes',
-         'ORL': 'Orlando City', 'CIN': 'FC Cincinnati', 'NSH': 'Nasvhille SC', 'CLB': 'Columbus Crew',
+         'ORL': 'Orlando City', 'CIN': 'FC Cincinnati', 'NSH': 'Nashville SC', 'CLB': 'Columbus Crew',
          'ATL': 'Atlanta United', 'PHI': 'Philadelphia Union', 'NE': 'New England Revolution',
          'STL': 'St. Louis CITY SC',
          'SEA': 'Seattle Sounders FC', 'DAL': 'FC Dallas', 'LAFC': 'Los Angeles Football Club',
@@ -81,17 +81,17 @@ for feed, i in enumerate(feeds):
     # yesterday = (date.today()- timedelta(days=1)).strftime('%Y_%m_%d')
     # today = date.today().strftime('%Y_%m_%d')
     if feeds[i] == 'TacticalFeed.mp4':
-        os.chdir(r'\\192.168.7.75\d\CastRouterVideoAndSetupXML' + '\\' + '2023_10_26')
+        os.chdir(r'\\192.168.7.75\d\CastRouterVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             print(filepath_new + '\\' + filename_new)
             shutil.move(file, filepath_new + '\\' + filename_new)
     elif feeds[i] == 'PanoramicFeed.mp4':
-        os.chdir(r'\\192.168.7.74\d\CastRouterVideoAndSetupXML' + '\\' + '2023_10_26')
+        os.chdir(r'\\192.168.7.74\d\CastRouterVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             print(filepath_new + '\\' + filename_new)
             shutil.move(file, filepath_new + '\\' + filename_new)
     elif feeds[i] == 'HighBehind_1.mp4' or feeds[i] == 'HighBehind_2.mp4':
-        os.chdir(r'\\192.168.7.76\d\CastRouterVideoAndSetupXML' + '\\' + '2023_10_26')
+        os.chdir(r'\\192.168.7.76\d\CastRouterVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             if feeds[i] == 'HighBehind_2.mp4' and 'PanoB' in file:
                 print(filepath_new + '\\' + filename_new)

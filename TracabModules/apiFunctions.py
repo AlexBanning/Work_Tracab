@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import ftputil
 import subprocess
 from datetime import date
+import numpy as np
 
 
 def get_token(url, creds):
@@ -62,6 +63,7 @@ def get_both_lineups(token, match_id_ere, home_team):
                              zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
                                  lineups['homeTeam']['players'], lineups['homeTeam']['players'])
                              if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+                             #and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
         away = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
@@ -69,11 +71,12 @@ def get_both_lineups(token, match_id_ere, home_team):
                              zip(lineups['awayTeam']['players'], lineups['awayTeam']['players'],
                                  lineups['awayTeam']['players'], lineups['awayTeam']['players'])
                              if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+                             #and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
       # Get Tracab matchID to download and open Tracab gamestats
         match_id_trac = get_tracabID(home_team)
-        subprocess.call('C:\\Users\\alexa\\Desktop\\App-CGN-conn.bat')
+        subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
         # subprocess.call('C:\\Users\\tracab\\Desktop\\App-CGN-conn.bat')
         # subprocess.call('C:\\Users\\a.banning\\Desktop\\App-CGN-conn.bat')
         with open('A:\\' + str(match_id_trac) + 'Gamestats.xml') as fp:

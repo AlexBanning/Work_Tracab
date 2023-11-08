@@ -38,9 +38,9 @@ if home_team == 'AFC Ajax':
 elif home_team == 'Almere City':
     home_team = 'Almere City FC'
 home, away = af.get_both_lineups(token, md_info[choice - 1]['matchNumber'], home_team=home_team)
-home_wrong_player, away_wrong_player = af.get_wrong_players(home, away)
 
 if not home[0].empty or not away[0].empty:
+    home_wrong_player, away_wrong_player = af.get_wrong_players(home, away)
     if home_wrong_player.empty and away_wrong_player.empty:
         print('Home Team')
         display(home[0].to_string())

@@ -164,9 +164,10 @@ def get_d3_schedule(comp_id, filename):
     return schedule
 
 
-def get_d3_mls_schedule(filename):
+def get_d3_mls_schedule(comp_id, filename):
     """
     Parse the schedule.xml of the mls tournament into a pd.DataFrame that can be pushed to the Google Sheet.
+    :param comp_id:
     :param filename:
     :return:
         schedule: pd.df
@@ -179,15 +180,19 @@ def get_d3_mls_schedule(filename):
 
     # Get all matches
     fixtures = data.find_all("Fixture")
-    # Current workaround as long as older seasons are also implemented in the schedule.xml
-    fixtures = [x for x in fixtures if x['Season'] == '2023/2024']
     # Define TimeSaving-Dates
     dst_start = datetime.strptime('2023-03-26 02:00', '%Y-%m-%d %H:%M')
     dst_end = datetime.strptime('2023-10-29 03:00', '%Y-%m-%d %H:%M')
     # Define league
-    league = 'MLS'
+    if comp_id == 1:
+        league = 'MLS'
+        # Current workaround as long as older seasons are also implemented in the schedule.xml
+        fixtures = [x for x in fixtures if x['Season'] == '2023/2024']
+    elif comp_id == 2:
+        league = 'MLS PlayOffs'
+
     # Create empty DF
-    schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
+    schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium", "STS-ID"])
     # Get info for all matches and update DF
     for i, match in enumerate(fixtures):
         date = match["PlannedKickoffTime"][0:10]
@@ -204,10 +209,11 @@ def get_d3_mls_schedule(filename):
         match_id = match["DlProviderId"]
         matchday = int(match["MatchDay"])
         stadium = match["StadiumName"].encode("latin").decode("utf-8")
+        sts_match_id = match["MatchId"]
 
         match_info = pd.DataFrame(
             {"Matchday": matchday, "MatchID": match_id, "KickOff": kickoff, "Home": home, "Away": away,
-             "League": league, "Stadium": stadium}, index=[0])
+             "League": league, "Stadium": stadium, "STS-ID": sts_match_id}, index=[0])
 
         schedule = pd.concat([schedule, match_info])
 
