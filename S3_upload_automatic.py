@@ -26,7 +26,8 @@ teams = {'New York Red Bulls': 'NYRB', 'Charlotte FC': 'CLT', 'Sporting Kansas C
          'St. Louis CITY SC': 'STL',
          'Seattle Sounders FC': 'SEA', 'FC Dallas': 'DAL', 'Los Angeles Football Club': 'LAFC',
          'Vancouver Whitecaps FC': 'VAN',
-         'Houston Dynamo FC': 'HOU', 'Real Salt Lake': 'RSL', 'Inter Miami CF': 'MIA', 'New York City FC': 'NYC'}
+         'Houston Dynamo FC': 'HOU', 'Real Salt Lake': 'RSL', 'Inter Miami CF': 'MIA', 'New York City FC': 'NYC',
+         'LA Galaxy': 'LA'}
 
 ht = teams[home]
 at = teams[away]

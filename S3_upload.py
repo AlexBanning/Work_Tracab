@@ -8,61 +8,79 @@ Automize the upload of video feeds to the S3 database
     - Adjust upload-location / file name accordingly
 3.) Execute cmd command and upload files
 """
-from TracabModules.s3_functions import get_STSID
+from TracabModules.s3_functions import get_STSID, newest, get_match_info
 import glob, os, shutil
 
-# Create a team dict to have 3LCs for all MLS teams available and map them with their full name
-# Currently only PlayOff teams!
-teams = {'NYRB': 'New York Red Bulls', 'CLT': 'Charlotte FC', 'SKC': 'Sporting Kansas City',
-         'SJ': 'San Jose Earthquakes',
-         'ORL': 'Orlando City', 'CIN': 'FC Cincinnati', 'NSH': 'Nashville SC', 'CLB': 'Columbus Crew',
-         'ATL': 'Atlanta United', 'PHI': 'Philadelphia Union', 'NE': 'New England Revolution',
-         'STL': 'St. Louis CITY SC',
-         'SEA': 'Seattle Sounders FC', 'DAL': 'FC Dallas', 'LAFC': 'Los Angeles Football Club',
-         'VAN': 'Vancouver Whitecaps FC',
-         'HOU': 'Houston Dynamo FC', 'RSL': 'Real Salt Lake'}
 
+match_folder = newest(r'\\192.168.7.72\Rec')
+print(match_folder)
+home, away, md = get_match_info(match_folder)
+
+
+# Create a team dict to have 3LCs for all MLS teams available and map them with their full name
+# Currently only PlayOff teams! Upper dictionary has 3lc linked to full names for old version
+#teams = {'NYRB': 'New York Red Bulls', 'CLT': 'Charlotte FC', 'SKC': 'Sporting Kansas City',
+#        'SJ': 'San Jose Earthquakes',
+#        'ORL': 'Orlando City', 'CIN': 'FC Cincinnati', 'NSH': 'Nashville SC', 'CLB': 'Columbus Crew',
+#        'ATL': 'Atlanta United', 'PHI': 'Philadelphia Union', 'NE': 'New England Revolution',
+#        'STL': 'St. Louis CITY SC',
+#        'SEA': 'Seattle Sounders FC', 'DAL': 'FC Dallas', 'LAFC': 'Los Angeles Football Club',
+#        'VAN': 'Vancouver Whitecaps FC',
+#        'HOU': 'Houston Dynamo FC', 'RSL': 'Real Salt Lake'}
+
+
+teams = {'New York Red Bulls': 'NYRB', 'Charlotte FC': 'CLT', 'Sporting Kansas City': 'SKC',
+         'San Jose Earthquakes': 'SJ',
+         'Orlando City': 'ORL', 'FC Cincinnati': 'CIN', 'Nashville SC': 'NSH', 'Columbus Crew': 'CLB',
+         'Atlanta United': 'ATL', 'Philadelphia Union': 'PHI', 'New England Revolution': 'NE',
+         'St. Louis CITY SC': 'STL',
+         'Seattle Sounders FC': 'SEA', 'FC Dallas': 'DAL', 'Los Angeles Football Club': 'LAFC',
+         'Vancouver Whitecaps FC': 'VAN',
+         'Houston Dynamo FC': 'HOU', 'Real Salt Lake': 'RSL', 'Inter Miami CF': 'MIA', 'New York City FC': 'NYC'}
+
+ht = teams[home]
+at = teams[away]
 # Create dictionary for video feeds
 feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4', '4': 'HighBehind_1.mp4'}
 
-# Request user input on home and away team and matchday
-# Implemented a safety to only accept existing 3LCs and the correct matchday format
-while True:
-    ht = input(' \n Please insert the three letter code of your home team \n')
-    try:
-        home_team = teams[ht]
-    except:
-        # input was incorrect
-        print('Invalid three letter code')
-        continue
-    else:
-        # input was correct
-        break
-while True:
-    at = input(' \n Please insert the three letter code of your away team \n')
-    try:
-        away_team = teams[at]
-    except:
-        print('Invalid three letter code')
-        continue
-    else:
-        break
-
-while True:
-    md = str(input(' \n Please insert the matchday \n'))
-    if int(md) < 10 and len(md) == 1:
-        break
-    elif int(md) >= 10 and len(md) == 2:
-        break
-    else:
-        print(' \n Wrong format. E.g., try 1 instead of 01.')
-        continue
+# # Request user input on home and away team and matchday
+# # Implemented a safety to only accept existing 3LCs and the correct matchday format
+# while True:
+#     ht = input(' \n Please insert the three letter code of your home team \n')
+#     try:
+#         home_team = teams[ht]
+#     except:
+#         # input was incorrect
+#         print('Invalid three letter code')
+#         continue
+#     else:
+#         # input was correct
+#         break
+# while True:
+#     at = input(' \n Please insert the three letter code of your away team \n')
+#     try:
+#         away_team = teams[at]
+#     except:
+#         print('Invalid three letter code')
+#         continue
+#     else:
+#         break
+#
+# while True:
+#     md = str(input(' \n Please insert the matchday \n'))
+#     if int(md) < 10 and len(md) == 1:
+#         break
+#     elif int(md) >= 10 and len(md) == 2:
+#         break
+#     else:
+#         print(' \n Wrong format. E.g., try 1 instead of 01.')
+#         continue
 
 
 # Add both team substrings to get the match string
 match = ht + '-' + at
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(2, home_team, away_team)
+sts_id, date = get_STSID(2, home, away)
 #sts_id = 'MLS-MAT-000168'
 # filepath_new = os.getcwd()
 # Create a folder with the correct naming on the desktop
@@ -108,9 +126,9 @@ command = 'aws s3 cp "' + filepath_new + '" "s3://mah-s3-download-section-mls-33
 
 print(command)
 
-try:
-    os.system(command)
-    input('Upload has finished. Press enter to exit')
-except:
-    input('Upload was not successful. Please try again and submit the error code!')
+# try:
+#     os.system(command)
+#     input('Upload has finished. Press enter to exit')
+# except:
+#     input('Upload was not successful. Please try again and submit the error code!')
 

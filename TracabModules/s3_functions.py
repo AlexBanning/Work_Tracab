@@ -1,10 +1,14 @@
 import ftputil
 from bs4 import BeautifulSoup
-from datetime import timedelta, datetime, date
+import os
+from xml.dom.minidom import parse
+
 
 def get_STSID(comp_id, home_team, away_team):
     """
 
+    :param away_team:
+    :param comp_id:
     :param home_team:
     :return:
     """
@@ -37,6 +41,37 @@ def get_STSID(comp_id, home_team, away_team):
     match_id = [x['MatchId'] for x in matches_schedule if
                 str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team][0]
     date = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
-                str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team][0].replace('-', '_')
+            str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team][0].replace('-', '_')
 
     return match_id, date
+
+
+def newest(path):
+    """
+    Return the newest folder of all folders within a directory
+    :param path: filepath as str
+    :return:
+        str: filepath of newest file
+    """
+    folders = [a for a in os.listdir(path) if
+               os.path.isdir(os.path.join(path, a))]
+    paths = [os.path.join(path, basename) for basename in folders]
+    return max(paths, key=os.path.getctime)
+
+
+def get_match_info(match_folder):
+    """
+    Search for necessary match information (both team names and matchday) and return them as str.
+    :param match_folder:
+    :return:
+    """
+
+    gamestats_path = match_folder + '\Data\Gamestats.xml'
+    xml_doc = parse(gamestats_path)
+    home_team_element = xml_doc.getElementsByTagName('Team')[0]
+    home_team_name = str(dict(home_team_element.attributes.items())['sTeamDesc'])
+    away_team_element = xml_doc.getElementsByTagName('Team')[1]
+    away_team_name = str(dict(away_team_element.attributes.items())['sTeamDesc'])
+    matchday = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iRoundId'])
+
+    return home_team_name, away_team_name, matchday
