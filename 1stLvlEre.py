@@ -71,5 +71,5 @@ if not home[0].empty or not away[0].empty:
         print(' \n \n The following differences in the away team could be detected: \n' +
               away_wrong_player.to_string())
 elif home[0].empty or away[0].empty:
-    print('The lineup information for this match are not available yet!')
+    print('The API lineup information for this match are not available yet!')
 input('\n Press Enter to exit;')
