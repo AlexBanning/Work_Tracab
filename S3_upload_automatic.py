@@ -9,7 +9,7 @@ Automize the upload of video feeds to the S3 database
 3.) Execute cmd command and upload files
 """
 from TracabModules.s3_functions import get_STSID, newest, get_match_info
-import glob, os, shutil
+import glob, os, shutil, sys
 
 
 match_folder = newest(r'\\192.168.7.72\Rec')
@@ -31,8 +31,21 @@ teams = {'New York Red Bulls': 'NYRB', 'Charlotte FC': 'CLT', 'Sporting Kansas C
          'Minnesota United': 'MIN', 'Austin FC': 'ATX', 'Colorado Rapids': 'COL', 'Portland Timbers': 'POR' }
 
 
-ht = teams[home]
-at = teams[away]
+try:
+    ht = teams[home]
+except KeyError:
+    # print('Home team is not in the teams-dictionary. Please check with the Developer!')
+    input('The home team cannot be found in the database. Please check with the developer.\n'
+          'Press Enter to leave!')
+    sys.exit()
+
+try:
+    at = teams[away]
+except KeyError:
+    input('The away team cannot be found in the database. Please check with the developer.\n'
+          'Press Enter to leave!')
+    sys.exit()
+    
 # Create dictionary for video feeds
 feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4', '4': 'HighBehind_1.mp4'}
 
