@@ -12,17 +12,14 @@ import glob
 import os
 import shutil
 import sys
-from TracabModules.MLS_Teams import MLS, LeaguesCup
+from TracabModules.MLS_Teams import MLS, LeaguesCup, competitions
 from TracabModules.s3_functions import get_STSID, newest, get_match_info
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 print(match_folder)
 home, away, md = get_match_info(match_folder)
 
-# User-Define the correct competition
-competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehearsals', '6': 'LeaguesCup',
-                '7': 'CampeonesCup'}
-
+# User define the competition and its ID
 comp_id = str(input('Which competition does the match belong to? Please insert the corresponding ID! \n'
                     '1 - MLS \n'
                     '2 - PlayOffs \n'

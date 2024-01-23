@@ -21,3 +21,6 @@ LeaguesCup = {'New York Red Bulls': 'RBNY', 'Charlotte FC': 'CLT', 'Sporting Kan
               'Chicago Fire FC': 'CHI',
               'Minnesota United': 'MIN', 'Austin FC': 'ATX', 'Colorado Rapids': 'COL', 'Portland Timbers': 'POR',
               'Mexican Dummy': 'MDU'}
+
+competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehearsals', '6': 'LeaguesCup',
+                '7': 'CampeonesCup'}
