@@ -12,36 +12,57 @@ import glob
 import os
 import shutil
 import sys
-from TracabModules.MLS_Teams import MLS
+from TracabModules.MLS_Teams import MLS, LeaguesCup
 from TracabModules.s3_functions import get_STSID, newest, get_match_info
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 print(match_folder)
 home, away, md = get_match_info(match_folder)
-# Define team-dictionary
-teams = MLS
 
-# Get 3LCs of both teams
+# User-Define the correct competition
+competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehearsals', '6': 'LeaguesCup',
+                '7': 'CampeonesCup'}
+
+comp_id = str(input('Which competition does the match belong to? Please insert the corresponding ID! \n'
+                    '1 - MLS \n'
+                    '2 - PlayOffs \n'
+                    '2S - MLS Friendlies \n'
+                    '6 - MLS Leagues Cup \n'
+                    '7 - Campeones Cup \n'
+                    ))
+try:
+    if comp_id is not None:
+        competition = str(competitions[comp_id])
+except KeyError:
+    input('The competition is invalid.\n'
+          'Press Enter to close the software!')
+    sys.exit()
+
+if not comp_id == str(6):
+    teams = MLS
+else:
+    teams = LeaguesCup
+
 try:
     ht = teams[home]
 except KeyError:
     # print('Home team is not in the teams-dictionary. Please check with the Developer!')
     input('The home team cannot be found in the database. Please check with the developer.\n'
-          'Press Enter to leave!')
+          'Press Enter to close the software!')
     sys.exit()
 
 try:
     at = teams[away]
 except KeyError:
     input('The away team cannot be found in the database. Please check with the developer.\n'
-          'Press Enter to leave!')
+          'Press Enter to close the software!')
     sys.exit()
-
 
 # Add both team substrings to get the match string
 match = str(ht) + 'vs' + str(at)
+
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(1, home, away)
+sts_id, date = get_STSID(comp_id, home, away)
 # create the path of the to-be-created folder for the upload command
 filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
 # Create a folder with the correct naming in the current directory
@@ -84,10 +105,8 @@ print('All files have been moved and renamed')
 
 # Upload folder after all videos have been moved and renamed
 command = ('aws s3 cp "' + filepath_new +
-           '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
+           '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/' + competition + '/Matchweek ' + str(md) + '/'
            + folder_new + '" --recursive')
-
-print(command)
 
 try:
     os.system(command)
