@@ -14,6 +14,8 @@ import shutil
 import sys
 from TracabModules.MLS_Teams import MLS
 from TracabModules.s3_functions import get_STSID, newest, get_match_info
+import glob, os, shutil
+
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 print(match_folder)
@@ -94,3 +96,4 @@ try:
     input('Upload has finished. Press enter to exit')
 except:
     input('Upload was not successful. Please try again and submit the error code!')
+
