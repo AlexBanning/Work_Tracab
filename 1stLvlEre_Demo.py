@@ -1,4 +1,3 @@
-from IPython.display import display
 from requests.structures import CaseInsensitiveDict
 import TracabModules.apiFunctions as af
 import requests
@@ -25,31 +24,41 @@ headers['Authorization'] = "Bearer " + token
 matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/2'
 md_info = requests.get(matchday_url, headers=headers).json()
 translation = str.maketrans('', '', string.digits)
-matches = [x['matchDescription'].translate(translation) for x in md_info]
+matches = pd.DataFrame([x['matchDescription'].translate(translation) for x in md_info], columns=['Match'])
 
-print('Please insert the number of the match you want to check:' + ' 1-' + str(len(matches)) + '\n'
-                                                                                               '' + '\n'.join(
-    matches) + '\n'
-      )
-choice = int(input())
-match = matches[int(choice) - 1]
-home_team = match.split('-')[0].strip()
-away_team = match.split('-')[1].strip()
+# Run the match selector
+root = tk.Tk()
+app = af.DataFrameSelectorApp(root, matches)
+root.mainloop()
+# Save the selected row to get the match
+if app.selected_index is not None:
+    selected_match = matches.iloc[app.selected_index]['Match']
+    print("Selected Match:")
+    print(selected_match)
+    # Use the selected_row in the remaining code
+
+home_team = selected_match.split('-')[0].strip()
+away_team = selected_match.split('-')[1].strip()
 
 if home_team == 'AFC Ajax':
     home_team = 'Ajax'
 elif home_team == 'Almere City':
     home_team = 'Almere City FC'
-home, away = af.get_both_lineups_demo(token, md_info[choice - 1]['matchNumber'], home_team=home_team)
+home, away = af.get_both_lineups_demo(token, md_info[app.selected_index]['matchNumber'], home_team=home_team)
 
-home_wrong_player, away_wrong_player = af.get_wrong_players(home, away)
+home[0] = home[0].rename(columns={'jerseyNumber': '# Home'})
+home[1] = home[1].rename(columns={'jerseyNumber': '# Home'})
+away[0] = away[0].rename(columns={'jerseyNumber': '# Away'})
+away[1] = away[1].rename(columns={'jerseyNumber': '# Away'})
+
+# df = pd.concat([home[0], away[0]])
+# home_wrong_player, away_wrong_player = af.get_wrong_players(home, away)
 
 if not home[0].empty or not away[0].empty:
     # Create and run the DataFrameViewer
-    app_home = af.DataFrameViewer(home[1], 'API - ' + home_team)
-    app_away = af.DataFrameViewer(away[1], 'API - ' + away_team)
-    app_home.mainloop()
-    app_away.mainloop()
+    app = af.DataFrameViewer(home[0], away[0], home_team, away_team)
+    app.mainloop()
 elif home[0].empty or away[0].empty:
     print('The API lineup information for this match are not available yet!')
-input('\n Press Enter to exit;')
+    input('\n Press Enter to exit;')
+
