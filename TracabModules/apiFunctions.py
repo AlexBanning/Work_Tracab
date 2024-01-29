@@ -8,7 +8,8 @@ import subprocess
 from datetime import date
 import numpy as np
 import tkinter as tk
-from tkinter import ttk
+from tkinter.font import Font  # Import the Font class
+from tkinter import ttk, messagebox
 
 
 def get_token(url, creds):
@@ -64,7 +65,7 @@ def get_both_lineups(token, match_id_ere, home_team):
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
                                  lineups['homeTeam']['players'], lineups['homeTeam']['players'])
-                             if z['playerStatus'] == 'EXTRA_PLAYER' or z['playerStatus'] == 'BASE_PLAYER']
+                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
                             # and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
@@ -141,7 +142,7 @@ def get_both_lineups_demo(token, match_id_ere, home_team):
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
                                  lineups['homeTeam']['players'], lineups['homeTeam']['players'])
-                             if z['playerStatus'] == 'EXTRA_PLAYER' or z['playerStatus'] == 'BASE_PLAYER']
+                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
                             # and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
@@ -317,22 +318,22 @@ def get_wrong_players(home, away):
     :return:
     """
 
-    home_check = pd.merge(home[0], home[1], on=['jerseyNumber'], how='left', indicator='exists')
-    away_check = pd.merge(away[0], away[1], on=['jerseyNumber'], how='left', indicator='exists')
+    home_check = pd.merge(home[0], home[1], on=['# Home'], how='left', indicator='exists')
+    away_check = pd.merge(away[0], away[1], on=['# Away'], how='left', indicator='exists')
     # add column to show if each row in first DataFrame exists in second
     home_check['exists'] = np.where(home_check.exists != 'both', True, False)
     away_check['exists'] = np.where(away_check.exists != 'both', True, False)
 
     home_wrong = np.where(home_check['exists'] == True)
-    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
-                                                                       'jerseyNumber': 'Nr. EreInfo'
+    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'RKC Waalwijk',
+                                                                       '# Home': 'Nr. EreInfo'
                                                                        }
-                                                              ).sort_values(by=['Player'], axis=0)
+                                                              ).sort_values(by=['RKC Waalwijk'], axis=0)
     away_wrong = np.where(away_check['exists'] == True)
-    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
-                                                                       'jerseyNumber': 'Nr. EreInfo'
+    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Heracles Almelo',
+                                                                       '# Away': 'Nr. EreInfo'
                                                                        }
-                                                              ).sort_values(by=['Player'], axis=0)
+                                                              ).sort_values(by=['Heracles Almelo'], axis=0)
 
     home_wrong_player = home_wrong_player.drop(['Player_y', 'exists'], axis=1)
     away_wrong_player = away_wrong_player.drop(['Player_y', 'exists'], axis=1)
@@ -341,31 +342,125 @@ def get_wrong_players(home, away):
 
 
 class DataFrameViewer(tk.Tk):
-    def __init__(self, df, team):
+    def __init__(self, df1, df2, homename, awayname):
         tk.Tk.__init__(self)
-        self.title(str(team))
+        self.title('API Information')
 
         # Adjust the default window size
-        self.geometry('300x500')
+        self.geometry('800x500')  # Adjust as needed
 
-        # Create a Treeview widget
-        self.tree = ttk.Treeview(self)
+        # Create a PanedWindow
+        paned_window = tk.PanedWindow(self, orient=tk.HORIZONTAL)
+        paned_window.pack(fill=tk.BOTH, expand=True)
+
+        # Display DataFrame 1
+        frame1 = ttk.Frame(paned_window)
+        paned_window.add(frame1)
+
+        self.label1 = ttk.Label(frame1, text=homename)
+        self.label1.pack(pady=5)
+
+        # Create vertical scrollbar for tree1
+        yscrollbar1 = ttk.Scrollbar(frame1, orient='vertical')
+        yscrollbar1.pack(side='right', fill='y')
+
+        # Create horizontal scrollbar for tree1
+        xscrollbar1 = ttk.Scrollbar(frame1, orient='horizontal')
+        xscrollbar1.pack(side='bottom', fill='x')
+
+        self.tree1 = ttk.Treeview(frame1, yscrollcommand=yscrollbar1.set, xscrollcommand=xscrollbar1.set)
+        self.tree1["columns"] = list(df1.columns)
+        self.tree1["show"] = "headings"
+
+        for col in df1.columns:
+            self.tree1.heading(col, text=col)
+            self.tree1.column(col, anchor=tk.CENTER)
+
+        for i, row in df1.iterrows():
+            self.tree1.insert("", i, values=list(row))
+
+        yscrollbar1.config(command=self.tree1.yview)
+        xscrollbar1.config(command=self.tree1.xview)
+
+        self.tree1.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Display DataFrame 2
+        frame2 = ttk.Frame(paned_window)
+        paned_window.add(frame2)
+
+        self.label2 = ttk.Label(frame2, text=awayname)
+        self.label2.pack(pady=5)
+
+        # Create vertical scrollbar for tree2
+        yscrollbar2 = ttk.Scrollbar(frame2, orient='vertical')
+        yscrollbar2.pack(side='right', fill='y')
+
+        # Create horizontal scrollbar for tree2
+        xscrollbar2 = ttk.Scrollbar(frame2, orient='horizontal')
+        xscrollbar2.pack(side='bottom', fill='x')
+
+        self.tree2 = ttk.Treeview(frame2, yscrollcommand=yscrollbar2.set, xscrollcommand=xscrollbar2.set)
+        self.tree2["columns"] = list(df2.columns)
+        self.tree2["show"] = "headings"
+
+        for col in df2.columns:
+            self.tree2.heading(col, text=col)
+            self.tree2.column(col, anchor=tk.CENTER)
+
+        for i, row in df2.iterrows():
+            self.tree2.insert("", i, values=list(row))
+
+        yscrollbar2.config(command=self.tree2.yview)
+        xscrollbar2.config(command=self.tree2.xview)
+
+        self.tree2.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+
+class DataFrameSelectorApp:
+    def __init__(self, root, df):
+        self.root = root
+        self.root.title("Match selection")
+
+        self.df = df
+        self.selected_index = None
+
+        # Create and place widgets
+        self.label_info = ttk.Label(root, text='Please enter the row index of the match(1 to ' + str(len(df)) +
+                                               '):')
+        self.label_info.pack(pady=10)
+
+        self.entry_index = ttk.Entry(root)
+        self.entry_index.pack(pady=10)
+
+        self.button_submit = ttk.Button(root, text="Submit", command=self.on_submit)
+        self.button_submit.pack(pady=10)
+
+        # Display DataFrame
+        self.tree = ttk.Treeview(root)
         self.tree["columns"] = list(df.columns)
         self.tree["show"] = "headings"
 
-        # Add columns to the Treeview
+        # Currently not displaying the column name
         for col in df.columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, width=20, anchor=tk.CENTER)  # Adjust the width as needed
+            #     self.tree.heading(col, text=col)
+            self.tree.column(col, width=300, anchor=tk.CENTER)
+        #
+        #     # Display the column name in bold
+        #     self.tree.tag_configure(f"{col}_tag", font=('Helvetica', 10, 'bold'))
 
-        # Insert data into the Treeview
         for i, row in df.iterrows():
             self.tree.insert("", i, values=list(row))
 
-        # Add a scrollbar
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scrollbar.set)
+        self.tree.pack(pady=10)
 
-        # Pack everything
-        self.tree.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+    def on_submit(self):
+        try:
+            index = int(self.entry_index.get()) - 1
+            if 0 <= index < len(self.df):
+                self.selected_index = index
+                self.root.destroy()  # Close the Tkinter window
+            else:
+                tk.messagebox.showerror("Error", "Invalid row. Please enter a valid number.")
+        except ValueError:
+            tk.messagebox.showerror("Error", "Invalid input. Please enter a valid number.")
+
