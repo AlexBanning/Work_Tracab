@@ -16,10 +16,9 @@ from TracabModules.MLS_Teams import MLS
 from TracabModules.s3_functions import get_STSID, newest, get_match_info
 import glob, os, shutil
 
-
 match_folder = newest(r'\\192.168.7.72\Rec')
 print(match_folder)
-home, away, md = get_match_info(match_folder)
+home, away, md, comp = get_match_info(match_folder)
 # Define team-dictionary
 teams = MLS
 
@@ -39,11 +38,10 @@ except KeyError:
           'Press Enter to leave!')
     sys.exit()
 
-
 # Add both team substrings to get the match string
 match = str(ht) + 'vs' + str(at)
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(1, home, away)
+sts_id, date = get_STSID(comp, home, away)
 # create the path of the to-be-created folder for the upload command
 filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
 # Create a folder with the correct naming in the current directory
@@ -52,7 +50,8 @@ os.mkdir(filepath_new)
 folder_new = str(sts_id) + '_' + match
 
 # Create dictionary for video feeds
-feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4', '4': 'HighBehind_1.mp4'}
+feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'PanoramicFeed_Opposite.mp4', '4': 'HighBehind_2.mp4',
+         '5': 'HighBehind_1.mp4'}
 
 # Loop, that goes through all four feeds to move and rename them
 for feed, i in enumerate(feeds):
@@ -63,17 +62,21 @@ for feed, i in enumerate(feeds):
     # yesterday = (date.today()- timedelta(days=1)).strftime('%Y_%m_%d')
     # today = date.today().strftime('%Y_%m_%d')
     if feeds[i] == 'TacticalFeed.mp4':
-        os.chdir(r'\\192.168.7.75\d\CastRouterVideoAndSetupXML' + '\\' + date)
+        os.chdir(r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             print(filepath_new + '\\' + filename_new)
             shutil.move(file, filepath_new + '\\' + filename_new)
-    elif feeds[i] == 'PanoramicFeed.mp4':
-        os.chdir(r'\\192.168.7.74\d\CastRouterVideoAndSetupXML' + '\\' + date)
+    elif feeds[i] == 'PanoramicFeed.mp4' or feeds[i] == 'PanoramicFeed_Opposite.mp4':
+        os.chdir(r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
-            print(filepath_new + '\\' + filename_new)
-            shutil.move(file, filepath_new + '\\' + filename_new)
+            if feeds[i] == 'PanoramicFeed.mp4' and 'PanoA' in file:
+                print(filepath_new + '\\' + filename_new)
+                shutil.move(file, filepath_new + '\\' + filename_new)
+            elif feeds[i] == 'PanoramicFeed_Opposite.mp4' and 'PanoC' in file:
+                print(filepath_new + '\\' + filename_new)
+                shutil.move(file, filepath_new + '\\' + filename_new)
     elif feeds[i] == 'HighBehind_1.mp4' or feeds[i] == 'HighBehind_2.mp4':
-        os.chdir(r'\\192.168.7.76\d\CastRouterVideoAndSetupXML' + '\\' + date)
+        os.chdir(r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             if feeds[i] == 'HighBehind_2.mp4' and 'PanoB' in file:
                 print(filepath_new + '\\' + filename_new)
@@ -85,9 +88,14 @@ for feed, i in enumerate(feeds):
 print('All files have been moved and renamed')
 
 # Upload folder after all videos have been moved and renamed
-command = ('aws s3 cp "' + filepath_new +
-           '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
-           + folder_new + '" --recursive')
+if comp == str(1):
+    command = ('aws s3 cp "' + filepath_new +
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
+               + folder_new + '" --recursive')
+elif comp == str(100):
+    command = ('aws s3 cp "' + filepath_new +
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
+               + folder_new + '" --recursive')
 
 print(command)
 
@@ -96,4 +104,3 @@ try:
     input('Upload has finished. Press enter to exit')
 except:
     input('Upload was not successful. Please try again and submit the error code!')
-
