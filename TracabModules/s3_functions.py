@@ -1,7 +1,10 @@
 import ftputil
 from bs4 import BeautifulSoup
 import os
+import logging
 from xml.dom.minidom import parse
+import shutil
+import sys, glob
 
 
 def get_STSID(comp_id, home_team, away_team):
@@ -73,5 +76,44 @@ def get_match_info(match_folder):
     away_team_element = xml_doc.getElementsByTagName('Team')[1]
     away_team_name = str(dict(away_team_element.attributes.items())['sTeamDesc'])
     matchday = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iRoundId'])
+    comp_id = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iCompetitionId'])
 
-    return home_team_name, away_team_name, matchday
+    return home_team_name, away_team_name, matchday, comp_id
+
+
+"""
+def validate_filepath(filepath):
+    if not os.path.exists(filepath):
+        logging.error(f"Invalid filepath: {filepath}")
+        sys.exit("Invalid filepath. Please check and try again.")
+
+
+def move_and_rename_videos(source_folder, destination_folder, filename_pattern):
+    os.chdir(source_folder)
+    for file in glob.glob(filename_pattern):
+        new_filepath = os.path.join(destination_folder, file)
+        logging.info(f"Moving {file} to {new_filepath}")
+        shutil.move(file, new_filepath)
+
+
+def upload_to_s3(local_path, s3_path):
+    command = f'aws s3 cp "{local_path}" "{s3_path}" --recursive'
+    logging.info(f"Executing command: {command}")
+    try:
+        os.system(command)
+        input('Upload has finished. Press enter to exit')
+    except Exception as e:
+        logging.error(f"Error during upload: {e}")
+        input('Upload was not successful. Please try again and submit the error code!')
+
+
+def get_source_folder(feed_type, date):
+    if feed_type == 'TacticalFeed.mp4':
+        return r'\\192.168.7.75\d\CastRouterVideoAndSetupXML' + '\\' + date
+    elif feed_type == 'PanoramicFeed.mp4':
+        return r'\\192.168.7.74\d\CastRouterVideoAndSetupXML' + '\\' + date
+    elif feed_type == 'HighBehind_2.mp4' or feed_type == 'HighBehind_1.mp4':
+        return r'\\192.168.7.76\d\CastRouterVideoAndSetupXML' + '\\' + date
+
+def move_and_rename_folder(feed_type)
+"""
