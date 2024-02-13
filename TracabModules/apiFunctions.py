@@ -300,7 +300,7 @@ def get_tracabID_demo(home_team):
     tId = [x for x, y in team_dict.items() if home_team in y][0]
     # MatchIds of all matches of the home_team
     matches_schedule = schedule_data.find_all('MatchData')
-    today = '2024-01-12'
+    today = '2024-02-10'
 
     try:
         match_id = [x['uID'][1:] for x in matches_schedule if x.find('MatchInfo').find('Date').text[0:10] == today and

@@ -22,7 +22,7 @@ headers = CaseInsensitiveDict()
 headers['accept'] = 'application/json'
 headers['Authorization'] = "Bearer " + token
 # Select the match of interest
-matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/2'
+matchday_url = 'https://data.voetbaldatacentre.nl/av/api/matches/6'
 md_info = requests.get(matchday_url, headers=headers).json()
 translation = str.maketrans('', '', string.digits)
 matches = [x['matchDescription'].translate(translation) for x in md_info]
