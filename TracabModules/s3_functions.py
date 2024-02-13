@@ -20,7 +20,11 @@ def get_STSID(comp_id, home_team, away_team):
     server = "213.168.127.130"
     user = "Alex_Test"
     password = "RobberyandLahm5%"
-    filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
+        password = "RobberyandLahm5%"
+    if comp_id == str(100):
+        filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00002S.xml'
+    else:
+        filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
     # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
     ftp_dir = 'D3_MLS/MatchInfo/'
     try:
