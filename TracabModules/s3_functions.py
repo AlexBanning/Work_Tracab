@@ -25,23 +25,29 @@ def get_STSID(comp_id, home_team, away_team):
     server = "213.168.127.130"
     user = "Alex_Test"
     password = "RobberyandLahm5%"
-    if comp_id == str(1):
-        filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-000001.xml'
+
+    filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(comp_id) + '.xml'
     print(filename)
     # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
     ftp_dir = 'D3_MLS/MatchInfo/'
     try:
         with ftputil.FTPHost(server, user, password) as ftp_host:
             ftp_host.chdir(ftp_dir)
-            ftp_host.open(filename)
             if ftp_host.path.isfile(filename):
                 ftp_host.download(filename, filename)
-    except:
-        print('schedule-file not found')
-        pass
+    except UnboundLocalError:
+        print('schedule-file not found, check the competition in the gamestats')
+        input('Enter to exit')
+        sys.exit()
+    try:
+        with open(filename) as fp:
+            data = BeautifulSoup(fp, 'xml')
+    except FileNotFoundError:
+        print('The schedule file for the competition is not available. \n'
+              'Please check the competition of the gamestats in the newest folder on C:\\Rec!')
+        input('Press Enter to exit Software')
+        sys.exit()
 
-    with open(filename) as fp:
-        data = BeautifulSoup(fp, 'xml')
 
     # MatchIds of all matches of the home_team
     matches_schedule = data.find_all('Fixture')
