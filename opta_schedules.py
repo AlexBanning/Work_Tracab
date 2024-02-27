@@ -7,6 +7,7 @@ comp_id = input('Which competition do you want to update? \n'
                 '5 - Champions League \n'
                 '6 - Europa League \n'
                 '9 - Eredivisie \n'
+                '1125 - Conference League \n'
                 )
 
 season_id = input('Which season do you want to update? \n')
