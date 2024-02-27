@@ -50,8 +50,8 @@ os.mkdir(filepath_new)
 folder_new = str(sts_id) + '_' + match
 
 # Create dictionary for video feeds
-feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '4': 'HighBehind_2.mp4',
-         '5': 'HighBehind_1.mp4'}
+feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4',
+         '4': 'HighBehind_1.mp4'}
 
 # Loop, that goes through all four feeds to move and rename them
 for feed, i in enumerate(feeds):
@@ -65,23 +65,23 @@ for feed, i in enumerate(feeds):
         os.chdir(r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             print(filepath_new + '\\' + filename_new)
-            shutil.move(file, filepath_new + '\\' + filename_new)
+            shutil.copy(file, filepath_new + '\\' + filename_new)
     if feeds[i] == 'PanoramicFeed.mp4':
         os.chdir(r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             print(filepath_new + '\\' + filename_new)
-            shutil.move(file, filepath_new + '\\' + filename_new)
+            shutil.copy(file, filepath_new + '\\' + filename_new)
     elif feeds[i] == 'HighBehind_1.mp4' or feeds[i] == 'HighBehind_2.mp4':
         os.chdir(r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date)
         for file in glob.glob("*.mp4"):
             if feeds[i] == 'HighBehind_2.mp4' and 'PanoB' in file:
                 print(filepath_new + '\\' + filename_new)
-                shutil.move(file, filepath_new + '\\' + filename_new)
+                shutil.copy(file, filepath_new + '\\' + filename_new)
             elif feeds[i] == 'HighBehind_1.mp4' and 'PanoD' in file:
                 print(filepath_new + '\\' + filename_new)
-                shutil.move(file, filepath_new + '\\' + filename_new)
+                shutil.copy(file, filepath_new + '\\' + filename_new)
 
-print('All files have been moved and renamed')
+print('All files have been copied and renamed')
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):
@@ -97,7 +97,7 @@ print(command)
 
 try:
     os.system(command)
-    shutil.rmtree(filepath_new)
     input('Upload has finished. Press enter to exit')
+    shutil.rmtree(filepath_new)
 except:
     input('Upload was not successful. Please try again and submit the error code!')
