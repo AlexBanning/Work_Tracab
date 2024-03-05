@@ -49,7 +49,11 @@ sts_id, date = get_STSID(comp, home, away)
 # create the path of the to-be-created folder for the upload command
 filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
 # Create a folder with the correct naming in the current directory
-os.mkdir(filepath_new)
+try:
+    os.mkdir(filepath_new)
+except FileExistsError:
+    os.rmdir(filepath_new)
+    os.mkdir(filepath_new)
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 

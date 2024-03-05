@@ -1,13 +1,25 @@
+"""
+Automize the upload of video feeds to the S3 database
+
+1.) What file should be uploaded?
+    - Take filepath as input
+2.) Create cmd command
+    - Paste input into line
+    - Adjust upload-location / file name accordingly
+3.) Execute cmd command and upload files
+"""
+import shutil
 import sys
 from MLS.MLS_Teams import MLS
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest, move_videos
 from TracabModules.Internal.scheduleFunctions import get_STSID
-import os, shutil
+import os
 
 
 match_folder = newest(r'\\192.168.7.72\Rec')
-print(match_folder)
+# newest(r'\\192.168.7.72\Rec ')
+print(match_folder + '\n')
 home, away, md, comp = get_match_info(match_folder)
 # Define team-dictionary
 teams = MLS
@@ -18,7 +30,9 @@ try:
 except KeyError:
     # print('Home team is not in the teams-dictionary. Please check with the Developer!')
     input('The home team cannot be found in the database. Please check with the developer.\n'
-          'Press Enter to leave!')
+          'Please Insert the 3LC and Team Name!')
+    ht = str(input())
+    home = str(input())
     sys.exit()
 
 try:
@@ -26,6 +40,8 @@ try:
 except KeyError:
     input('The away team cannot be found in the database. Please check with the developer.\n'
           'Press Enter to leave!')
+    at = str(input())
+    away = str(input())
     sys.exit()
 
 # Add both team substrings to get the match string
@@ -35,7 +51,11 @@ sts_id, date = get_STSID(comp, home, away)
 # create the path of the to-be-created folder for the upload command
 filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
 # Create a folder with the correct naming in the current directory
-os.mkdir(filepath_new)
+try:
+    os.mkdir(filepath_new)
+except FileExistsError:
+    shutil.rmtree(filepath_new)
+    os.mkdir(filepath_new)
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
@@ -52,6 +72,7 @@ elif comp == str(100):
                + folder_new + '" --recursive')
 
 print(command)
+input('Press Enter to exit Demo')
 
 try:
     os.system(command)

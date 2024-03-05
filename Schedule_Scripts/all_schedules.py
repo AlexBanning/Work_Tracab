@@ -1,4 +1,4 @@
-import TracabModules.scheduleFunctions as sf
+import TracabModules.Internal.scheduleFunctions as sf
 
 """
 Schedule-Script for all main competitions we are covering in the 23/24 season 

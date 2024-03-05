@@ -356,7 +356,7 @@ def get_STSID(comp_id, home_team, away_team):
     date = 0
 
     try:
-        filename = get_schedule_xml(comp_id, vendor='d3_mls')
+        filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False)
     except UnboundLocalError:
         print('schedule-file not found, check the competition in the gamestats')
         input('Enter to exit')
