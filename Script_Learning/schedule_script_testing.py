@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from TracabModules.scheduleFunctions import get_schedule_xml as gs
 import os
 import ftputil
+from xml.dom.minidom import parse, parseString
+from datetime import timedelta, datetime
 
 with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\Script_Learning\\schedule.xml') as fp:
     data = BeautifulSoup(fp, 'xml')
@@ -50,14 +52,12 @@ date = sports_event[0].contents[1]["start-date-time"][0:4] + "-" + sports_event[
 # min = sports_event[0].contents[1]["start-date-time"][-9:-7]
 
 ko = sports_event[0].contents[1]["start-date-time"][-11:-9] + ":" \
-         + sports_event[0].contents[1]["start-date-time"][-9:-7]
+     + sports_event[0].contents[1]["start-date-time"][-9:-7]
 
 KO_date = date + " " + ko
 
 match = {"Matchday": round_id, "MatchID": matchId, "KickOff": KO_date, "Home": home, "Away": away,
          "League": league, "Stadium": stadium}
-
-
 
 # Get division
 league_name = data.find_all("sports-content-code")[1]["code-name"]
@@ -71,7 +71,7 @@ rounds = data.find_all("tournament-round")
 season = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
 # Iterate the whole season
 for i, round in enumerate(rounds):
-    round_id = i+1
+    round_id = i + 1
     matchday = []
     # Get match specific information
     for j, match in enumerate(round.contents[1::2]):
@@ -114,8 +114,6 @@ with open('C:\\Users\\a.banning\\PycharmProjects\\Work_Tracab\\srml-' + str(comp
           encoding='utf8') as fp_t:
     team_data = BeautifulSoup(fp, 'xml')
 
-
-
 # Create dictionary to link team_name and team_id
 teams = team_data.find_all('Team')
 team_names = [x.find('Name').text for x in teams]
@@ -130,13 +128,13 @@ dates = [x.find('MatchInfo').find('Date').text for x in matches]
 stadiums = [x.find('Stat').text for x in matches]
 home_teams = [team_dict[x.find_all('TeamData')[0]['TeamRef']] for x in matches]
 away_teams = [team_dict[x.find_all('TeamData')[1]['TeamRef']] for x in matches]
-league = ['Eredivisie' for i in range(0,306)]
+league = ['Eredivisie' for i in range(0, 306)]
 
 schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)))
 
 # Test for Keytoq
 ftp_dir = 'Keytoq/MatchInfo/'
-filename= 'main.xml'
+filename = 'main.xml'
 server = "213.168.127.130"
 user = "Alex_Test"
 password = "RobberyandLahm5%"
@@ -163,16 +161,44 @@ for i, md in enumerate(matches):
     away = [x['team_b'] for x in md]
     matchId = [x['id'] for x in md]
     league = ['Ekstraklasa' for x in md]
-    round_id = [str((i+1)) for x in md]
+    round_id = [str((i + 1)) for x in md]
 
     match_info = pd.DataFrame({"Matchday": round_id, "MatchID": matchId, "KickOff": ko_date, "Home": home, "Away": away,
-                  "League": league})
+                               "League": league})
     season = pd.concat([season, match_info])
 
-
-
-gs(comp_id= 285026, season_id=2023, vendor='FIFA')
+gs(comp_id=285026, season_id=2023, vendor='FIFA')
 
 test = "Bayern München"
 
 new = test.encode('latin').decode('latin')
+
+### Test minidom
+
+comp_id = 9
+season_id = 2023
+vendor = 'Opta'
+
+# xml paths
+schedule_path = 'C:\\Users\\a.banning\\PycharmProjects\\Work_Tracab\\srml-' + str(comp_id) + '-2023-results.xml'
+squad_path = 'C:\\Users\\a.banning\\PycharmProjects\\Work_Tracab\\srml-' + str(comp_id) + '-2023-squads.xml'
+
+xml_doc_squad = parse(squad_path)
+teams = xml_doc_squad.getElementsByTagName('Team')[0:18]
+team_names = [x.getElementsByTagName('Name')[0].firstChild.data for x in teams]
+team_ids = [x.getAttribute('uID') for x in teams]
+team_dict = dict(zip(team_ids, team_names))
+
+xml_doc = parse(schedule_path)
+matches = xml_doc.getElementsByTagName('MatchData')
+# Get dates of all matches in correct format and adjusted to CET
+dates = [datetime.strftime(datetime.strptime(x.firstChild.nodeValue[:-3], '%Y-%m-%d %H:%M') +
+                           timedelta(hours=1), '%Y-%m-%d %H:%M') for x in
+         xml_doc.getElementsByTagName('Date')
+         ]
+
+match_ids = [x.getAttribute('uID')[1:] for x in matches]
+matchday = [x.getElementsByTagName('MatchInfo')[0].getAttribute('MatchDay') for x in matches]
+stadiums = [x.getElementsByTagName('Stat')[0].firstChild.data for x in matches]
+home_teams = [team_dict[x.getElementsByTagName('TeamData')[0].getAttribute('TeamRef')] for x in matches]
+away_teams = [team_dict[x.getElementsByTagName('TeamData')[1].getAttribute('TeamRef')] for x in matches]
