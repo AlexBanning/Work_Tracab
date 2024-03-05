@@ -1,8 +1,6 @@
 import xml.etree.ElementTree as eT
-from bs4 import BeautifulSoup
-import pandas as pd
-from datetime import datetime, timedelta
-import os
+from xml.dom.minidom import parse
+import sys
 
 
 def write_gamestats(schedule, players, comp_iD, season_iD, vendor_iD):
@@ -36,7 +34,7 @@ def write_gamestats(schedule, players, comp_iD, season_iD, vendor_iD):
             data.set('iGameNumber', match_info['iD'])
             data.set('dtGameBegin', match_info['kickOff'])
             data.set('iRoundId', match_info['round'])
-            data.set('sRoundDescription', 'round_'+ match_info['round'])
+            data.set('sRoundDescription', 'round_' + match_info['round'])
             data.set('sStadium', match_info['venue'])
             data.set('iStadiumId', '')
             data.set('sRefereeFirstName', 'Ref1')
@@ -118,74 +116,25 @@ def write_gamestats(schedule, players, comp_iD, season_iD, vendor_iD):
             print(match_info['iD'] + "_Gamestats.xml" + " has been successfully printed.")
 
 
-def get_schedule(file, league):
+def get_match_info(match_folder):
     """
-    Needs the location of the schedule-file and the name of the schedule's league/competition
-    :param file:
-    :param league:
+    Search for necessary match information (both team names and matchday) and return them as str.
+    :param match_folder:
     :return:
-        schedule: pd.DataFrame
-        Pandas Dataframe that contains the whole schedule of the tournament with the following columns:
-            Matchday
-            MatchID
-            KickOff
-            Home
-            Away
-            hID: ID of Home-Team
-            aID: ID of Away-Team
-            League
-            Stadium
-
     """
-    with open(file) as fp:
-        data = BeautifulSoup(fp, 'xml')
+    try:
+        gamestats_path = match_folder + r'\Data\Gamestats.xml'
+        xml_doc = parse(gamestats_path)
+        home_team_element = xml_doc.getElementsByTagName('Team')[0]
+        home_team_name = str(dict(home_team_element.attributes.items())['sTeamDesc'])
+        away_team_element = xml_doc.getElementsByTagName('Team')[1]
+        away_team_name = str(dict(away_team_element.attributes.items())['sTeamDesc'])
+        matchday = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iRoundId'])
+        comp_id = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iCompetitionId'])
 
-    rounds = data.find_all('tournament-round')
+    except FileNotFoundError:
+        print('The newest folder in "C:\\Rec" is no matchID folder. \n'
+              'Please adjust the folders or delete newer ones and restart the software!')
+        sys.exit()
 
-    # Create empty DF
-    schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "hID", "aID", "League", "Stadium"])
-    # Get info for all matches and update DF
-    for j, round in enumerate(rounds):
-        matchday = round['round-key']
-        fixtures = round.find_all("sports-event")
-        for i, match in enumerate(fixtures):
-            date = match.find('event-metadata')["start-date-time"][0:10]
-            time = match.find('event-metadata')["start-date-time"][11:16]
-            # Adjust kickoff time from GMT to CET summer time
-            ko_date = (datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M') + timedelta(hours=2)).strftime('%Y-%m-%d %H:%M')
-            home = match.find_all('team')[0].find('team-metadata').find('name')["nickname"].encode("latin").decode("utf-8")
-            home_id = match.find_all('team')[0].find('team-metadata')["team-key"]
-            away = match.find_all('team')[1].find('team-metadata').find('name')["nickname"].encode("latin").decode("utf-8")
-            away_id = match.find_all('team')[1].find('team-metadata')["team-key"]
-            match_id = match.find('event-metadata')["event-key"]
-            stadium = match.find('event-metadata').find('site').find('site-metadata').find('name')['full'].encode("latin").decode("utf-8")
-
-            match_info = {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
-                          "hID": home_id, "aID": away_id, "League": league, "Stadium": stadium}
-
-            schedule = schedule.append(pd.DataFrame([match_info]))
-
-    return schedule
-
-
-def get_players(file):
-    """
-    Needs the path of the file that contains all information for all players of the tournament
-    :param file: str
-        String that is equivalent to the Path of the file of interest
-    :return:
-        players: pd.DataFrame
-        A pandas DataFrame containing all required information for all tournament players with the following columns:
-            Team
-            Shirt Nr
-            Last Name as in Passport
-            First Name as in Passport
-            IFES Player ID
-    """
-
-    # Create a DF with all players from all teams
-    players = pd.read_excel(
-        'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_players.xlsx')
-    players = players[['Team', 'Shirt Nr', 'Last Name as in Passport', 'First Name as in Passport', 'IFES Player ID']]
-
-    return players
+    return home_team_name, away_team_name, matchday, comp_id

@@ -20,7 +20,7 @@ with ftputil.FTPHost(server, user, password) as ftp_host:
         ftp_host.download(filename, filename)
 
 # Create a schedule for FIFA WWC
-# with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
+# with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
 #    data = BeautifulSoup(fp, 'xml')
 
 

@@ -3,27 +3,27 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ET
 import gspread
-from TracabModules import gamestatsFunctions as gf
+from FIFA_Gamestats import testFunctions as gf
 import os
 import ftputil
 
 # Create a schedule DF
 schedule = pd.read_excel(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\schedule.xlsx')
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\schedule.xlsx')
 
 new_schedule = schedule[['KickOffMoment', 'IfesMatchNumber', 'IfesMatchId', 'IfesMatchShortName']]
 
 # Create a player database with information to all players of each team
 players = pd.read_excel(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\players.xlsx')
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\players.xlsx')
 players = players[['Team', 'Shirt Nr', 'Last Name as in Passport', 'First Name as in Passport', 'IFES ID']]
 # Create a referee database with information to all match officials
 refs = pd.read_excel(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\referees.xlsx')
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\referees.xlsx')
 
 # Create a team officials database with information to all officials of each team
 t_officials = pd.read_excel(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\teamOfficials.xlsx')
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\teamOfficials.xlsx')
 
 player_db = []
 nations = players['Team'].unique().tolist()
@@ -52,7 +52,7 @@ away_team = players[players['Team']==away]
 
 # Testing to recreate our gamestats in the correct format and syntax
 tree = ET.parse(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\Gamestats.xml'
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\Gamestats.xml'
 )
 root = tree.getroot()
 teams = tree.findall('Team')
@@ -76,12 +76,12 @@ htt = ET.SubElement(data, 'Team')
 hroster = ET.SubElement(htt, 'Roster')
 for player in home_team.iterrows():
     print(player)
-     i = ET.SubElement(hroster, 'Player')
-     hroster.set('iJerseyNo', player['Shirt Nr'])
-     hroster.set('iId', player['IFES ID'])
-     hroster.set('iLastName', player['Last Name as in Passport'])
-     hroster.set('iFirstName', player['First Name as in Passport'])
-     hroster.set('iShortName', ' ')
+    i = ET.SubElement(hroster, 'Player')
+    hroster.set('iJerseyNo', player['Shirt Nr'])
+    hroster.set('iId', player['IFES ID'])
+    hroster.set('iLastName', player['Last Name as in Passport'])
+    hroster.set('iFirstName', player['First Name as in Passport'])
+    hroster.set('iShortName', ' ')
 
 hlineup = ET.SubElement(htt, 'Lineup')
 att = ET.SubElement(data, 'Team')
@@ -123,7 +123,7 @@ with ftputil.FTPHost(server, user, password) as ftp_host:
 
 # Create schedule for google sheet for FIFA WWC
 # Path on home computer
-with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
+with open('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\women_schedule.xml') as fp:
     data = BeautifulSoup(fp, 'xml')
 
 # Path on laptop
@@ -169,7 +169,7 @@ worksheet.update([schedule.columns.values.tolist()] + schedule.values.tolist())
 
 # Create a DF with all players from all teams
 players = pd.read_excel(
-    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_players.xlsx')
+    'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\women_players.xlsx')
 players = players[['Team', 'Shirt Nr', 'Last Name as in Passport', 'First Name as in Passport', 'IFES Player ID']]
 
 # Create list of series with all players from a team
@@ -184,10 +184,10 @@ ateam_players = [x[1] for x in players.iterrows() if x[1]['Team'] == away_team]
 league = 'FIFA WWC'
 os.chdir('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA WWC')
 schedule = gf.get_schedule(file=
-                'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_schedule.xml',
+                'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\women_schedule.xml',
                 league='FIFA WWC')
 players = gf.get_players(file=
-               'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA-Gamestats\\tournamentInfo\\women_players.xlsx')
+               'C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\FIFA_Gamestats\\tournamentInfo\\women_players.xlsx')
 os.chdir('C:\\Users\\alexa\\PycharmProjects\\Work_Tracab\\' + league)
 gf.write_gamestats(schedule=schedule, players=players, comp_iD='285026', season_iD='2023', vendor_iD='15')
 

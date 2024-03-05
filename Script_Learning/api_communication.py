@@ -1,8 +1,7 @@
 import requests
 import pandas as pd
-from IPython.display import display
 from requests.structures import CaseInsensitiveDict
-import TracabModules.apiFunctions as af
+import TracabModules.External.apiFunctions as af
 
 
 login_url = 'https://data.voetbaldatacentre.nl/api/login'

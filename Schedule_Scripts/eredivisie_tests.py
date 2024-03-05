@@ -1,13 +1,11 @@
 import pandas as pd
 from IPython.display import display
 from requests.structures import CaseInsensitiveDict
-import TracabModules.apiFunctions as af
+import TracabModules.External.apiFunctions as af
 from bs4 import BeautifulSoup
 import requests
 import string
 import ftputil
-from datetime import date, datetime
-import subprocess
 
 login_url = 'https://data.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'

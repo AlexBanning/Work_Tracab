@@ -1,6 +1,6 @@
 import pandas as pd
 from IPython.display import display
-import TracabModules.apiFunctions as af
+import TracabModules.External.apiFunctions as af
 
 
 login_url = 'https://data.voetbaldatacentre.nl/api/login'

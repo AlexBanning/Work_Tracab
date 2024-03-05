@@ -10,8 +10,10 @@ Automize the upload of video feeds to the S3 database
 """
 import sys
 from TracabModules.MLS_Teams import MLS
-from TracabModules.s3_functions import get_STSID, newest, get_match_info
-import glob, os, shutil
+from TracabModules.Internal.gamestats_functions import get_match_info
+from TracabModules.Internal.server_manipulations import newest, move_videos
+from TracabModules.Internal.scheduleFunctions import get_STSID
+import os, shutil
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
@@ -51,39 +53,7 @@ os.mkdir(filepath_new)
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
-# Create dictionary for video feeds
-feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4',
-         '4': 'HighBehind_1.mp4'}
-
-# Loop, that goes through all four feeds to move and rename them
-for feed, i in enumerate(feeds):
-    print(feeds[i])
-    filename_new = sts_id + '_' + match + '_' + feeds[i]
-    # open folder of specific isma server to rename video feed
-    # os.chdir("C:\\Users\\alexa\\Desktop\\MD34_NYCvMIA")
-    # yesterday = (date.today()- timedelta(days=1)).strftime('%Y_%m_%d')
-    # today = date.today().strftime('%Y_%m_%d')
-    if feeds[i] == 'TacticalFeed.mp4':
-        os.chdir(r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date)
-        for file in glob.glob("*.mp4"):
-            print(filepath_new + '\\' + filename_new)
-            shutil.copy(file, filepath_new + '\\' + filename_new)
-    if feeds[i] == 'PanoramicFeed.mp4':
-        os.chdir(r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date)
-        for file in glob.glob("*.mp4"):
-            print(filepath_new + '\\' + filename_new)
-            shutil.copy(file, filepath_new + '\\' + filename_new)
-    elif feeds[i] == 'HighBehind_1.mp4' or feeds[i] == 'HighBehind_2.mp4':
-        os.chdir(r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date)
-        for file in glob.glob("*.mp4"):
-            if feeds[i] == 'HighBehind_2.mp4' and 'PanoB' in file:
-                print(filepath_new + '\\' + filename_new)
-                shutil.copy(file, filepath_new + '\\' + filename_new)
-            elif feeds[i] == 'HighBehind_1.mp4' and 'PanoD' in file:
-                print(filepath_new + '\\' + filename_new)
-                shutil.copy(file, filepath_new + '\\' + filename_new)
-
-print('All files have been copied and renamed \n')
+move_videos(sts_id, match, date, filepath_new)
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):

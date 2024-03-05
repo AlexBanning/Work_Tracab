@@ -1,6 +1,5 @@
-from IPython.display import display
 from requests.structures import CaseInsensitiveDict
-import TracabModules.apiFunctions as af
+import TracabModules.External.apiFunctions as af
 import requests
 import string
 import tkinter as tk
