@@ -7,13 +7,15 @@ Schedule-Script for all main competitions we are covering in the 23/24 season
 """
 Create MLS Schedule
 """
-sf.get_schedule_xml(1, vendor='d3_mls', season_id=2023)
+sf.get_schedule_xml(1, vendor='d3_mls', season_id=2024)
+
 
 # Define filename so the schedule function can open it
-mls_filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(1) + '.xml'
+mls_filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(1) + '.xml'
+
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-mls_schedule = sf.get_d3_mls_schedule(mls_filename)
+mls_schedule = sf.get_d3_mls_schedule(comp_id=1,filename=mls_filename)
 
 """
 Create BL1 Schedule
@@ -51,7 +53,7 @@ schedule_filename = 'srml-' + str(9) + '-' + str(2023) + '-results.xml'
 squads_filename = 'srml-' + str(9) + '-' + str(2023) + '-squads.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-opta_schedule = sf.get_opta_schedule(schedule_filename, squads_filename)
+opta_schedule = sf.get_opta_schedule(comp_id=9, schedule_filename=schedule_filename, squad_filename=squads_filename)
 
 """
 Create Ekstraklasa Schedule

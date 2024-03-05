@@ -32,7 +32,7 @@ def get_schedule_xml(comp_id, vendor, **kwargs):
         squads_filename = 'srml-' + str(comp_id) + '-' + str(season_id) + '-squads.xml'
         ftp_dir = 'Opta/MatchInfo'
     if vendor == 'd3_mls':
-        filename = 'Feed_01_06_basedata_fixtures_MLS-COM-00000' + str(comp_id) + '.xml'
+        filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(comp_id) + '.xml'
         # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
         ftp_dir = 'D3_MLS/MatchInfo/'
     if vendor == 'keytoq':
@@ -181,13 +181,13 @@ def get_d3_mls_schedule(comp_id, filename):
     # Get all matches
     fixtures = data.find_all("Fixture")
     # Define TimeSaving-Dates
-    dst_start = datetime.strptime('2023-03-26 02:00', '%Y-%m-%d %H:%M')
-    dst_end = datetime.strptime('2023-10-29 03:00', '%Y-%m-%d %H:%M')
+    dst_start = datetime.strptime('2023-03-31 02:00', '%Y-%m-%d %H:%M')
+    dst_end = datetime.strptime('2023-10-27 03:00', '%Y-%m-%d %H:%M')
     # Define league
     if comp_id == 1:
         league = 'MLS'
         # Current workaround as long as older seasons are also implemented in the schedule.xml
-        fixtures = [x for x in fixtures if x['Season'] == '2023/2024']
+        fixtures = [x for x in fixtures if x['Season'] == '2024']
     elif comp_id == 2:
         league = 'MLS PlayOffs'
 
@@ -265,8 +265,12 @@ def get_opta_schedule(comp_id, schedule_filename, squad_filename):
         league = ['Eredivisie' for i in range(0, 306)]
     elif int(comp_id) == 5:
         league = ['CL' for i in range(0, 306)]
-    if int(comp_id) == 6:
+    elif int(comp_id) == 6:
         league = ['EL' for i in range(0, 306)]
+    elif int(comp_id) == 1125:
+        league = ['Conference League' for i in range(0, 306)]
+    elif int(comp_id) == 646:
+        league = ['W-CL' for i in range(0, 306)]
 
     schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)),
                             columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])

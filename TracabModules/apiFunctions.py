@@ -325,15 +325,15 @@ def get_wrong_players(home, away):
     away_check['exists'] = np.where(away_check.exists != 'both', True, False)
 
     home_wrong = np.where(home_check['exists'] == True)
-    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'RKC Waalwijk',
-                                                                       '# Home': 'Nr. EreInfo'
+    home_wrong_player = home_check.iloc[home_wrong[0]].rename(columns={'Player_x': 'Player',
+                                                                       'jerseyNumber': 'Nr. EreInfo'
                                                                        }
-                                                              ).sort_values(by=['RKC Waalwijk'], axis=0)
+                                                              ).sort_values(by=['Player'], axis=0)
     away_wrong = np.where(away_check['exists'] == True)
-    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Heracles Almelo',
-                                                                       '# Away': 'Nr. EreInfo'
+    away_wrong_player = away_check.iloc[away_wrong[0]].rename(columns={'Player_x': 'Player',
+                                                                       'jerseyNumber': 'Nr. EreInfo'
                                                                        }
-                                                              ).sort_values(by=['Heracles Almelo'], axis=0)
+                                                              ).sort_values(by=['Player'], axis=0)
 
     home_wrong_player = home_wrong_player.drop(['Player_y', 'exists'], axis=1)
     away_wrong_player = away_wrong_player.drop(['Player_y', 'exists'], axis=1)
@@ -463,4 +463,3 @@ class DataFrameSelectorApp:
                 tk.messagebox.showerror("Error", "Invalid row. Please enter a valid number.")
         except ValueError:
             tk.messagebox.showerror("Error", "Invalid input. Please enter a valid number.")
-
