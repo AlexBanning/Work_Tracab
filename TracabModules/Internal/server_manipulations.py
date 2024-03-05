@@ -2,6 +2,7 @@ import os
 import glob
 import shutil
 
+
 def newest(path):
     """
     Return the newest folder of all folders within a directory

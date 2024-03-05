@@ -1,5 +1,5 @@
 import sys
-from TracabModules.MLS_Teams import MLS
+from MLS.MLS_Teams import MLS
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest, move_videos
 from TracabModules.Internal.scheduleFunctions import get_STSID

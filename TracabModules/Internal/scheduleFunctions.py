@@ -69,7 +69,8 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     except:
         pass
 
-    return print('The schedule for competition ' + str(comp_id) + ' of ' + str(vendor) + ' has been downloaded')
+    return (filename,
+            print('The schedule for competition ' + str(comp_id) + ' of ' + str(vendor) + ' has been downloaded'))
 
 
 def get_fifa_schedule(comp_id, filename):
@@ -354,25 +355,14 @@ def get_STSID(comp_id, home_team, away_team):
     match_id = 0
     date = 0
 
-    server = "213.168.127.130"
-    user = "Alex_Test"
-    password = "RobberyandLahm5%"
-
-    filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(comp_id) + '.xml'
-    print(filename)
-    # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
-    ftp_dir = 'D3_MLS/MatchInfo/'
     try:
-        with ftputil.FTPHost(server, user, password) as ftp_host:
-            ftp_host.chdir(ftp_dir)
-            if ftp_host.path.isfile(filename):
-                ftp_host.download(filename, filename)
+        filename = get_schedule_xml(comp_id, vendor='d3_mls')
     except UnboundLocalError:
         print('schedule-file not found, check the competition in the gamestats')
         input('Enter to exit')
         sys.exit()
     try:
-        with open(filename) as fp:
+        with open(filename[0]) as fp:
             data = BeautifulSoup(fp, 'xml')
     except FileNotFoundError:
         print('The schedule file for the competition is not available. \n'
@@ -382,10 +372,6 @@ def get_STSID(comp_id, home_team, away_team):
 
     # MatchIds of all matches of the home_team
     matches_schedule = data.find_all('Fixture')
-    # today = '2023-10-24'
-    # today = date.today().strftime('%Y-%m-%d')
-    # yesterday = (date.today()- timedelta(days=1)).strftime('%Y-%m-%d')
-    # yesterday = '2023-10-25'
     while True:
         try:
             match_id = [x['MatchId'] for x in matches_schedule if
@@ -411,31 +397,16 @@ def get_tracabID(home_team):
     """
     # Create a function that can download the gamestats of a single match based on the home team's name
     # Download squad xml and schedule xml to be able to map team name and team ID and get the MatchID of their match
-    server = "213.168.127.130"
-    user = "Alex_Test"
-    password = "RobberyandLahm5%"
-    schedule_filename = 'srml-9-2023-results.xml'
-    squads_filename = 'srml-9-2023-squads.xml'
-    ftp_dir = 'Opta/MatchInfo'
-    try:
-        with ftputil.FTPHost(server, user, password) as ftp_host:
-            ftp_host.chdir(ftp_dir)
-            ftp_host.open(schedule_filename)
-            if ftp_host.path.isfile(schedule_filename):
-                ftp_host.download(schedule_filename, schedule_filename)
-            ftp_host.open(squads_filename)
-            if ftp_host.path.isfile(squads_filename):
-                ftp_host.download(squads_filename, squads_filename)
-    except:
-        pass
+
+    get_schedule_xml(9, vendor='opta', season_id=2023, chdr=False)
 
     # Open xmls
-    with open(schedule_filename,
+    with open('srml-9-2023-results.xml',
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
 
     # Open team info
-    with open(squads_filename,
+    with open('srml-9-2023-squads.xml',
               encoding='utf8') as fp:
         team_data = BeautifulSoup(fp, 'xml')
 

@@ -9,11 +9,11 @@ Automize the upload of video feeds to the S3 database
 3.) Execute cmd command and upload files
 """
 import sys
-from TracabModules.MLS_Teams import MLS
+from MLS.MLS_Teams import MLS
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest, move_videos
 from TracabModules.Internal.scheduleFunctions import get_STSID
-import os, shutil
+import os
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
