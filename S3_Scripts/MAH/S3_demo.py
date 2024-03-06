@@ -14,6 +14,7 @@ from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest, move_videos
 from TracabModules.Internal.scheduleFunctions import get_STSID
 import os
+import shutil
 
 match_folder = newest(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
@@ -52,7 +53,7 @@ filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
 try:
     os.mkdir(filepath_new)
 except FileExistsError:
-    os.rmdir(filepath_new)
+    shutil.rmtree(filepath_new)
     os.mkdir(filepath_new)
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
