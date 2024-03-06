@@ -69,11 +69,11 @@ def get_player_stats(files, gamelog, ven):
         tot_time = np.round(float(stats_elements[-1].getElementsByTagName('PlayTime')[0].childNodes[0].data) / 25 / 60,
                             2)
         dist_min = np.round(np.divide(player_og_stats[0], tot_time), 2)
-        dist_min_sprints = np.round(np.divide(player_og_stats[5], tot_time), 2)
-        dist_min_hsruns = np.round(np.divide(player_og_stats[7], tot_time), 2)
-        dist_min_runs = np.round(np.divide(player_og_stats[9], tot_time), 2)
-        n_vhiruns = np.sum([player_og_stats[4], player_og_stats[6]])
-        dist_vhiruns = np.round(np.sum([player_og_stats[5], player_og_stats[7]]), 2)
+        dist_min_sprints = np.round(np.divide(player_og_stats[4], tot_time), 2)
+        dist_min_hsruns = np.round(np.divide(player_og_stats[6], tot_time), 2)
+        dist_min_runs = np.round(np.divide(player_og_stats[8], tot_time), 2)
+        n_vhiruns = np.sum([player_og_stats[3], player_og_stats[5]])
+        dist_vhiruns = np.round(np.sum([player_og_stats[4], player_og_stats[6]]), 2)
         dist_min_vhiruns = np.round(np.divide(dist_vhiruns, tot_time), 2)
         n_hiruns = np.sum([player_og_stats[-6], n_vhiruns])
         dist_hiruns = np.round(np.sum([player_og_stats[-5], dist_vhiruns]), 2)
@@ -83,11 +83,11 @@ def get_player_stats(files, gamelog, ven):
         player = pd.DataFrame({"TeamID": team_id, "PlayerID": player_id, "PlayerNumber": player_nr,
                                "PlayerName": player_name, "PlayTime (min)": tot_time,
                                "Distance (m)": player_og_stats[0],
-                               "Distance/min": dist_min, "TopSpeed (km/h)": player_og_stats[2],
-                               "AvgSpeed (km/h)": player_og_stats[3], "Sprints > 25,2km/h": player_og_stats[4],
-                               "Distance Sprints (m)": player_og_stats[5], "Distance/min Sprints": dist_min_sprints,
-                               "HighSpeedRuns 19,8-25,2km/h": player_og_stats[6],
-                               "Distance HSR (m)": player_og_stats[7],
+                               "Distance/min": dist_min, "TopSpeed (km/h)": player_og_stats[1],
+                               "AvgSpeed (km/h)": player_og_stats[2], "Sprints > 25,2km/h": player_og_stats[3],
+                               "Distance Sprints (m)": player_og_stats[4], "Distance/min Sprints": dist_min_sprints,
+                               "HighSpeedRuns 19,8-25,2km/h": player_og_stats[5],
+                               "Distance HSR (m)": player_og_stats[6],
                                "Distance/min HSR": dist_min_hsruns, "Runnings 14,4-19,8kmh/": player_og_stats[-6],
                                "Running Distance (m)": player_og_stats[-5], "Running Distance/min": dist_min_runs,
                                "HighIntensityRuns > 14,4km/h": n_hiruns, "Distance HIR (m)": dist_hiruns,
