@@ -29,10 +29,6 @@ def move_videos(sts_id, match, date, filepath_new):
     for feed, i in enumerate(feeds):
         print(feeds[i])
         filename_new = sts_id + '_' + match + '_' + feeds[i]
-        # open folder of specific isma server to rename video feed
-        # os.chdir("C:\\Users\\alexa\\Desktop\\MD34_NYCvMIA")
-        # yesterday = (date.today()- timedelta(days=1)).strftime('%Y_%m_%d')
-        # today = date.today().strftime('%Y_%m_%d')
         if feeds[i] == 'TacticalFeed.mp4':
             os.chdir(r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date)
             for file in glob.glob("*.mp4"):
