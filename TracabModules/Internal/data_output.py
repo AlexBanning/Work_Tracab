@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from xml.dom.minidom import parse
 import os
-from TracabModules.Internal.gamelog_functions import get_player_name
+from TracabModules.Internal.gamelog_functions import get_player_name, get_match_info
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "PlayTime (min)", "Distance (m)", "Distance/min",
@@ -68,6 +68,7 @@ def get_player_stats(files, gamelog, ven):
         # calculate those KPIs that are not directly inside the PlayerID_Resolution.xml
         tot_time = np.round(float(stats_elements[-1].getElementsByTagName('PlayTime')[0].childNodes[0].data) / 25 / 60,
                             2)
+        top_speed = max([float(x.getElementsByTagName('TopSpeed')[0].childNodes[0].data) for x in stats_elements])
         dist_min = np.round(np.divide(player_og_stats[0], tot_time), 2)
         dist_min_sprints = np.round(np.divide(player_og_stats[4], tot_time), 2)
         dist_min_hsruns = np.round(np.divide(player_og_stats[6], tot_time), 2)
@@ -83,7 +84,7 @@ def get_player_stats(files, gamelog, ven):
         player = pd.DataFrame({"TeamID": team_id, "PlayerID": player_id, "PlayerNumber": player_nr,
                                "PlayerName": player_name, "PlayTime (min)": tot_time,
                                "Distance (m)": player_og_stats[0],
-                               "Distance/min": dist_min, "TopSpeed (km/h)": player_og_stats[1],
+                               "Distance/min": dist_min, "TopSpeed (km/h)": top_speed,
                                "AvgSpeed (km/h)": player_og_stats[2], "Sprints > 25,2km/h": player_og_stats[3],
                                "Distance Sprints (m)": player_og_stats[4], "Distance/min Sprints": dist_min_sprints,
                                "HighSpeedRuns 19,8-25,2km/h": player_og_stats[5],
@@ -104,3 +105,58 @@ def get_player_stats(files, gamelog, ven):
 
     return players_data_bvb, players_data_oppo
 
+
+def write_excel(dfl_df, epl_df, gamelog):
+    """
+
+    :param gamelog:
+    :param epl_df:
+    :param dfl_df:
+    :return:
+    """
+
+    bvb_id, bvb_name, oppo_id, oppo_name, match_id, matchday, comp_id = get_match_info(gamelog)
+    sheets = ['BVB_Live_EPL', 'Opp_Live_EPL', 'BVB_Live_DFL', 'Opp_Live_DFL']
+
+    # Write Excel-File. Would need some formatting and additional information to match Falk's application 100%
+    writer = pd.ExcelWriter("Test.xlsx", engine="xlsxwriter")
+
+    # Write each dataframe to a different worksheet.
+    epl_df[0].to_excel(writer, sheet_name=sheets[0], index=False, startrow=8, header=False)
+    epl_df[1].to_excel(writer, sheet_name=sheets[1], index=False, startrow=8, header=False)
+    dfl_df[0].to_excel(writer, sheet_name=sheets[2], index=False, startrow=8, header=False)
+    dfl_df[1].to_excel(writer, sheet_name=sheets[3], index=False, startrow=8, header=False)
+
+    for sheet in sheets:
+        # Get the xlsxwriter workbook and worksheet objects.
+        if 'BVB' in sheet:
+            teamID_x = bvb_id
+            teamName = bvb_name
+        if 'Opp' in sheet:
+            teamID_x = oppo_id
+            teamName = oppo_name
+        workbook = writer.book
+        worksheet = writer.sheets[sheet]
+        worksheet.write(0, 0, 'ChyronHego - Tracab Physical Summary')
+        worksheet.write(1, 0, 'LeagueID:')
+        worksheet.write(1, 1, comp_id)
+        worksheet.write(2, 0, 'RoundID:')
+        worksheet.write(2, 1, matchday)
+        worksheet.write(3, 0, 'Game ID:')
+        worksheet.write(3, 1, match_id)
+        worksheet.write(5, 0, 'TeamID:')
+        worksheet.write(5, 1, teamID_x)
+        worksheet.write(6, 0, 'TeamName')
+        worksheet.write(6, 1, teamName)
+        # Add a header format.
+        header_format = workbook.add_format({
+            'bold': False,
+            'text_wrap': False,
+            'border': 0})
+
+        # Write the column headers with the defined format.
+        for col_num, value in enumerate(epl_df[0].columns.values):
+            worksheet.write(7, col_num, value, header_format)
+
+    # Close the Pandas Excel writer and output the Excel file.
+    writer.close()

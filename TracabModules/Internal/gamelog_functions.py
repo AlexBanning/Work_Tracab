@@ -26,3 +26,28 @@ def get_player_name(gamelog, team_id, player_id):
                    x.getElementsByTagName('PlId')[0].firstChild.data == player_id][0]
 
     return player_name
+
+
+def get_match_info(gamelog):
+    """
+    This function aims to fetch the TeamID, TeamName, GameID, CompID and Matchday out of a gamelog.
+    :param gamelog:
+    :return:
+    """
+    xml_doc = parse(gamelog)
+    teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
+    bvb_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+              x.attributes['TeamId'].childNodes[0].data == '18'][0]
+    oppo_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+              x.attributes['TeamId'].childNodes[0].data != '18'][0]
+    bvb_name = [x for x in teams if
+                x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
+    oppo_name = [x for x in teams if
+                x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
+
+    match_id = xml_doc.getElementsByTagName('TracabData')[0].attributes['GameId'].childNodes[0].data
+    matchday = xml_doc.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
+    comp_id = xml_doc.getElementsByTagName('EnvironmentSettings')[0].attributes['CompetitionId'].childNodes[0].data
+
+    return bvb_id, bvb_name, oppo_id, oppo_name, match_id, matchday, comp_id
+
