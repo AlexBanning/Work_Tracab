@@ -18,7 +18,6 @@ latest_htf1 = newest_file(path_htf1, 'mp4')
 latest_htf2 = newest_file(path_htf2, 'mp4')
 
 match = latest_htf1[-13:-6].replace('_', '-')
-print(match)
 
 bl2_schedule = pd.read_excel(r'C:\Users\tracab\Desktop\BL2_HTF_Schedule.xlsx', header=1)
 
