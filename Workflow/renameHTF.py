@@ -5,6 +5,7 @@ STS requirements.
 v1.0: 2024/03/08 11:45
     - First version already able to rename the videos accordingly
     - Currently this version needs to be adjusted based on bl1 or bl2 usage
+    - SuperCup for BL1 schedule is neglected. NEEDS TO BE ADJUSTED FOR UPCOMING SEASON!!!
 """
 import pandas as pd
 import os
