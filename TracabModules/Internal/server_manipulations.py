@@ -3,17 +3,31 @@ import glob
 import shutil
 
 
-def newest(path):
+def newest_folder(path):
     """
     Return the newest folder of all folders within a directory
     :param path: filepath as str
     :return:
-        str: filepath of newest file
+        str: filepath of newest folder
     """
     folders = [a for a in os.listdir(path) if
                os.path.isdir(os.path.join(path, a))]
     paths = [os.path.join(path, basename) for basename in folders]
     return max(paths, key=os.path.getctime)
+
+
+def newest_file(path, format):
+    """
+    Return the newest file inside a folder
+    :param path: filepath as str
+    :param format: str
+        String that indicates the format of the requested file
+    :return:
+        str: filepath of newest file
+    """
+    list_of_files = glob.glob(path + '/*.' + format)
+    latest_file = max(list_of_files, key=os.path.getctime)
+    return latest_file
 
 
 def move_videos(sts_id, match, date, filepath_new):

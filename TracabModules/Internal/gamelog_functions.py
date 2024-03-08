@@ -33,6 +33,7 @@ def get_match_info(gamelog):
     This function aims to fetch the TeamID, TeamName, GameID, CompID and Matchday out of a gamelog.
     :param gamelog:
     :return:
+        Dict: Dictionary containing 'all' match information from the gamelog
     """
     xml_doc = parse(gamelog)
     teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
@@ -49,5 +50,6 @@ def get_match_info(gamelog):
     matchday = xml_doc.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
     comp_id = xml_doc.getElementsByTagName('EnvironmentSettings')[0].attributes['CompetitionId'].childNodes[0].data
 
-    return bvb_id, bvb_name, oppo_id, oppo_name, match_id, matchday, comp_id
+    return dict({'bvb_id': bvb_id, 'bvb_name': bvb_name, 'oppo_id': oppo_id, 'oppo_name': oppo_name,
+                 'match_id': match_id, 'md': matchday, 'comp_id': comp_id})
 

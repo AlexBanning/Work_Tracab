@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from xml.dom.minidom import parse
 import os
-from TracabModules.Internal.gamelog_functions import get_player_name, get_match_info
+from TracabModules.Internal.gamelog_functions import get_player_name
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "PlayTime (min)", "Distance (m)", "Distance/min",
@@ -22,16 +22,19 @@ resolution_kpis = ['Distance', 'TopSpeed', 'AvgSpeed', 'Sprints', 'SprintDistanc
                    'SpeedRunsIBC', 'AvgTimeIBC']
 
 
-def get_player_stats(files, gamelog, ven):
+def get_player_stats(main_folder, files, gamelog, ven, match_info):
     """
     This function aims to fetch all KPIs of interest for the BVB validation from the PlayerID_resolution.xml-files and
     returns them for both BVB and their opponents.
+
+    :param main_folder:
     :param ven: str
         String indicating whether DFL or EPL files should be fetched.
     :param gamelog: str
         String that is equal to the path of the gamelog that needs to be used to fetch the players' names.
     :param files: list of str
         List that contains the names of all PlayerID_resolution.xml files in the destined folder.
+    :param match_info:
     :return:
         players_data_bvb: pd.DataFrame
         players_data_oppo: pd.DataFrame
@@ -43,9 +46,11 @@ def get_player_stats(files, gamelog, ven):
     players_data_oppo = pd.DataFrame()
 
     if ven == 'DFL':
-        path = os.getcwd() + r'\Players_DFL'
+        path = (os.getcwd() + r'\Live_DFL\Webmonitor\Game_' +
+                match_info['match_id'] + r'_3\Live\Team\Player')
     elif ven == 'EPL':
-        path = os.getcwd() + r'\Players_EPL'
+        path = (os.getcwd() + r'\Live_EPL\Webmonitor\Game_' +
+                match_info['match_id'] + r'_2\Live\Team\Player')
 
     # Loop through all PlayerID_Resolution.xml files to fetch KPI-scores for each player
     for i, file in enumerate(files):
@@ -53,7 +58,7 @@ def get_player_stats(files, gamelog, ven):
         team_id = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['TeamID'].childNodes[0].data)
         player_id = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['PlayerID'].childNodes[0].data)
         player_nr = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['PlayerNumber'].childNodes[0].data)
-        player_name = get_player_name(gamelog, team_id, player_id)
+        player_name = get_player_name(main_folder + r'\Live_DFL' + '\\' + gamelog, team_id, player_id)
         stats_elements = xml_doc.getElementsByTagName('Stats')
 
         # Fetch those KPIs that are directly inside the PlayerID_Resolution.xml
@@ -106,20 +111,19 @@ def get_player_stats(files, gamelog, ven):
     return players_data_bvb, players_data_oppo
 
 
-def write_excel(dfl_df, epl_df, gamelog):
+def write_excel(dfl_df, epl_df, match_info):
     """
 
-    :param gamelog:
-    :param epl_df:
-    :param dfl_df:
-    :return:
+
+    :param epl_df: list of pd.DataFrame
+    :param dfl_df: list of pd.DataFrame
+    :param match_info: Dict
     """
 
-    bvb_id, bvb_name, oppo_id, oppo_name, match_id, matchday, comp_id = get_match_info(gamelog)
     sheets = ['BVB_Live_EPL', 'Opp_Live_EPL', 'BVB_Live_DFL', 'Opp_Live_DFL']
 
     # Write Excel-File. Would need some formatting and additional information to match Falk's application 100%
-    writer = pd.ExcelWriter("Test.xlsx", engine="xlsxwriter")
+    writer = pd.ExcelWriter("Live_Game_" + match_info['match_id'] + "_2.xlsx", engine="xlsxwriter")
 
     # Write each dataframe to a different worksheet.
     epl_df[0].to_excel(writer, sheet_name=sheets[0], index=False, startrow=8, header=False)
@@ -130,20 +134,20 @@ def write_excel(dfl_df, epl_df, gamelog):
     for sheet in sheets:
         # Get the xlsxwriter workbook and worksheet objects.
         if 'BVB' in sheet:
-            teamID_x = bvb_id
-            teamName = bvb_name
+            teamID_x = match_info['bvb_id']
+            teamName = match_info['bvb_name']
         if 'Opp' in sheet:
-            teamID_x = oppo_id
-            teamName = oppo_name
+            teamID_x = match_info['oppo_id']
+            teamName = match_info['oppo_name']
         workbook = writer.book
         worksheet = writer.sheets[sheet]
         worksheet.write(0, 0, 'ChyronHego - Tracab Physical Summary')
         worksheet.write(1, 0, 'LeagueID:')
-        worksheet.write(1, 1, comp_id)
+        worksheet.write(1, 1, match_info['comp_id'])
         worksheet.write(2, 0, 'RoundID:')
-        worksheet.write(2, 1, matchday)
+        worksheet.write(2, 1, match_info['md'])
         worksheet.write(3, 0, 'Game ID:')
-        worksheet.write(3, 1, match_id)
+        worksheet.write(3, 1, match_info['match_id'])
         worksheet.write(5, 0, 'TeamID:')
         worksheet.write(5, 1, teamID_x)
         worksheet.write(6, 0, 'TeamName')
