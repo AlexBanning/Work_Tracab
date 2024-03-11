@@ -22,7 +22,7 @@ resolution_kpis = ['Distance', 'TopSpeed', 'AvgSpeed', 'Sprints', 'SprintDistanc
                    'SpeedRunsIBC', 'AvgTimeIBC']
 
 
-def get_player_stats(main_folder, files, gamelog, ven, match_info):
+def get_player_stats(main_folder, files, gamelog, ven, obs, match_info):
     """
     This function aims to fetch all KPIs of interest for the BVB validation from the PlayerID_resolution.xml-files and
     returns them for both BVB and their opponents.
@@ -45,12 +45,17 @@ def get_player_stats(main_folder, files, gamelog, ven, match_info):
     players_data_bvb = pd.DataFrame()
     players_data_oppo = pd.DataFrame()
 
+    if obs is True:
+        dpt = 'Observed'
+    elif obs is False:
+        dpt = 'Live'
+
     if ven == 'DFL':
-        path = (os.getcwd() + r'\Live_DFL\Webmonitor\Game_' +
-                match_info['match_id'] + r'_3\Live\Team\Player')
+        path = (os.getcwd() + r'\Observed_DFL\Webmonitor\Game_' +
+                match_info['match_id'] + r'_3' + '\\' + dpt + r'\Team\Player')
     elif ven == 'EPL':
-        path = (os.getcwd() + r'\Live_EPL\Webmonitor\Game_' +
-                match_info['match_id'] + r'_2\Live\Team\Player')
+        path = (os.getcwd() + r'\Observed_EPL\Webmonitor\Game_' +
+                match_info['match_id'] + r'_2' + '\\' + dpt + r'\Team\Player')
 
     # Loop through all PlayerID_Resolution.xml files to fetch KPI-scores for each player
     for i, file in enumerate(files):
@@ -58,7 +63,7 @@ def get_player_stats(main_folder, files, gamelog, ven, match_info):
         team_id = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['TeamID'].childNodes[0].data)
         player_id = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['PlayerID'].childNodes[0].data)
         player_nr = str(xml_doc.getElementsByTagName('PlayerData')[0].attributes['PlayerNumber'].childNodes[0].data)
-        player_name = get_player_name(main_folder + r'\Live_DFL' + '\\' + gamelog, team_id, player_id)
+        player_name = get_player_name(main_folder + '\\' + dpt + '_DFL' + '\\' + gamelog, team_id, player_id)
         stats_elements = xml_doc.getElementsByTagName('Stats')
 
         # Fetch those KPIs that are directly inside the PlayerID_Resolution.xml
@@ -111,7 +116,7 @@ def get_player_stats(main_folder, files, gamelog, ven, match_info):
     return players_data_bvb, players_data_oppo
 
 
-def write_excel(dfl_df, epl_df, match_info):
+def write_excel(dfl_df, epl_df, match_info, obs):
     """
 
 
@@ -120,10 +125,15 @@ def write_excel(dfl_df, epl_df, match_info):
     :param match_info: Dict
     """
 
-    sheets = ['BVB_Live_EPL', 'Opp_Live_EPL', 'BVB_Live_DFL', 'Opp_Live_DFL']
+    if obs is False:
+        sheets = ['BVB_Live_EPL', 'Opp_Live_EPL', 'BVB_Live_DFL', 'Opp_Live_DFL']
+        excel_name = "Live_Game_" + match_info['match_id'] + "_2.xlsx"
+    elif obs is True:
+        sheets = ['BVB_Observed_EPL', 'Opp_Observed_EPL', 'BVB_Observed_DFL', 'Opp_Observed_DFL']
+        excel_name = "Observed_Game_" + match_info['match_id'] + "_2.xlsx"
 
     # Write Excel-File. Would need some formatting and additional information to match Falk's application 100%
-    writer = pd.ExcelWriter("Live_Game_" + match_info['match_id'] + "_2.xlsx", engine="xlsxwriter")
+    writer = pd.ExcelWriter(excel_name, engine="xlsxwriter")
 
     # Write each dataframe to a different worksheet.
     epl_df[0].to_excel(writer, sheet_name=sheets[0], index=False, startrow=8, header=False)

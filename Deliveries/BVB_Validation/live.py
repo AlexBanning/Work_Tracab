@@ -38,9 +38,9 @@ epl_folder = os.getcwd() + r'\Live_EPL\Webmonitor\Game_' + match_info['match_id'
 files_epl = [x for x in os.listdir(epl_folder) if 'Resolution.xml' in x]
 
 # Create DFs for all four Excel-sheets
-bvb_dfl, oppo_dfl = get_player_stats(main_folder, files_dfl, gamelog, 'DFL', match_info)
-bvb_epl, oppo_epl = get_player_stats(main_folder, files_epl, gamelog, 'EPL', match_info)
+bvb_dfl, oppo_dfl = get_player_stats(main_folder, files_dfl, gamelog, 'DFL', obs=False, match_info=match_info)
+bvb_epl, oppo_epl = get_player_stats(main_folder, files_epl, gamelog, 'EPL', obs=False, match_info=match_info)
 
 os.chdir(main_folder)
 # Write Excel-file
-write_excel([bvb_dfl, oppo_dfl], [bvb_epl, oppo_epl], match_info)
+write_excel([bvb_dfl, oppo_dfl], [bvb_epl, oppo_epl], match_info, obs=False)
