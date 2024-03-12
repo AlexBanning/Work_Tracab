@@ -2,6 +2,9 @@ import os
 import glob
 import shutil
 from tkinter import filedialog
+from tkinter import messagebox
+import tkinter as tk
+import logging
 
 
 def newest_folder(path):
@@ -31,11 +34,11 @@ def newest_file(path, format):
     return latest_file
 
 
-def choose_file(initialdir, feed):
+def choose_file(initialdir, feed, allowed_types):
     file = filedialog.askopenfilename(
         initialdir=initialdir,
         title=feed,
-        filetypes=[("MP4 files", "*.mp4")]
+        filetypes=[allowed_types]
     )
     return file
 
@@ -74,3 +77,26 @@ def move_videos(sts_id, match, date, filepath_new):
                     shutil.copy(file, filepath_new + '\\' + filename_new)
 
     print('All files have been copied and renamed')
+
+
+def display_popup(title, message):
+    """
+
+    :param title:
+    :param message:
+    :return:
+    """
+    root = tk.Tk()
+    root.withdraw()
+    messagebox.showinfo(title=title, message=message)
+    root.mainloop()
+
+
+def rename_htf_files(source_path, destination_path, new_filename):
+    try:
+        logging.info(f"Renaming {source_path} to {destination_path}\\{new_filename}")
+        os.rename(source_path, f"{destination_path}\\{new_filename}")
+    except FileNotFoundError:
+        logging.error(f"File not found: {source_path}")
+    except Exception as e:
+        logging.error(f"Error renaming file: {e}")

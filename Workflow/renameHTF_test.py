@@ -8,6 +8,9 @@ v1.0: 2024/03/08 11:45
     - SuperCup for BL1 schedule is neglected. NEEDS TO BE ADJUSTED FOR UPCOMING SEASON!!!
 v1.1: 2024/03/08 14:20
     - Added additional check for the existence of both or only one HTF
+v1.2: 2024/03/12 13:35
+    - Added some GUI at the end indicating when files have been renamed
+    - Added some logging information
 """
 import pandas as pd
 import logging
@@ -23,8 +26,8 @@ logging.basicConfig(level=logging.INFO)
 path_htf1 = r'D:\B'
 path_htf2 = r'E:\D'
 
-latest_htf1 = choose_file(path_htf1, "HTF_1")
-latest_htf2 = choose_file(path_htf2, "HTF_2")
+latest_htf1 = choose_file(path_htf1, feed="HTF_1", allowed_types=("MP4 files", "*.mp4"))
+latest_htf2 = choose_file(path_htf2, feed="HTF_2", allowed_types=("MP4 files", "*.mp4"))
 
 match = latest_htf1[-13:-6].replace('_', '-')
 
@@ -35,6 +38,7 @@ new_htf2 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Left'].va
 new_htf1 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Right'].values[0]
 
 # Rename the available HTFs
+
 logging.info(f"Renaming {latest_htf2} to {path_htf2}\\{new_htf2}")
 os.rename(latest_htf2, f"{path_htf2}\\{new_htf2}")
 logging.info(f"Renaming {latest_htf1} to {path_htf1}\\{new_htf1}")
