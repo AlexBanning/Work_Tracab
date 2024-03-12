@@ -1,6 +1,7 @@
 import os
 import glob
 import shutil
+from tkinter import filedialog
 
 
 def newest_folder(path):
@@ -28,6 +29,15 @@ def newest_file(path, format):
     list_of_files = glob.glob(path + '/*.' + format)
     latest_file = max(list_of_files, key=os.path.getctime)
     return latest_file
+
+
+def choose_file(initialdir, feed):
+    file = filedialog.askopenfilename(
+        initialdir=initialdir,
+        title=feed,
+        filetypes=[("MP4 files", "*.mp4")]
+    )
+    return file
 
 
 def move_videos(sts_id, match, date, filepath_new):
