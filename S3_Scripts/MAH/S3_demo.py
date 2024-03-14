@@ -11,12 +11,12 @@ Automize the upload of video feeds to the S3 database
 import sys
 from MLS.MLS_Teams import MLS
 from TracabModules.Internal.gamestats_functions import get_match_info
-from TracabModules.Internal.server_manipulations import newest, move_videos
+from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
 import os
 import shutil
 
-match_folder = newest(r'\\192.168.7.72\Rec')
+match_folder = newest_folder(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
 print(match_folder + '\n')
 home, away, md, comp = get_match_info(match_folder)
@@ -58,7 +58,12 @@ except FileExistsError:
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
-move_videos(sts_id, match, date, filepath_new)
+feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
+         'PanoD': 'HighBehind_1.mp4'}
+
+for feed_identifier, feed_type in feeds.items():
+    move_and_rename_feed(feed_type=feed_type, feed_identifier=feed_identifier, filepath_new=filepath_new,
+                         sts_id=sts_id, match=match, date=date)
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):

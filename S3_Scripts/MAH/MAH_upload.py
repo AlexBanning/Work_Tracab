@@ -1,23 +1,21 @@
 """
 Automize the upload of video feeds to the S3 database
 
-1.) What file should be uploaded?
-    - Take filepath as input
-2.) Create cmd command
-    - Paste input into line
-    - Adjust upload-location / file name accordingly
-3.) Execute cmd command and upload files
+v2.0 2024/03/14 09:40
+    - Improved modularity for future adjustments
+    - Renamed to MAH_upload.py to lose redundant and long name
+
 """
 import shutil
 import sys
 from MLS.MLS_Teams import MLS
 from TracabModules.Internal.gamestats_functions import get_match_info
-from TracabModules.Internal.server_manipulations import newest, move_videos
+from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
 import os
 
 
-match_folder = newest(r'\\192.168.7.72\Rec')
+match_folder = newest_folder(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
 print(match_folder + '\n')
 home, away, md, comp = get_match_info(match_folder)
@@ -59,7 +57,12 @@ except FileExistsError:
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
-move_videos(sts_id, match, date, filepath_new)
+feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
+         'PanoD': 'HighBehind_1.mp4'}
+
+for feed_identifier, feed_type in feeds.items():
+    move_and_rename_feed(feed_type=feed_type, feed_identifier=feed_identifier, filepath_new=filepath_new,
+                         sts_id=sts_id, match=match, date=date)
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):
@@ -72,11 +75,8 @@ elif comp == str(100):
                + folder_new + '" --recursive')
 
 print(command)
-input('Press Enter to exit Demo')
-
 try:
     os.system(command)
     input('Upload has finished. Press enter to exit')
-    shutil.rmtree(filepath_new)
 except:
     input('Upload was not successful. Please try again and submit the error code!')

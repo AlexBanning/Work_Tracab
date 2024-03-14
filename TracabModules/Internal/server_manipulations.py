@@ -100,3 +100,36 @@ def rename_htf_files(source_path, destination_path, new_filename):
         logging.error(f"File not found: {source_path}")
     except Exception as e:
         logging.error(f"Error renaming file: {e}")
+
+
+def move_and_rename_feed(feed_type, feed_identifier, filepath_new, sts_id, match, date):
+    def get_source_folder(feed_type, date):
+        # Define your logic to determine the source folder based on feed_type
+        if feed_type == 'TacticalFeed.mp4':
+            return r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date
+        elif feed_type == 'PanoramicFeed.mp4':
+            return r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date
+        elif feed_type == 'HighBehind_1.mp4' or feed_type == 'HighBehind_2.mp4':
+            return r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+        else:
+            # Handle other cases if needed
+            return None
+
+    feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
+             'PanoD': 'HighBehind_1.mp4'}
+
+    source_folder = get_source_folder(feed_type,
+                                      date)  # Define your function to get the source folder based on feed_type
+
+    os.chdir(source_folder)
+
+    for file in glob.glob("*.mp4"):
+        new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feeds[str(feed_identifier)]}")
+
+        if (feed_type == 'HighBehind_1.mp4' and f'{feed_identifier}' in file
+                or feed_type == 'HighBehind_2.mp4' and f'{feed_identifier}' in file):
+            print(f'{feed_type} copied to: {new_filepath} \n')
+            shutil.copy(file, new_filepath)
+        else:
+            print(f'{feed_type} copied to: {new_filepath} \n')
+            shutil.copy(file, new_filepath)
