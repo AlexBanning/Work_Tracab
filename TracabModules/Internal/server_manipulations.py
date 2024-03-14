@@ -102,34 +102,68 @@ def rename_htf_files(source_path, destination_path, new_filename):
         logging.error(f"Error renaming file: {e}")
 
 
-def move_and_rename_feed(feed_type, feed_identifier, filepath_new, sts_id, match, date):
-    def get_source_folder(feed_type, date):
-        # Define your logic to determine the source folder based on feed_type
-        if feed_type == 'TacticalFeed.mp4':
-            return r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date
+def get_source_folder(feed_type, date, nyc):
+    folder_map = {
+        'TacticalFeed.mp4': r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date,
+        'PanoramicFeed.mp4': r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date,
+        'HighBehind_1.mp4': r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date,
+        'HighBehind_2.mp4': r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+    }
+
+    if nyc:
+        folder_map['HighBehind_1.mp4'] = r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date
+        folder_map['HighBehind_2.mp4'] = r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+
+    return folder_map.get(feed_type)
+
+
+def copy_files(filepath_new, sts_id, match, feed_identifier, feed_type):
+    for file in glob.glob("*.mp4"):
+        if feed_type == 'HighBehind_1.mp4':
+            if 'PanoD' in file:
+                new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
+                print(f'{feed_type} copied to: {new_filepath} \n')
+                shutil.copy(file, new_filepath)
+        elif feed_type == 'HighBehind_2.mp4':
+            if 'PanoB' in file:
+                new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
+                print(f'{feed_type} copied to: {new_filepath} \n')
+                shutil.copy(file, new_filepath)
         elif feed_type == 'PanoramicFeed.mp4':
-            return r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date
-        elif feed_type == 'HighBehind_1.mp4' or feed_type == 'HighBehind_2.mp4':
-            return r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+            if 'PanoA' in file:
+                new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
+                print(f'{feed_type} copied to: {new_filepath} \n')
+                shutil.copy(file, new_filepath)
         else:
-            # Handle other cases if needed
-            return None
+            new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
+            print(f'{feed_type} copied to: {new_filepath} \n')
+            shutil.copy(file, new_filepath)
+
+
+def move_and_rename_feed(filepath_new, sts_id, match, date, nyc=False):
 
     feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
              'PanoD': 'HighBehind_1.mp4'}
 
-    source_folder = get_source_folder(feed_type,
-                                      date)  # Define your function to get the source folder based on feed_type
-
-    os.chdir(source_folder)
-
-    for file in glob.glob("*.mp4"):
-        new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feeds[str(feed_identifier)]}")
-
-        if (feed_type == 'HighBehind_1.mp4' and f'{feed_identifier}' in file
-                or feed_type == 'HighBehind_2.mp4' and f'{feed_identifier}' in file):
-            print(f'{feed_type} copied to: {new_filepath} \n')
-            shutil.copy(file, new_filepath)
+    for feed_identifier, feed_type in feeds.items():
+        source_folder = get_source_folder(feed_type, date, nyc)
+        if source_folder:
+            os.chdir(source_folder)
+            copy_files(filepath_new, sts_id, match, feed_identifier, feed_type)
         else:
-            print(f'{feed_type} copied to: {new_filepath} \n')
-            shutil.copy(file, new_filepath)
+            print(f"No source folder found for feed type: {feed_type}")
+
+
+def get_feed_names(sts_id, match):
+    """
+
+    :param sts_id:
+    :param match:
+    :return:
+    """
+    feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
+             'PanoD': 'HighBehind_1.mp4'}
+
+    for feed_identifier, feed_type in feeds.items():
+        new_filename = f'{sts_id}_{match}_{feeds[str(feed_identifier)]}'
+        print(f'{feed_type} must be renamed to: {new_filename} \n')

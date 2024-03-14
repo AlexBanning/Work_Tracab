@@ -4,6 +4,7 @@ Automize the upload of video feeds to the S3 database
 v2.0 2024/03/14 09:40
     - Improved modularity for future adjustments
     - Renamed to MAH_upload.py to lose redundant and long name
+    - Added parameters to enable easy implementations of special set-ups if file-locations differ from default
 
 """
 import shutil
@@ -17,7 +18,7 @@ import os
 
 match_folder = newest_folder(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
-print(match_folder + '\n')
+print(f'Matchfolder: {match_folder} \n')
 home, away, md, comp = get_match_info(match_folder)
 # Define team-dictionary
 teams = MLS
@@ -57,12 +58,7 @@ except FileExistsError:
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
-feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
-         'PanoD': 'HighBehind_1.mp4'}
-
-for feed_identifier, feed_type in feeds.items():
-    move_and_rename_feed(feed_type=feed_type, feed_identifier=feed_identifier, filepath_new=filepath_new,
-                         sts_id=sts_id, match=match, date=date)
+move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date=date)
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):
