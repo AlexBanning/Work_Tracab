@@ -10,12 +10,12 @@ pyinstaller --noconfirm --onefile --console --add-data "C:/Users/a.banning/Pycha
 --------------------------------------------------------------------------------------------------------------------------------------------
 renameHTF:
 
-pyinstaller --noconfirm --onefile --console --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "glob" --hidden-import "pandas" --hidden-import "os"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Workflow/renameHTF.py"
+pyinstaller --noconfirm --onedfile --windowed --icon "C:/Users/a.banning/Downloads/Tracab.ico" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "os" --hidden-import "glob" --hidden-import "ftputil" --hidden-import "tkinter" --hidden-import "tkinter.filedialog" --hidden-import "tkinter.messagebox" --hidden-import "pandas" --hidden-import "logging"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Workflow/DFL/renameHTF.py"
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 filedownloader_renameHTF: 
 
-pyinstaller --noconfirm --onefile --console --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "ftputil"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Workflow/filedownloader.py"
+pyinstaller --noconfirm --onefile --console --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "ftputil"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Workflow/FileDownloader/filedownloader_renameHTF.py"
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 filedownloader_MAH:
