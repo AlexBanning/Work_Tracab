@@ -5,6 +5,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import tkinter as tk
 import logging
+import ftputil
 
 
 def newest_folder(path):
@@ -167,3 +168,27 @@ def get_feed_names(sts_id, match):
     for feed_identifier, feed_type in feeds.items():
         new_filename = f'{sts_id}_{match}_{feeds[str(feed_identifier)]}'
         print(f'{feed_type} must be renamed to: {new_filename} \n')
+
+
+def filedownloader(filename, source, destination):
+    """
+
+    :param filename:
+    :param source:
+    :param destination:
+    :return:
+    """
+
+    server = "213.168.127.130"
+    user = "Alex_Test"
+    password = "RobberyandLahm5%"
+
+    try:
+        with ftputil.FTPHost(server, user, password) as ftp_host:
+            ftp_host.chdir(source)
+            ftp_host.open(filename)
+            if ftp_host.path.isfile(filename):
+                ftp_host.download(filename, destination + filename)
+                print(f'{filename} has been downloaded to {destination}')
+    except:
+        pass
