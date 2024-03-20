@@ -35,13 +35,20 @@ def newest_file(path, format):
     return latest_file
 
 
-def choose_file(initialdir, feed, allowed_types):
-    file = filedialog.askopenfilename(
-        initialdir=initialdir,
-        title=feed,
-        filetypes=[allowed_types]
-    )
-    return file
+def choose_file(initialdir, title, allowed_types, keyword=None):
+    while True:
+        file_path = filedialog.askopenfilename(
+            initialdir=initialdir,
+            title=title,
+            filetypes=[allowed_types]
+        )
+        if not file_path:
+            return None  # User canceled the dialog
+
+        if keyword and keyword not in file_path:
+            messagebox.showwarning('Invalid File Selected', f'Please select a {title} feed!')
+        else:
+            return file_path
 
 
 def move_videos(sts_id, match, date, filepath_new):
@@ -142,7 +149,6 @@ def copy_files(filepath_new, sts_id, match, feed_identifier, feed_type):
 
 
 def move_and_rename_feed(filepath_new, sts_id, match, date, nyc=False):
-
     feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
              'PanoD': 'HighBehind_1.mp4'}
 

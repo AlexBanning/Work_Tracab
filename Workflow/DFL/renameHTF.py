@@ -2,16 +2,19 @@
 Purpose of this code is to find the latest HTF videos that were just rendered into .mp4 and then rename them according
 STS requirements.
 
-v1.0: 2024/03/08 11:45
+v0.0: 2024/03/08 11:45
     - First version already able to rename the videos accordingly
     - Currently this version needs to be adjusted based on bl1 or bl2 usage
     - SuperCup for BL1 schedule is neglected. NEEDS TO BE ADJUSTED FOR UPCOMING SEASON!!!
-v1.1: 2024/03/08 14:20
+v0.1: 2024/03/08 14:20
     - Added additional check for the existence of both or only one HTF
-v1.2: 2024/03/12 13:35
+v0.2: 2024/03/12 13:35
     - Added some GUI at the end indicating when files have been renamed
     - Added some logging information
     - Added additional functions and modularity
+v1.0: 2024/03/20 15:30
+    - Added additional fail-safe if wrong files get selected
+    - Final version, ready to be implemented in workflow
 """
 import pandas as pd
 import logging
@@ -26,12 +29,12 @@ ALLOWED_FILE_TYPES = ("MP4 files", "*.mp4")
 # Add this at the beginning of your script
 logging.basicConfig(level=logging.INFO)
 
-latest_htf1 = choose_file(DEFAULT_PATH_HTF1, feed="HTF_1", allowed_types=("MP4 files", "*.mp4"))
-latest_htf2 = choose_file(DEFAULT_PATH_HTF2, feed="HTF_2", allowed_types=("MP4 files", "*.mp4"))
+latest_htf1 = choose_file(DEFAULT_PATH_HTF1, title="HTF_1", allowed_types=("MP4 files", "*.mp4"), keyword='_1.mp4')
+latest_htf2 = choose_file(DEFAULT_PATH_HTF2, title="HTF_2", allowed_types=("MP4 files", "*.mp4"), keyword='_2.mp4')
 
 match = latest_htf1[-13:-6].replace('_', '-')
 
-bl1_schedule = pd.read_excel(r'C:\Users\tracab\Desktop\BL1_HTF_Schedule.xlsx', header=1)
+bl1_schedule = pd.read_excel(BL1_SCHEDULE_PATH, header=1)
 
 # Right/Left is seen from the benches => Default: left == HTF2
 new_htf2 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Left'].values[0]

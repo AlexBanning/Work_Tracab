@@ -17,9 +17,9 @@ if choice == str(1):
         try:
             with ftputil.FTPHost(server, user, password) as ftp_host:
                 ftp_host.chdir(ftp_dir)
-                ftp_host.open(filename)
-                if ftp_host.path.isfile(filename):
-                    ftp_host.download(filename, filename)
+                ftp_host.open('renameHTF_bl1')
+                if ftp_host.path.isdir('renameHTF_bl1'):
+                    ftp_host.download('renameHTF_bl1', 'renameHTF_bl1')
         except:
             pass
 elif choice == str(2):
