@@ -2,6 +2,10 @@ import json
 
 import pandas as pd
 
+
+'''
+JSON ------------------------------------------------------------------------------------------------------------------
+'''
 with open(r'C:\Users\a.banning\Downloads\184537.json') as f:
     d = json.load(f)
 
@@ -17,3 +21,9 @@ refs = [x for x in example if x['Team'] == 3]
 other = [x for x in example if x['Team'] != 1 and x['Team'] != 0 and x['Team'] != 3]
 
 home_pos = pd.DataFrame([[x['X'], y['Y']] for x,y in zip(example, example) if x['Team'] == 0])
+
+
+'''
+DAT-File ------------------------------------------------------------------------------------------------------------------
+'''
+df = pd.read_csv(r'C:\Users\a.banning\Downloads\2374244.dat', delimiter='\t')

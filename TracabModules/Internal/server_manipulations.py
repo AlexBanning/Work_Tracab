@@ -24,8 +24,8 @@ def newest_folder(path):
 def newest_file(path, format):
     """
     Return the newest file inside a folder
-    :param path: filepath as str
-    :param format: str
+    :param path: filepath as string
+    :param format: string
         String that indicates the format of the requested file
     :return:
         str: filepath of newest file
