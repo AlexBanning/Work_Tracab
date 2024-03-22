@@ -2,7 +2,6 @@ from requests.structures import CaseInsensitiveDict
 import requests
 import json
 import pandas as pd
-import numpy as np
 
 
 # Create header
@@ -16,7 +15,7 @@ headers['Authorization'] = 'Bearer ' + token
 game_id = '2374331'
 vendor_id = '5'
 extr_vers = '4'
-data_quality = '0'
+data_quality = '1'
 
 # Create metadata URL
 metadata_url = (f'https://api.tracab.com/api/V1/feeds/game_metadata?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}'
@@ -54,11 +53,43 @@ del framecount[-1]
 # playerpositions
 player_frames = [x for x in frames[1::3]]
 players = [[y for y in x.split(';') if y != ''] for x in player_frames]
-players_x = [[x.split(',') for x in frame] for frame in players]
-x_pos = [[int(x[3]) for x in frame] for frame in players_x]
+players_split = [[x.split(',') for x in frame] for frame in players]
+x_pos_home = [[int(x[3]) for x in frame  if x[0] == '1'] for frame in players_split]
+x_pos_away = [[int(x[3]) for x in frame  if x[0] == '0'] for frame in players_split]
+x_pos_refs = [[int(x[3]) for x in frame  if x[0] == '3'] for frame in players_split]
+y_pos_home = [[int(x[4]) for x in frame  if x[0] == '1'] for frame in players_split]
+y_pos_away = [[int(x[4]) for x in frame  if x[0] == '0'] for frame in players_split]
+y_pos_refs = [[int(x[4]) for x in frame  if x[0] == '3'] for frame in players_split]
 
-# DF of all X positions of all players and refs
-df = pd.DataFrame(x_pos)
+columns_x = ['x_1', 'x_2', 'x_3', 'x_4', 'x_5', 'x_6', 'x_7', 'x_8', 'x_9', 'x_10', 'x_11']
+columns_y = ['y_1', 'y_2', 'y_3', 'y_4', 'y_5', 'y_6', 'y_7', 'y_8', 'y_9', 'y_10', 'y_11']
+
+home_x = pd.DataFrame(x_pos_home, columns=columns_x)
+home_y = pd.DataFrame(y_pos_home, columns=columns_y)
+
+# Initialize an empty list to store the merged columns
+merged_columns = []
+
+# Merge columns alternately
+for x_col, y_col in zip(columns_x, columns_y):
+    merged_columns.append(x_col)
+    merged_columns.append(y_col)
+
+# Select only the matching columns from home_x and home_y based on the merged pattern
+merged_home = pd.concat([home_x[columns_x], home_y[columns_y]], axis=1)
+
+# Rename columns based on the merged pattern
+merged_home.columns = merged_columns
+
+
+home_xy = [[(x,y) for x,y in zip(frame_x,frame_y)] for frame_x, frame_y in zip(x_pos_home,y_pos_home)]
+away_xy = [[(x,y) for x,y in zip(frame_x,frame_y)] for frame_x, frame_y in zip(x_pos_away,y_pos_away)]
+refs_xy = [[(x,y) for x,y in zip(frame_x,frame_y)] for frame_x, frame_y in zip(x_pos_refs,y_pos_refs)]
+
+# DFs of all XY positions of all players and refs
+df_home = pd.DataFrame(home_xy)
+df_away = pd.DataFrame(away_xy)
+df_refs = pd.DataFrame(refs_xy)
 
 
 ball_frames = [x for x in frames[2::3]]

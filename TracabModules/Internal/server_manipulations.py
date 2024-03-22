@@ -51,42 +51,6 @@ def choose_file(initialdir, title, allowed_types, keyword=None):
             return file_path
 
 
-def move_videos(sts_id, match, date, filepath_new):
-    """
-
-    :return:
-    """
-    # Create dictionary for video feeds
-    feeds = {'1': 'TacticalFeed.mp4', '2': 'PanoramicFeed.mp4', '3': 'HighBehind_2.mp4',
-             '4': 'HighBehind_1.mp4'}
-
-    # Loop, that goes through all four feeds to move and rename them
-    for feed, i in enumerate(feeds):
-        print(feeds[i])
-        filename_new = sts_id + '_' + match + '_' + feeds[i]
-        if feeds[i] == 'TacticalFeed.mp4':
-            os.chdir(r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date)
-            for file in glob.glob("*.mp4"):
-                print(filepath_new + '\\' + filename_new)
-                shutil.copy(file, filepath_new + '\\' + filename_new)
-        if feeds[i] == 'PanoramicFeed.mp4':
-            os.chdir(r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date)
-            for file in glob.glob("*.mp4"):
-                print(filepath_new + '\\' + filename_new)
-                shutil.copy(file, filepath_new + '\\' + filename_new)
-        elif feeds[i] == 'HighBehind_1.mp4' or feeds[i] == 'HighBehind_2.mp4':
-            os.chdir(r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date)
-            for file in glob.glob("*.mp4"):
-                if feeds[i] == 'HighBehind_2.mp4' and 'PanoB' in file:
-                    print(filepath_new + '\\' + filename_new)
-                    shutil.copy(file, filepath_new + '\\' + filename_new)
-                elif feeds[i] == 'HighBehind_1.mp4' and 'PanoD' in file:
-                    print(filepath_new + '\\' + filename_new)
-                    shutil.copy(file, filepath_new + '\\' + filename_new)
-
-    print('All files have been copied and renamed')
-
-
 def display_popup(title, message):
     """
 
@@ -125,7 +89,7 @@ def get_source_folder(feed_type, date, nyc):
     return folder_map.get(feed_type)
 
 
-def copy_files(filepath_new, sts_id, match, feed_identifier, feed_type):
+def copy_files(filepath_new, sts_id, match, feed_type):
     for file in glob.glob("*.mp4"):
         if feed_type == 'HighBehind_1.mp4':
             if 'PanoD' in file:
@@ -156,7 +120,7 @@ def move_and_rename_feed(filepath_new, sts_id, match, date, nyc=False):
         source_folder = get_source_folder(feed_type, date, nyc)
         if source_folder:
             os.chdir(source_folder)
-            copy_files(filepath_new, sts_id, match, feed_identifier, feed_type)
+            copy_files(filepath_new, sts_id, match, feed_type)
         else:
             print(f"No source folder found for feed type: {feed_type}")
 
@@ -168,12 +132,15 @@ def get_feed_names(sts_id, match):
     :param match:
     :return:
     """
-    feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
-             'PanoD': 'HighBehind_1.mp4'}
+    feeds = {'AutoCam': 'TacticalFeed', 'PanoA': 'PanoramicFeed', 'PanoB': 'HighBehind_2',
+             'PanoD': 'HighBehind_1'}
 
+    feed_names = []
     for feed_identifier, feed_type in feeds.items():
         new_filename = f'{sts_id}_{match}_{feeds[str(feed_identifier)]}'
-        print(f'{feed_type} must be renamed to: {new_filename} \n')
+        feed_names.append(new_filename)
+
+    return feed_names
 
 
 def filedownloader(filename, source, destination):
