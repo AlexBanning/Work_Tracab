@@ -16,13 +16,13 @@ headers['accept'] = 'application/json'
 headers['Authorization'] = 'Bearer ' + token
 
 # Define match parameters
-game_id = '2374393'
+game_id = '2374222'
 vendor_id = '5'
 extr_vers = '4'
-data_quality = '0'
+data_quality = '1'
 team_id = '215'
 
-master_laptop
+
 # Call fixtures and results
 fixtures_url = f'https://api.tracab.com/api/fixtures/?VendorID={vendor_id}&Teams={team_id}'
 r_fixtures = requests.get(fixtures_url, headers=headers)

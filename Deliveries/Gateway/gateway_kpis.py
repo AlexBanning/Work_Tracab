@@ -1,5 +1,6 @@
 """
-The purpose of this code will be to calculate relevant KPIs from Tracab's Gateway output (dat-file + metadata)
+The purpose of this code will be to calculate relevant KPIs from Tracab's Gateway output (dat-file + metadata).
+Only needed for additional KPIs that are not already provided by the Gateway
 
 """
 
