@@ -3,7 +3,7 @@ import requests
 import numpy as np
 import pandas as pd
 from requests.structures import CaseInsensitiveDict
-
+from floodlight.io.tracab import read_position_data_dat
 
 # Create header
 token = 'MGZhNjQ2ZTQ2NmQwOGFkNGE2NDYzMTlkNDFhN2FiNDUzZjgwZGIyYjhjNGNlNGMwODhmZDY1YjNmNjQ2YjdkZA=='
@@ -40,7 +40,10 @@ home_pos = pd.DataFrame([[x['X'], y['Y']] for x,y in zip(example, example) if x[
 '''
 DAT-File ------------------------------------------------------------------------------------------------------------------
 '''
-df = pd.read_csv(r'C:\Users\a.banning\Downloads\2374244.dat', delimiter='\t')
+
+pos_data = read_position_data_dat(filepath_dat=r'C:\Users\alexa\Desktop\dat_file.dat',
+                                  filepath_metadata=r'C:\Users\alexa\Desktop\metadata.json')
+
 
 '''
 TF05-Feed -------------------------------------------------------------------------------------------------------------
@@ -75,3 +78,4 @@ tf08_url = (f'https://api.tracab.com/api/V1/feeds/tf08?GameID={game_id}&VendorID
             )
 r_tf08 = requests.get(tf08_url, headers=headers)
 tf08_data = json.loads(r_tf08.content.decode('utf8'))
+

@@ -7,6 +7,7 @@ import socket
 import struct
 import json
 
+
 # Create header
 token = 'MGZhNjQ2ZTQ2NmQwOGFkNGE2NDYzMTlkNDFhN2FiNDUzZjgwZGIyYjhjNGNlNGMwODhmZDY1YjNmNjQ2YjdkZA=='
 user_id = '360'
@@ -15,16 +16,18 @@ headers['accept'] = 'application/json'
 headers['Authorization'] = 'Bearer ' + token
 
 # Define match parameters
-game_id = '13415'
-vendor_id = '10'
+game_id = '2374393'
+vendor_id = '5'
 extr_vers = '4'
 data_quality = '0'
 team_id = '215'
 
+master_laptop
 # Call fixtures and results
 fixtures_url = f'https://api.tracab.com/api/fixtures/?VendorID={vendor_id}&Teams={team_id}'
 r_fixtures = requests.get(fixtures_url, headers=headers)
 fixtures = json.loads(r_fixtures.content.decode('utf8'))
+
 
 # Create metadata URL
 metadata_url = (
@@ -33,6 +36,8 @@ metadata_url = (
 
 # Send request to API
 r_meta = requests.get(metadata_url, headers=headers).json()
+with open(r'C:\Users\alexa\Desktop\metadata.json', 'w') as f:
+    json.dump(r_meta, f)
 
 # Get raw data in json-format
 json_url = f'https://api.tracab.com/api/V1/downloads/tf10?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
@@ -46,29 +51,18 @@ player_frames = frames['PlayerPositions']
 # List of DFs for each frame
 dfs = [pd.DataFrame(fr) for fr in player_frames]
 
-# Get raw data in binary-format
+# Get raw data in binary-format (No permissions)
 bin_url = f'https://api.tracab.com/api/V1/downloads/tbf?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
 r_bin = requests.get(bin_url, headers=headers)
 
-# Get raw data in dat file (ASCII format) and parse into seperate lists
-dat_url = (f'https://api.tracab.com/api/V1/downloads/dat?GameID={game_id}&VendorID={vendor_id}'
-           f'&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0')
+# Get raw data in dat file (ASCII format)
+dat_url = f'https://api.tracab.com/api/V1/downloads/dat?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
 r_dat = requests.get(dat_url, headers=headers)
 dat_text = r_dat.text
-# Split string into data parts (framecount:playerpositions:ballinfo)
-frames = dat_text.split(':')
-framecount = [x.replace('\n', '') for x in frames[0::3]]
-del framecount[-1]
-# playerpositions
-player_frames = [x for x in frames[1::3]]
-players = [[y for y in x.split(';') if y != ''] for x in player_frames]
-players_split = [[x.split(',') for x in frame] for frame in players]
-x_pos_home = [[int(x[3]) for x in frame if x[0] == '1'] for frame in players_split]
-x_pos_away = [[int(x[3]) for x in frame if x[0] == '0'] for frame in players_split]
-x_pos_refs = [[int(x[3]) for x in frame if x[0] == '3'] for frame in players_split]
-y_pos_home = [[int(x[4]) for x in frame if x[0] == '1'] for frame in players_split]
-y_pos_away = [[int(x[4]) for x in frame if x[0] == '0'] for frame in players_split]
-y_pos_refs = [[int(x[4]) for x in frame if x[0] == '3'] for frame in players_split]
+with open(r'C:\Users\alexa\Desktop\dat_file.dat', 'w') as f:
+    f.write(dat_text)
+    f.close()
+
 
 # TF05 Feed (Heatmap and Formation)
 tf05_url = (f'https://api.tracab.com/api/V1/feeds/tf05?GameID={game_id}&VendorID={vendor_id}'
