@@ -1,6 +1,6 @@
 S3_demo: 
 
-pyinstaller --noconfirm --onefile --console --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/MLS;MLS/" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "pandas" --hidden-import "xml.dom.minidom" --hidden-import "xml.etree.ElementTree" --hidden-import "ftputil" --hidden-import "bs4" --hidden-import "gspread"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/S3_Scripts/MAH/S3_demo.py"
+pyinstaller --noconfirm --onedir --windowed --icon "C:/Users/a.banning/Downloads/Tracab.ico" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "glob" --hidden-import "shutil" --hidden-import "tkinter" --hidden-import "tkinter.messagebox" --hidden-import "tkinter.filediealog" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/MLS;MLS/" --hidden-import "ftputil" --hidden-import "pandas" --hidden-import "bs4" --hidden-import "gspread" --hidden-import "xml.etree.ElementTree" --hidden-import "xml.dom.minidom" --hidden-import "logging" --hidden-import "threading"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/S3_Scripts/MAH/S3_demo.py"
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 BVB_live_validation: 
