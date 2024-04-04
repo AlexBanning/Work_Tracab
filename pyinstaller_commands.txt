@@ -21,3 +21,13 @@ pyinstaller --noconfirm --onefile --console --paths "C:/Users/a.banning/PycharmP
 filedownloader_MAH:
 
 pyinstaller --noconfirm --onefile --console --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "ftputil" --hidden-import "glob" --hidden-import "shutil" --hidden-import "tkinter.filedialog" --hidden-import "tkinter.messagebox" --hidden-import "tkinter" --hidden-import "logging"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Workflow/FileDownloader/fileDownloader_MAH.py"
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+all_schedules:
+
+pyinstaller --noconfirm --onefile --console --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --hidden-import "pandas" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "ftputil" --hidden-import "bs4" --hidden-import "datetime.timedelta" --hidden-import "datetime.datetime" --hidden-import "datetime.date" --hidden-import "gspread" --hidden-import "xml.etree.ElementTree"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/Schedule_Scripts/all_schedules.py"
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+MAH_upoad:
+
+pyinstaller --noconfirm --onefile --console --icon "C:/Users/a.banning/Downloads/Tracab.ico" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/TracabModules;TracabModules/" --add-data "C:/Users/a.banning/PycharmProjects/Work_Tracab/MLS;MLS/" --paths "C:/Users/a.banning/PycharmProjects/Work_Tracab/venv/Lib/site-packages" --hidden-import "shutil" --hidden-import "xml.etree.ElementTree" --hidden-import "xml.dom.minidom" --hidden-import "glob" --hidden-import "tkinter.filedialog" --hidden-import "tkinter.messagebox" --hidden-import "tkinter" --hidden-import "logging" --hidden-import "ftputil" --hidden-import "pandas" --hidden-import "bs4" --hidden-import "datetime.timedelta" --hidden-import "datetime.datetime" --hidden-import "datetime.date" --hidden-import "gspread"  "C:/Users/a.banning/PycharmProjects/Work_Tracab/S3_Scripts/MAH/MAH_upload.py"
