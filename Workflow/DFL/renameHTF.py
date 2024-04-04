@@ -30,7 +30,7 @@ import sys
 # Constants
 DEFAULT_PATH_HTF1 = r'D:\B'
 DEFAULT_PATH_HTF2 = r'E:\D'
-BL2_SCHEDULE_PATH = os.getcwd() + '\\BL2_HTF_Schedule.xlsx'
+BL1_SCHEDULE_PATH = os.getcwd() + '\\BL1_HTF_Schedule.xlsx'
 ALLOWED_FILE_TYPES = ("MP4 files", "*.mp4")
 
 # Add this at the beginning of your script
@@ -44,17 +44,17 @@ if latest_htf1:
 else:
     match = latest_htf2[-13:-6].replace('_', '-')
 
-bl2_schedule = pd.read_excel(BL2_SCHEDULE_PATH, header=1)
+bl1_schedule = pd.read_excel(BL1_SCHEDULE_PATH, header=1)
 
 # Right/Left is seen from the benches => Default: left == HTF2
 try:
-    new_htf2 = bl2_schedule.loc[bl2_schedule['3LC'] == match]['High Behind Left'].values[0]
+    new_htf2 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Left'].values[0]
 except IndexError:
     messagebox.showwarning('Invalid 3LC in selected file/-s',
                            f'Please select the correct file/-s and check the 3LC!')
     sys.exit()
 try:
-    new_htf1 = bl2_schedule.loc[bl2_schedule['3LC'] == match]['High Behind Right'].values[0]
+    new_htf1 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Right'].values[0]
 except IndexError:
     messagebox.showwarning('Invalid 3LC in selected file/-s',
                            f'Please select the correct file/-s and check the 3LC!')
@@ -62,9 +62,9 @@ except IndexError:
 # Rename the available HTFs
 if latest_htf1:
     rename_htf_files(latest_htf1, DEFAULT_PATH_HTF1, new_htf1)
-
-elif latest_htf2:
+if latest_htf2:
     rename_htf_files(latest_htf2, DEFAULT_PATH_HTF2, new_htf2)
 
 # Display popup window with information
 display_popup("Renaming HTFs", "Files have been successfully renamed!")
+sys.exit()

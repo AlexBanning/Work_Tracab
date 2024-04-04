@@ -39,3 +39,4 @@ rename_htf_files(latest_htf2, DEFAULT_PATH_HTF2, new_htf2)
 
 # Display popup window with information
 display_popup("Renaming HTFs", "File has been successfully renamed!")
+sys.exit()

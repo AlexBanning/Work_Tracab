@@ -49,3 +49,5 @@ if latest_htf2:
 
 # Display popup window with information
 display_popup("Renaming HTFs", "Files have been successfully renamed!")
+
+sys.exit()

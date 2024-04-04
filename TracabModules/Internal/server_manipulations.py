@@ -36,18 +36,24 @@ def newest_file(path, format):
 
 
 def choose_file(initialdir, title, allowed_types, keyword=None):
+    root = tk.Tk()
+    root.withdraw()
+
     while True:
         file_path = filedialog.askopenfilename(
+            parent=root,
             initialdir=initialdir,
             title=title,
             filetypes=[allowed_types]
         )
         if not file_path:
+            root.destroy()
             return None  # User canceled the dialog
 
         if keyword and keyword not in file_path:
             messagebox.showwarning('Invalid File Selected', f'Please select a {title} feed!')
         else:
+            root.destroy()
             return file_path
 
 
