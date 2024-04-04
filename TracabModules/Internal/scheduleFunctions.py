@@ -186,8 +186,8 @@ def get_d3_mls_schedule(comp_id, filename):
     # Get all matches
     fixtures = data.find_all("Fixture")
     # Define TimeSaving-Dates
-    dst_start = datetime.strptime('2023-03-31 02:00', '%Y-%m-%d %H:%M')
-    dst_end = datetime.strptime('2023-10-27 03:00', '%Y-%m-%d %H:%M')
+    dst_start = datetime.strptime('2024-03-31 02:00', '%Y-%m-%d %H:%M')
+    dst_end = datetime.strptime('2024-10-27 03:00', '%Y-%m-%d %H:%M')
     # Define league
     if comp_id == 1:
         league = 'MLS'

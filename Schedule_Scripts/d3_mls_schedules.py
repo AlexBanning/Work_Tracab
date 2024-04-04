@@ -1,4 +1,4 @@
-import TracabModules.scheduleFunctions as sf
+import TracabModules.Internal.scheduleFunctions as sf
 
 """
 Schedule-Script for all competitions of the MLS and deltatre as info provider
