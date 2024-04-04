@@ -74,7 +74,7 @@ def rename_htf_files(source_path, destination_path, new_filename):
         logging.error(f"Error renaming file: {e}")
 
 
-def get_source_folder(feed_type, date, nyc):
+def get_source_folder(feed_type, date, stl):
     folder_map = {
         'TacticalFeed.mp4': r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date,
         'PanoramicFeed.mp4': r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date,
@@ -82,9 +82,8 @@ def get_source_folder(feed_type, date, nyc):
         'HighBehind_2.mp4': r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
     }
 
-    if nyc:
-        folder_map['HighBehind_1.mp4'] = r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date
-        folder_map['HighBehind_2.mp4'] = r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+    if stl:
+        folder_map['TacticalFeed.mp4'] = r'\\192.168.7.70\d\TraCamVideoAndSetupXML' + '\\' + date
 
     return folder_map.get(feed_type)
 
@@ -112,12 +111,12 @@ def copy_files(filepath_new, sts_id, match, feed_type):
             shutil.copy(file, new_filepath)
 
 
-def move_and_rename_feed(filepath_new, sts_id, match, date, nyc=False):
+def move_and_rename_feed(filepath_new, sts_id, match, date, stl=False):
     feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
              'PanoD': 'HighBehind_1.mp4'}
 
     for feed_identifier, feed_type in feeds.items():
-        source_folder = get_source_folder(feed_type, date, nyc)
+        source_folder = get_source_folder(feed_type, date, stl)
         if source_folder:
             os.chdir(source_folder)
             copy_files(filepath_new, sts_id, match, feed_type)
