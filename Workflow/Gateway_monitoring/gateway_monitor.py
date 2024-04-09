@@ -9,12 +9,10 @@ v0.1: Very rough version of a GUI that indicates if a feed is available of not.
     - FeedStatusGUI needs to be adjusted so that the necessary data gets returned after a successful download
     - Try to limit the download size of json files, maybe stream of 'stream-api.tracab.com' might work for this one,
       including start and end subscription.
+v0.2: First version of GUI that returns the availability of all used feeds and first team information in terms of home
+      and away names
 """
 
-
-# from TracabModules.Internal.gateway import (download_metadata_file, download_tf08_feed, download_tf09_feed,
-#                                           download_ascii_feed, download_json_feed, download_binary_feed,
-#                                           download_tf05_feed)
 from TracabModules.Internal.gateway import GatewayDownloader, FeedStatusGUI
 
 """
@@ -24,7 +22,7 @@ EXTR_VERS = '4'
 DATA_QUALITY = '0'
 
 # GameID and VendorID should be user-defined in the final version
-game_id = '184777'
+game_id = '186491'
 vendor_id = '4'
 
 
