@@ -143,12 +143,18 @@ class FeedStatusGUI:
             'Away': None
         }
 
+        self.distances = {
+            'Home Distance': None,
+            '': None,
+            'Away Distance': None
+        }
+
         self.root = tk.Tk()
         self.root.title("Feed Status")
         self.root.configure(bg='#2F4F4F')
 
         # Adjust the size of the GUI window
-        self.root.geometry("400x300")
+        self.root.geometry("500x300")
 
         # Create a frame to contain the labels and buttons
         self.center_frame = tk.Frame(self.root)
@@ -157,6 +163,7 @@ class FeedStatusGUI:
 
         self.status_labels = {}
         self.team_labels = {}
+        self.distance_labels = {}
         self.progress_bars = {}
 
         self.create_widgets()
@@ -187,6 +194,10 @@ class FeedStatusGUI:
             self.team_labels[team].grid(row=i, column=3, padx=10, pady=5, sticky="nsew")
             self.team_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
+        for i, (team, dist) in enumerate(self.distances.items()):
+            self.distance_labels[team] = tk.Label(self.center_frame)
+            self.distance_labels[team].grid(row=i, column=6, padx=10, pady=5, sticky="nsew")
+            self.distance_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
     def check_json_feed(self):
         # Execute function to check JSON feed availability
@@ -243,12 +254,17 @@ class FeedStatusGUI:
             self.feed_status[feed] = False
 
     def update_team_name(self, team, name):
-        self.team_labels[team].configure(text=f"{name}", bg="white", fg="black")
+        self.team_labels[team].configure(text=f"{name}", bg="#2F4F4F", fg="#98FB98")
+
+    def update_team_distance(self, team, distance):
+        self.distance_labels[team].configure(text=f"Total distance: {distance}m", bg="#2F4F4F", fg="#98FB98")
 
     def enable_upcoming_functions(self, tf08_data):
         kpis = self.calculator.get_tf08_kpis(tf08_data)
         self.update_team_name('Home', list(kpis.keys())[0])
         self.update_team_name('Away', list(kpis.keys())[1])
+        self.update_team_distance('Home Distance', list(kpis.values())[0])
+        self.update_team_distance('Away Distance', list(kpis.values())[1])
 
 
 

@@ -22,8 +22,8 @@ EXTR_VERS = '4'
 DATA_QUALITY = '0'
 
 # GameID and VendorID should be user-defined in the final version
-game_id = '186491'
-vendor_id = '4'
+game_id = '2436196'
+vendor_id = '5'
 
 
 """
