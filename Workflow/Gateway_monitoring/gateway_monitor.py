@@ -5,12 +5,19 @@ delivery is working successfully.
 Goal: Show the most basic KPIS (Team total distance, possession %, team's topspeed), but also provide information if all
       feeds are available and possible to be fetched
 
-v0.1: Very rough version of a GUI that indicates if a feed is available of not.
+v0.1: 2024/04/8 22:30
+    - Very rough version of a GUI that indicates if a feed is available of not.
     - FeedStatusGUI needs to be adjusted so that the necessary data gets returned after a successful download
     - Try to limit the download size of json files, maybe stream of 'stream-api.tracab.com' might work for this one,
       including start and end subscription.
-v0.2: First version of GUI that returns the availability of all used feeds and first team information in terms of home
+v0.2: 2024/04/09 21:00
+    - First version of GUI that returns the availability of all used feeds and first team information in terms of home
       and away names
+    - Cannot work with the 202 response for ASCII feeds, need to implement some loop that it retries until feed has been
+      processed.
+v0.3: 2024/04/10 16:00
+    - Further developed version that not only shows distance and possession, but also already in some kind of readable
+      form.
 """
 
 from TracabModules.Internal.gateway import GatewayDownloader, FeedStatusGUI
@@ -22,7 +29,7 @@ EXTR_VERS = '4'
 DATA_QUALITY = '0'
 
 # GameID and VendorID should be user-defined in the final version
-game_id = '2436196'
+game_id = '2437085'
 vendor_id = '5'
 
 

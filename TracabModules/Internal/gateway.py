@@ -6,6 +6,7 @@ import json
 import tkinter as tk
 from tkinter import ttk
 import threading
+import time
 
 # Create header
 TOKEN = 'MGZhNjQ2ZTQ2NmQwOGFkNGE2NDYzMTlkNDFhN2FiNDUzZjgwZGIyYjhjNGNlNGMwODhmZDY1YjNmNjQ2YjdkZA=='
@@ -33,6 +34,12 @@ class GatewayDownloader:
         url = (f'https://api.tracab.com/api/V1/downloads/dat?GameID={self.game_id}&VendorID={self.vendor_id}&'
                f'ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}&Phase=0')
         response, success = self._make_request(url)
+
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 10 seconds...")
+            time.sleep(10)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         if success:
             logging.info(f'The ASCII-feed for GameID {self.game_id} has been downloaded')
             return response, success
@@ -145,8 +152,14 @@ class FeedStatusGUI:
 
         self.distances = {
             'Home Distance': None,
-            '': None,
+            'Distance': 'Distance',
             'Away Distance': None
+        }
+
+        self.possession = {
+            'Home Possession': None,
+            'Possession': 'Possession',
+            'Away Possession': None
         }
 
         self.root = tk.Tk()
@@ -164,6 +177,7 @@ class FeedStatusGUI:
         self.status_labels = {}
         self.team_labels = {}
         self.distance_labels = {}
+        self.possession_labels = {}
         self.progress_bars = {}
 
         self.create_widgets()
@@ -191,13 +205,20 @@ class FeedStatusGUI:
         for i, (team, name) in enumerate(self.teams.items()):
             team_label_text = f"{team}"
             self.team_labels[team] = tk.Label(self.center_frame, text=team_label_text)
-            self.team_labels[team].grid(row=i, column=3, padx=10, pady=5, sticky="nsew")
+            self.team_labels[team].grid(row=0, column=i + 3, padx=10, pady=5, sticky="nsew")
             self.team_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
         for i, (team, dist) in enumerate(self.distances.items()):
-            self.distance_labels[team] = tk.Label(self.center_frame)
-            self.distance_labels[team].grid(row=i, column=6, padx=10, pady=5, sticky="nsew")
+            distance_label_text = f"{team}"
+            self.distance_labels[team] = tk.Label(self.center_frame, text=distance_label_text)
+            self.distance_labels[team].grid(row=1, column=i+3, padx=10, pady=5, sticky="nsew")
             self.distance_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
+
+        for i, (team, possession) in enumerate(self.possession.items()):
+            possession_label_text = f"{team}"
+            self.possession_labels[team] = tk.Label(self.center_frame, text=possession_label_text)
+            self.possession_labels[team].grid(row=2, column=i+3, padx=10, pady=5, sticky="nsew")
+            self.possession_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
     def check_json_feed(self):
         # Execute function to check JSON feed availability
@@ -225,9 +246,9 @@ class FeedStatusGUI:
         self.update_feed_status('ASCII', ascii_success)
         self.progress.step(16.7)  # Simulate progress
 
-        json_response, json_success = self.downloader.download_json_feed()
-        self.update_feed_status('JSON', json_success)
-        self.progress.step(16.7)  # Simulate progress
+        # json_response, json_success = self.downloader.download_json_feed()
+        # self.update_feed_status('JSON', json_success)
+        # self.progress.step(16.7)  # Simulate progress
 
         tf05_data, tf05_success = self.downloader.download_tf05_feed()
         self.update_feed_status('TF05', tf05_success)
@@ -257,14 +278,19 @@ class FeedStatusGUI:
         self.team_labels[team].configure(text=f"{name}", bg="#2F4F4F", fg="#98FB98")
 
     def update_team_distance(self, team, distance):
-        self.distance_labels[team].configure(text=f"Total distance: {distance}m", bg="#2F4F4F", fg="#98FB98")
+        self.distance_labels[team].configure(text=f"{distance} km", bg="#2F4F4F", fg="#98FB98")
+
+    def update_team_possession(self, team, possession):
+        self.possession_labels[team].configure(text=f"{possession} %", bg="#2F4F4F", fg="#98FB98")
 
     def enable_upcoming_functions(self, tf08_data):
         kpis = self.calculator.get_tf08_kpis(tf08_data)
         self.update_team_name('Home', list(kpis.keys())[0])
         self.update_team_name('Away', list(kpis.keys())[1])
-        self.update_team_distance('Home Distance', list(kpis.values())[0])
-        self.update_team_distance('Away Distance', list(kpis.values())[1])
+        self.update_team_distance('Home Distance', list(kpis.values())[0]['Distance'])
+        self.update_team_distance('Away Distance', list(kpis.values())[1]['Distance'])
+        self.update_team_possession('Home Possession', list(kpis.values())[0]['Possession'])
+        self.update_team_possession('Away Possession', list(kpis.values())[1]['Possession'])
 
 
 
