@@ -19,7 +19,8 @@ v1.3: 2024/03/08 10:20
     - Ideas for future: Implement a warning if the TDF did not contain any clicks
 """
 import os
-from TracabModules.Internal.data_output import get_player_stats, write_excel
+from TracabModules.Internal.data_output import write_excel
+from TracabModules.DataManipulation.data_manipulation import get_excel_kpis
 from TracabModules.Internal.gamelog_functions import get_match_info
 
 # Define main_folder in which the application is located
@@ -38,8 +39,8 @@ epl_folder = os.getcwd() + r'\Live_EPL\Webmonitor\Game_' + match_info['match_id'
 files_epl = [x for x in os.listdir(epl_folder) if 'Resolution.xml' in x]
 
 # Create DFs for all four Excel-sheets
-bvb_dfl, oppo_dfl = get_player_stats(main_folder, files_dfl, gamelog, 'DFL', obs=False, match_info=match_info)
-bvb_epl, oppo_epl = get_player_stats(main_folder, files_epl, gamelog, 'EPL', obs=False, match_info=match_info)
+bvb_dfl, oppo_dfl = get_excel_kpis(main_folder, files_dfl, gamelog, 'DFL', obs=False, match_info=match_info)
+bvb_epl, oppo_epl = get_excel_kpis(main_folder, files_epl, gamelog, 'EPL', obs=False, match_info=match_info)
 
 os.chdir(main_folder)
 # Write Excel-file

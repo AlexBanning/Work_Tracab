@@ -7,7 +7,6 @@ import socket
 import struct
 import json
 
-
 # Create header
 token = 'MGZhNjQ2ZTQ2NmQwOGFkNGE2NDYzMTlkNDFhN2FiNDUzZjgwZGIyYjhjNGNlNGMwODhmZDY1YjNmNjQ2YjdkZA=='
 user_id = '360'
@@ -16,18 +15,16 @@ headers['accept'] = 'application/json'
 headers['Authorization'] = 'Bearer ' + token
 
 # Define match parameters
-game_id = '2374222'
+game_id = '184558'
 vendor_id = '5'
 extr_vers = '4'
-data_quality = '1'
+data_quality = '0'
 team_id = '215'
-
 
 # Call fixtures and results
 fixtures_url = f'https://api.tracab.com/api/fixtures/?VendorID={vendor_id}&Teams={team_id}'
 r_fixtures = requests.get(fixtures_url, headers=headers)
 fixtures = json.loads(r_fixtures.content.decode('utf8'))
-
 
 # Create metadata URL
 metadata_url = (
@@ -52,7 +49,7 @@ player_frames = frames['PlayerPositions']
 dfs = [pd.DataFrame(fr) for fr in player_frames]
 
 # Get raw data in binary-format (No permissions)
-bin_url = f'https://api.tracab.com/api/V1/downloads/tbf?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
+url = f'https://api.tracab.com/api/V1/downloads/tbf?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
 r_bin = requests.get(bin_url, headers=headers)
 
 # Get raw data in dat file (ASCII format)
@@ -62,7 +59,6 @@ dat_text = r_dat.text
 with open(r'C:\Users\alexa\Desktop\dat_file.dat', 'w') as f:
     f.write(dat_text)
     f.close()
-
 
 # TF05 Feed (Heatmap and Formation)
 tf05_url = (f'https://api.tracab.com/api/V1/feeds/tf05?GameID={game_id}&VendorID={vendor_id}'
@@ -121,11 +117,11 @@ heartbeat_size_bytes = struct.pack('!I', heartbeat_message_size)
 
 # Send StartSubscription
 startsub_data = {
-    "GetLive": False,
-    "GameID": 13415,
+    "GetLive": True,
+    "GameID": 2437085,
     "ClassID": "TCMDStartGameStreamSubscriptionRequest",
-    "VendorID": 10,
-    "OutProtocol": "ASCII"
+    "VendorID": 5,
+    "OutProtocol": "JSON"
 }
 # Convert JSON data to string
 startsub_message = json.dumps(startsub_data)
@@ -179,3 +175,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     # Process response
     print("Response:", startsub_response.decode('iso-8859-1'))
+
+    print("Status ID is 1. Ready to receive data stream.")
+    # Receive and process data stream
+    s.settimeout(10)
+    while True:
+        try:
+            data = s.recv(1024)
+            if not data:
+                break
+            # Process the received data as needed
+            print("Received data:", data.decode())
+        except socket.timeout:
+            print("Timeout reached. Stopping receiving process.")
+            break
+
+# Test to retrieve the json data after subscribing to the match
+json_url = (f'https://stream-api.tracab.com/api/V1/downloads/tf10?GameID={game_id}&VendorID={vendor_id}&'
+            f'ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0')
+r_json = requests.get(json_url, headers=headers, stream=True, timeout=5)

@@ -88,6 +88,11 @@ class GatewayDownloader:
                f'&ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}'
                )
         response, success = self._make_request(url)
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 5 seconds...")
+            time.sleep(5)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         data = json.loads(response.content.decode('utf8'))
 
         if success:

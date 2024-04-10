@@ -45,7 +45,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     # Try statement as workaround due to raised (unknown) error when downloading files from ftp
     # Change directory so the schedules are downloaded into the MatchInfo folder
     if chdr is True:
-            os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+        os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
 
     try:
         if vendor != 'opta':
@@ -118,9 +118,10 @@ def get_fifa_schedule(comp_id, filename):
     return schedule
 
 
-def get_d3_schedule(comp_id, filename):
+def get_d3_schedule(comp_id, filename, chdr=True):
     """
     Parse the schedule.xml of the deltatre tournament into a pd.DataFrame that can be pushed to the Google Sheet.
+    :param chdr:
     :param comp_id:
     :param filename:
     :return:
@@ -129,7 +130,10 @@ def get_d3_schedule(comp_id, filename):
     """
 
     # Parse in the schedule
-    tree = ET.parse("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo\\" + filename)
+    if chdr == True:
+        tree = ET.parse("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo\\" + filename)
+    else:
+        tree = ET.parse(filename)
     root = tree.getroot()
     # Get (if available) both halfs (all rounds) of a tournament, e.g. 'Hinrunde', 'Rückrunde'
     division = [x for x in root[1][1:]]
