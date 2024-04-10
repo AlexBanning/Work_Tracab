@@ -69,8 +69,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     except:
         pass
 
-    return (filename,
-            print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n'))
+    return print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
 
 
 def get_fifa_schedule(comp_id, filename):
