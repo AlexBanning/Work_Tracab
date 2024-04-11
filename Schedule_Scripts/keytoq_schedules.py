@@ -1,4 +1,4 @@
-import TracabModules.scheduleFunctions as sf
+import TracabModules.Internal.scheduleFunctions as sf
 
 """
 Schedule-Script for all competitions with keytoq as info provider
