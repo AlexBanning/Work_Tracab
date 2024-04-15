@@ -136,10 +136,12 @@ class GatewayDownloader:
 
 
 class FeedStatusGUI:
-    def __init__(self, game_id, vendor_id, data_quality, extr_vers):
+    def __init__(self, data_quality, extr_vers):
         self.check_feeds_button = None
-        self.downloader = GatewayDownloader(game_id, vendor_id, data_quality, extr_vers)
-        self.calculator = GatewayKPIs()
+        self.data_quality = data_quality
+        self.extr_version = extr_vers
+        self.downloader = None
+        self.calculator = None
         self.feed_status = {
             'Metadata': False,
             'ASCII': False,
@@ -172,7 +174,7 @@ class FeedStatusGUI:
         self.root.configure(bg='#2F4F4F')
 
         # Adjust the size of the GUI window
-        self.root.geometry("500x300")
+        self.root.geometry("560x350")
 
         # Create a frame to contain the labels and buttons
         self.center_frame = tk.Frame(self.root)
@@ -192,19 +194,32 @@ class FeedStatusGUI:
     def create_widgets(self):
         # Progress bar
         self.progress = ttk.Progressbar(self.center_frame, orient="horizontal", mode="determinate")
-        self.progress.grid(row=len(self.feed_status) + 2, column=0, pady=5, sticky="ew")
+        self.progress.grid(row=len(self.feed_status) + 4, column=0, pady=5, sticky="ew")
+
+        # Entry widgets for GameID and VendorID
+        tk.Label(self.center_frame, text="GameID:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        self.game_id_entry = tk.Entry(self.center_frame)
+        self.game_id_entry.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
+
+        tk.Label(self.center_frame, text="VendorID:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        self.vendor_id_entry = tk.Entry(self.center_frame)
+        self.vendor_id_entry.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
+
+        # Button to set GameID and VendorID
+        self.set_ids_button = tk.Button(self.center_frame, text="Get Feeds", command=self.set_ids)
+        self.set_ids_button.grid(row=2, column=0, columnspan=1, pady=5, sticky="ew")
 
         for i, (feed, status) in enumerate(self.feed_status.items()):
             feed_label_text = f"{feed} {'Available' if status else ''}"
             self.status_labels[feed] = tk.Label(self.center_frame, text=feed_label_text)
-            self.status_labels[feed].grid(row=i, column=0, padx=10, pady=5, sticky="nsew")
+            self.status_labels[feed].grid(row=i+4, column=0, padx=10, pady=5, sticky="nsew")
 
             color = "green" if status else "red"
             self.status_labels[feed].configure(bg=color, fg="white")
 
-        # Create button to check all feeds
-        self.check_feeds_button = tk.Button(self.center_frame, text="Check All Feeds", command=self.check_feeds)
-        self.check_feeds_button.grid(row=len(self.feed_status) + 1, column=0, pady=10, sticky="nsew")
+        # # Create button to check all feeds
+        # self.check_feeds_button = tk.Button(self.center_frame, text="Check All Feeds", command=self.check_feeds)
+        # self.check_feeds_button.grid(row=len(self.feed_status) + 1, column=0, pady=10, sticky="nsew")
 
         # Add Text widget to display Team Names
         for i, (team, name) in enumerate(self.teams.items()):
@@ -225,6 +240,10 @@ class FeedStatusGUI:
             self.possession_labels[team].grid(row=2, column=i+3, padx=10, pady=5, sticky="nsew")
             self.possession_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
+        #Add update KPIs button
+        self.update_button = tk.Button(self.center_frame, text='Update', command=self.update_kpi_function)
+        self.update_button.grid(row=3, column=3, padx=10, pady=5, sticky="nsew")
+
     def check_json_feed(self):
         # Execute function to check JSON feed availability
         json_response, json_success = self.downloader.download_json_feed()
@@ -234,6 +253,17 @@ class FeedStatusGUI:
         else:
             self.status_labels['JSON'].config(text="JSON", bg="red", fg="white")
             logging.error("JSON feed is not available")
+
+    def set_ids(self):
+        self.game_id = self.game_id_entry.get()
+        self.vendor_id = self.vendor_id_entry.get()
+
+        self.downloader = GatewayDownloader(self.game_id, self.vendor_id, self.data_quality, self.extr_version)
+
+        logging.info(f"GameID set to {self.game_id} and VendorID set to {self.vendor_id}")
+
+        # Start checking feeds after setting IDs
+        self.check_feeds()
 
     def check_feeds(self):
         thread = threading.Thread(target=self.execute_download_functions)
@@ -269,7 +299,7 @@ class FeedStatusGUI:
 
         if all((metadata_success, ascii_success, tf05_success, tf09_success, tf08_success)):
             self.progress['value'] = self.progress['maximum']
-            self.enable_upcoming_functions(tf08_data)
+            self.get_kpi_function(tf08_data)
 
     def update_feed_status(self, feed, success):
         if success:
@@ -288,8 +318,9 @@ class FeedStatusGUI:
     def update_team_possession(self, team, possession):
         self.possession_labels[team].configure(text=f"{possession} %", bg="#2F4F4F", fg="#98FB98")
 
-    def enable_upcoming_functions(self, tf08_data):
-        kpis = self.calculator.get_tf08_kpis(tf08_data)
+    def get_kpi_function(self, tf08_data):
+        self.calculator = GatewayKPIs(tf08_data, kpi_list_tf08=['Possession', 'Distance'])
+        kpis = self.calculator.get_tf08_kpis()
         self.update_team_name('Home', list(kpis.keys())[0])
         self.update_team_name('Away', list(kpis.keys())[1])
         self.update_team_distance('Home Distance', list(kpis.values())[0]['Distance'])
@@ -297,5 +328,11 @@ class FeedStatusGUI:
         self.update_team_possession('Home Possession', list(kpis.values())[0]['Possession'])
         self.update_team_possession('Away Possession', list(kpis.values())[1]['Possession'])
 
+    def update_kpi_function(self):
+        logging.basicConfig(level=logging.INFO)
+        tf08_data, tf08_success = self.downloader.download_tf08_feed()
+        self.update_feed_status('TF08', tf08_success)
+        self.get_kpi_function(tf08_data)
+        logging.info(f'The values for {self.game_id} have been updated')
 
 

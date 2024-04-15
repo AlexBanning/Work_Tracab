@@ -18,9 +18,12 @@ v0.2: 2024/04/09 21:00
 v0.3: 2024/04/10 16:00
     - Further developed version that not only shows distance and possession, but also already in some kind of readable
       form.
+v0.5: 2024/04/15 14:30
+    - User is now able to manually define the VendorID and GameID.
+    - Update button for KPIs has been introduced. Needs to be tested during a live game.
 """
 
-from TracabModules.Internal.gateway import GatewayDownloader, FeedStatusGUI
+from TracabModules.Internal.gateway import FeedStatusGUI
 
 """
 Definition of game parameters
@@ -28,24 +31,7 @@ Definition of game parameters
 EXTR_VERS = '4'
 DATA_QUALITY = '0'
 
-# GameID and VendorID should be user-defined in the final version
-game_id = '2437085'
-vendor_id = '5'
-
-
-"""
-Connect to GW to check if all feeds are available
-"""
-downloader = GatewayDownloader(game_id, vendor_id, DATA_QUALITY, EXTR_VERS)
-metadata_response, metadata_success,  = downloader.download_metadata_file()
-ascii_response, ascii_success,  = downloader.download_ascii_feed()
-json_response, json_success,  = downloader.download_json_feed()
-
-tf05_data, tf05_success = downloader.download_tf05_feed()
-tf09_data, tf09_success = downloader.download_tf09_feed()
-tf08_data, tf08_success = downloader.download_tf08_feed()
-
 """
 Feed-status overview 
 """
-app = FeedStatusGUI(game_id, vendor_id, DATA_QUALITY, EXTR_VERS)
+app = FeedStatusGUI(DATA_QUALITY, EXTR_VERS)
