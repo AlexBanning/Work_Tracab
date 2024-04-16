@@ -59,10 +59,10 @@ class GatewayKPIs:
         return home_possession, away_possession
 
     def extract_topSpeedPlayer_kpi(self, tf08_data):
-        home_speeds = {player['PlayerName']: player['TopSpeed'] for player in
-                       self.tf08_data['Periods'][0]['HomeTeam']['Players']}
-        away_speeds = {player['PlayerName']: player['TopSpeed'] for player in
-                       self.tf08_data['Periods'][0]['AwayTeam']['Players']}
+        home_speeds = {f'{player['PlayerName'].split(' ')[0][0]}. {player['PlayerName'].split(' ')[1]}':
+                           player['TopSpeed'] for player in self.tf08_data['Periods'][0]['HomeTeam']['Players']}
+        away_speeds = {f'{player['PlayerName'].split(' ')[0][0]}. {player['PlayerName'].split(' ')[1]}':
+                           player['TopSpeed'] for player in self.tf08_data['Periods'][0]['AwayTeam']['Players']}
 
         return home_speeds, away_speeds
 
