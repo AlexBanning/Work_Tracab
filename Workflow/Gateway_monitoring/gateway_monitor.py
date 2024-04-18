@@ -21,6 +21,9 @@ v0.3: 2024/04/10 16:00
 v0.5: 2024/04/15 14:30
     - User is now able to manually define the VendorID and GameID.
     - Update button for KPIs has been introduced. Needs to be tested during a live game.
+v1.0: 2024/04/16 17:00
+    - First version that could be used by the end user.
+    - Design and amount of KPIs not final yet.
 """
 
 from TracabModules.Internal.gateway import FeedStatusGUI
@@ -35,3 +38,4 @@ DATA_QUALITY = '0'
 Feed-status overview 
 """
 app = FeedStatusGUI(DATA_QUALITY, EXTR_VERS)
+

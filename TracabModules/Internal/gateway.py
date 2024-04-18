@@ -1,10 +1,12 @@
 from requests.structures import CaseInsensitiveDict
 from TracabModules.DataManipulation.data_manipulation import GatewayKPIs
+import numpy as np
 import requests
 import logging
 import json
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font as tkfont
 import threading
 import time
 
@@ -51,6 +53,12 @@ class GatewayDownloader:
         url = (f'https://api.tracab.com/api/V1/downloads/tf10?GameID={self.game_id}&VendorID={self.vendor_id}&'
                f'ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}&Phase=0')
         response, success = self._make_request(url)
+
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 10 seconds...")
+            time.sleep(10)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         if success:
             logging.info(f'The JSON-feed for GameID {self.game_id} has been downloaded')
             return response, success
@@ -64,10 +72,15 @@ class GatewayDownloader:
                f'ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}&Phase=0')
         response, success = self._make_request(url)
 
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 10 seconds...")
+            time.sleep(10)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         if success:
             logging.info(f'The binary-feed for GameID {self.game_id} has been downloaded')
             return response, success
-        #else:
+        # else:
         #    return logging.info(f'Error: {response.status_code}')
 
     def download_metadata_file(self):
@@ -75,6 +88,12 @@ class GatewayDownloader:
         url = (f'https://api.tracab.com/api/V1/feeds/game_metadata?GameID={self.game_id}&VendorID={self.vendor_id}&'
                f'ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}&Phase=0')
         response, success = self._make_request(url)
+
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 10 seconds...")
+            time.sleep(10)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         if success:
             logging.info(f'The metadata for GameID {self.game_id} has been downloaded')
             return response, success
@@ -88,6 +107,7 @@ class GatewayDownloader:
                f'&ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}'
                )
         response, success = self._make_request(url)
+
         while response.status_code == 202:
             logging.info(f"Received status code 202. Retrying in 5 seconds...")
             time.sleep(5)  # Wait for 10 seconds before retrying
@@ -109,6 +129,12 @@ class GatewayDownloader:
                f'&ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}'
                )
         response, success = self._make_request(url)
+
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 5 seconds...")
+            time.sleep(5)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         data = json.loads(response.content.decode('utf8'))
 
         if success:
@@ -125,6 +151,12 @@ class GatewayDownloader:
                f'&ExtractionVersion={self.extr_version}&DataQuality={self.data_quality}'
                )
         response, success = self._make_request(url)
+
+        while response.status_code == 202:
+            logging.info(f"Received status code 202. Retrying in 5 seconds...")
+            time.sleep(5)  # Wait for 10 seconds before retrying
+            response, success = self._make_request(url)
+
         data = json.loads(response.content.decode('utf8'))
 
         if success:
@@ -153,7 +185,7 @@ class FeedStatusGUI:
 
         self.teams = {
             'Home': None,
-            ' vs.': None,
+            '': None,
             'Away': None
         }
 
@@ -169,6 +201,12 @@ class FeedStatusGUI:
             'Away Possession': None
         }
 
+        self.speed = {
+            'Home Speed': None,
+            'Top Speed': 'Top Speed',
+            'Away Speed': None
+        }
+
         self.root = tk.Tk()
         self.root.title("Feed Status")
         self.root.configure(bg='#2F4F4F')
@@ -178,71 +216,95 @@ class FeedStatusGUI:
 
         # Create a frame to contain the labels and buttons
         self.center_frame = tk.Frame(self.root)
-        self.center_frame.grid(row=0, column=0, padx=10, pady=10)
+        self.center_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.center_frame.configure(bg='#2F4F4F')
+
+        # Configure row and column weights for center_frame
+        for i in range(len(self.feed_status) + 5):  # +5 for labels, entries, and progress bar
+            self.center_frame.grid_rowconfigure(i, weight=1)
+        for i in range(4):  # Assuming 4 columns for labels and entries
+            self.center_frame.grid_columnconfigure(i, weight=1)
 
         self.status_labels = {}
         self.team_labels = {}
         self.distance_labels = {}
         self.possession_labels = {}
+        self.speed_labels = {}
         self.progress_bars = {}
 
         self.create_widgets()
 
+        # Adjust the window geometry
+        self.adjust_window_size()
+
         self.root.mainloop()
+
+    def adjust_window_size(self):
+        self.root.update_idletasks()  # Update the GUI to finish arranging widgets
+        width = self.root.winfo_reqwidth()  # Get the required width of the GUI
+        height = self.root.winfo_reqheight()  # Get the required height of the GUI
+        self.root.geometry(f"{width}x{height}")  # Set the GUI window size
 
     def create_widgets(self):
         # Progress bar
-        self.progress = ttk.Progressbar(self.center_frame, orient="horizontal", mode="determinate")
-        self.progress.grid(row=len(self.feed_status) + 4, column=0, pady=5, sticky="ew")
+        self.progress = ttk.Progressbar(self.center_frame, orient="horizontal", mode="determinate", length=150)
+        self.progress.grid_remove()
 
         # Entry widgets for GameID and VendorID
-        tk.Label(self.center_frame, text="GameID:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.center_frame, text="GameID:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.game_id_entry = tk.Entry(self.center_frame)
-        self.game_id_entry.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
+        self.game_id_entry.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
-        tk.Label(self.center_frame, text="VendorID:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        tk.Label(self.center_frame, text="VendorID:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.vendor_id_entry = tk.Entry(self.center_frame)
-        self.vendor_id_entry.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
+        self.vendor_id_entry.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
         # Button to set GameID and VendorID
         self.set_ids_button = tk.Button(self.center_frame, text="Get Feeds", command=self.set_ids)
-        self.set_ids_button.grid(row=2, column=0, columnspan=1, pady=5, sticky="ew")
+        self.set_ids_button.grid(row=2, column=0, pady=5, sticky="ew")
 
         for i, (feed, status) in enumerate(self.feed_status.items()):
             feed_label_text = f"{feed} {'Available' if status else ''}"
             self.status_labels[feed] = tk.Label(self.center_frame, text=feed_label_text)
-            self.status_labels[feed].grid(row=i+4, column=0, padx=10, pady=5, sticky="nsew")
+            self.status_labels[feed].grid(row=i + 4, column=0, padx=10, pady=5, sticky="nsew")
 
             color = "green" if status else "red"
             self.status_labels[feed].configure(bg=color, fg="white")
 
-        # # Create button to check all feeds
-        # self.check_feeds_button = tk.Button(self.center_frame, text="Check All Feeds", command=self.check_feeds)
-        # self.check_feeds_button.grid(row=len(self.feed_status) + 1, column=0, pady=10, sticky="nsew")
-
         # Add Text widget to display Team Names
         for i, (team, name) in enumerate(self.teams.items()):
             team_label_text = f"{team}"
-            self.team_labels[team] = tk.Label(self.center_frame, text=team_label_text)
+            self.team_labels[team] = tk.Label(self.center_frame, text=team_label_text,font=tkfont.Font(weight='bold'))
             self.team_labels[team].grid(row=0, column=i + 3, padx=10, pady=5, sticky="nsew")
             self.team_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
-
+        # Add Text widget to display Team Distances
         for i, (team, dist) in enumerate(self.distances.items()):
             distance_label_text = f"{team}"
             self.distance_labels[team] = tk.Label(self.center_frame, text=distance_label_text)
-            self.distance_labels[team].grid(row=1, column=i+3, padx=10, pady=5, sticky="nsew")
+            self.distance_labels[team].grid(row=1, column=i + 3, padx=10, pady=5, sticky="nsew")
             self.distance_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
-
+        # Add Text widget to display Team Possession
         for i, (team, possession) in enumerate(self.possession.items()):
             possession_label_text = f"{team}"
             self.possession_labels[team] = tk.Label(self.center_frame, text=possession_label_text)
-            self.possession_labels[team].grid(row=2, column=i+3, padx=10, pady=5, sticky="nsew")
+            self.possession_labels[team].grid(row=2, column=i + 3, padx=10, pady=5, sticky="nsew")
             self.possession_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
+        # Add Text widget to display Team Top Speeds
+        for i, (team, speed) in enumerate(self.speed.items()):
+            speed_label_text = f"{team}"
+            self.speed_labels[team] = tk.Label(self.center_frame, text=speed_label_text)
+            self.speed_labels[team].grid(row=3, column=i + 3, padx=10, pady=5, sticky="nsew")
+            self.speed_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
 
-        #Add update KPIs button
+        # Add update KPIs button
         self.update_button = tk.Button(self.center_frame, text='Update', command=self.update_kpi_function)
-        self.update_button.grid(row=3, column=3, padx=10, pady=5, sticky="nsew")
+        self.update_button.grid(row=4, column=3, padx=10, pady=5, sticky="nsew")
+
+        # Adjust the window geometry
+        self.root.update_idletasks()  # Update the window to get correct sizes
+        width = self.root.winfo_reqwidth()
+        height = self.root.winfo_reqheight()
+        self.root.geometry(f"{width}x{height}")
 
     def check_json_feed(self):
         # Execute function to check JSON feed availability
@@ -270,20 +332,25 @@ class FeedStatusGUI:
         thread.start()
 
     def execute_download_functions(self):
+        self.progress.grid(row=len(self.feed_status) + 4, column=0, pady=5, sticky="ew")
         self.progress['value'] = 0  # Reset progress bar
         self.progress['maximum'] = 100  # Set maximum value
+
+        self.adjust_window_size()
 
         metadata_response, metadata_success = self.downloader.download_metadata_file()
         self.update_feed_status('Metadata', metadata_success)
         self.progress.step(16.7)  # Simulate progress
 
+        self.adjust_window_size()
+
         ascii_response, ascii_success = self.downloader.download_ascii_feed()
         self.update_feed_status('ASCII', ascii_success)
         self.progress.step(16.7)  # Simulate progress
 
-        # json_response, json_success = self.downloader.download_json_feed()
-        # self.update_feed_status('JSON', json_success)
-        # self.progress.step(16.7)  # Simulate progress
+        json_response, json_success = self.downloader.download_json_feed()
+        self.update_feed_status('JSON', json_success)
+        self.progress.step(16.7)  # Simulate progress
 
         tf05_data, tf05_success = self.downloader.download_tf05_feed()
         self.update_feed_status('TF05', tf05_success)
@@ -296,6 +363,8 @@ class FeedStatusGUI:
         tf08_data, tf08_success = self.downloader.download_tf08_feed()
         self.update_feed_status('TF08', tf08_success)
         self.progress.step(16.7)  # Simulate progress
+
+        self.progress.grid_remove()
 
         if all((metadata_success, ascii_success, tf05_success, tf09_success, tf08_success)):
             self.progress['value'] = self.progress['maximum']
@@ -316,10 +385,13 @@ class FeedStatusGUI:
         self.distance_labels[team].configure(text=f"{distance} km", bg="#2F4F4F", fg="#98FB98")
 
     def update_team_possession(self, team, possession):
-        self.possession_labels[team].configure(text=f"{possession} %", bg="#2F4F4F", fg="#98FB98")
+        self.possession_labels[team].configure(text=f"{possession}%", bg="#2F4F4F", fg="#98FB98")
+
+    def update_team_speed(self, team, speed):
+        self.speed_labels[team].configure(text=f"{speed} km/h", bg="#2F4F4F", fg="#98FB98")
 
     def get_kpi_function(self, tf08_data):
-        self.calculator = GatewayKPIs(tf08_data, kpi_list_tf08=['Possession', 'Distance'])
+        self.calculator = GatewayKPIs(tf08_data, kpi_list_tf08=['Possession', 'TopSpeedPlayer', 'Distance'])
         kpis = self.calculator.get_tf08_kpis()
         self.update_team_name('Home', list(kpis.keys())[0])
         self.update_team_name('Away', list(kpis.keys())[1])
@@ -327,6 +399,13 @@ class FeedStatusGUI:
         self.update_team_distance('Away Distance', list(kpis.values())[1]['Distance'])
         self.update_team_possession('Home Possession', list(kpis.values())[0]['Possession'])
         self.update_team_possession('Away Possession', list(kpis.values())[1]['Possession'])
+        home_topspeed = np.max(list(list(kpis.values())[0]['TopSpeedPlayer'].values()))
+        home_topspeed_player = list(list(kpis.values())[0]['TopSpeedPlayer'].keys())[list(list(kpis.values())[0]['TopSpeedPlayer'].values()).index(home_topspeed)]
+        self.update_team_speed('Home Speed', f'{home_topspeed_player}: {home_topspeed}')
+        away_topspeed = np.max(list(list(kpis.values())[1]['TopSpeedPlayer'].values()))
+        away_topspeed_player = list(list(kpis.values())[1]['TopSpeedPlayer'].keys())[list(list(kpis.values())[1]['TopSpeedPlayer'].values()).index(away_topspeed)]
+        self.update_team_speed('Away Speed', f'{away_topspeed_player}: {away_topspeed}')
+        self.adjust_window_size()
 
     def update_kpi_function(self):
         logging.basicConfig(level=logging.INFO)
@@ -334,5 +413,6 @@ class FeedStatusGUI:
         self.update_feed_status('TF08', tf08_success)
         self.get_kpi_function(tf08_data)
         logging.info(f'The values for {self.game_id} have been updated')
+
 
 
