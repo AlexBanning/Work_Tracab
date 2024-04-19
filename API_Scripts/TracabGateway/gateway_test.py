@@ -15,8 +15,8 @@ headers['accept'] = 'application/json'
 headers['Authorization'] = 'Bearer ' + token
 
 # Define match parameters
-game_id = '184558'
-vendor_id = '5'
+game_id = '184530'
+vendor_id = '4'
 extr_vers = '4'
 data_quality = '0'
 team_id = '215'

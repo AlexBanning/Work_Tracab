@@ -6,6 +6,8 @@ import logging
 import json
 import tkinter as tk
 from tkinter import ttk
+from tkinter import PhotoImage
+from PIL import ImageTk, Image
 from tkinter import font as tkfont
 import threading
 import time
@@ -270,6 +272,10 @@ class FeedStatusGUI:
 
             color = "green" if status else "red"
             self.status_labels[feed].configure(bg=color, fg="white")
+
+        # # Create button to check all feeds
+        # self.check_feeds_button = tk.Button(self.center_frame, text="Check All Feeds", command=self.check_feeds)
+        # self.check_feeds_button.grid(row=len(self.feed_status) + 1, column=0, pady=10, sticky="nsew")
 
         # Add Text widget to display Team Names
         for i, (team, name) in enumerate(self.teams.items()):

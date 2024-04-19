@@ -39,3 +39,4 @@ Feed-status overview
 """
 app = FeedStatusGUI(DATA_QUALITY, EXTR_VERS)
 
+
