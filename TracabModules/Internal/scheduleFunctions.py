@@ -54,8 +54,11 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
                 ftp_host.open(filename)
                 if ftp_host.path.isfile(filename):
                     ftp_host.download(filename, filename)
+
+            return filename, print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
     except:
         pass
+
     try:
         if vendor == 'opta':
             with ftputil.FTPHost(server, user, password) as ftp_host:
@@ -66,10 +69,13 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
                 ftp_host.open(squads_filename)
                 if ftp_host.path.isfile(squads_filename):
                     ftp_host.download(squads_filename, squads_filename)
+
+            return print(
+                f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
     except:
         pass
 
-    return print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
+
 
 
 def get_fifa_schedule(comp_id, filename):

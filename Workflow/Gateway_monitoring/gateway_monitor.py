@@ -54,3 +54,4 @@ if __name__ == "__main__":
     # Start processing data in another thread
     process_thread = threading.Thread(target=processor.process_data)
     process_thread.start()
+
