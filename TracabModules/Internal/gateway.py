@@ -4,11 +4,14 @@ import numpy as np
 import requests
 import logging
 import json
+import socket
+import struct
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font as tkfont
 import threading
 import time
+import queue
 
 # Create header
 TOKEN = 'MGZhNjQ2ZTQ2NmQwOGFkNGE2NDYzMTlkNDFhN2FiNDUzZjgwZGIyYjhjNGNlNGMwODhmZDY1YjNmNjQ2YjdkZA=='
@@ -19,12 +22,17 @@ HEADERS['Authorization'] = 'Bearer ' + TOKEN
 
 
 class GatewayDownloader:
-    def __init__(self, game_id, vendor_id, data_quality, extr_vers):
+    def __init__(self, game_id, vendor_id, data_quality, extr_vers, protocol=None):
+        # All Feeds
         self.game_id = game_id
         self.vendor_id = vendor_id
         self.data_quality = data_quality
         self.extr_version = extr_vers
         self.headers = HEADERS
+
+        # Live Data
+        self.protocol = protocol
+        self.data_queue = queue.Queue()
 
     def _make_request(self, url):
         response = requests.get(url, headers=self.headers)
@@ -168,6 +176,18 @@ class GatewayDownloader:
 
 
 class FeedStatusGUI:
+    class TextHandler(logging.Handler):
+        def __init__(self, text_widget):
+            logging.Handler.__init__(self)
+            self.text_widget = text_widget
+
+        def emit(self, record):
+            msg = self.format(record)
+            self.text_widget.configure(state='normal')
+            self.text_widget.insert(tk.END, msg + '\n')
+            self.text_widget.configure(state='disabled')
+            self.text_widget.see(tk.END)
+
     def __init__(self, data_quality, extr_vers):
         self.check_feeds_button = None
         self.data_quality = data_quality
@@ -209,6 +229,7 @@ class FeedStatusGUI:
 
         self.root = tk.Tk()
         self.root.title("Feed Status")
+        self.root.iconbitmap("Tracab.ico")
         self.root.configure(bg='#2F4F4F')
 
         # Adjust the size of the GUI window
@@ -274,7 +295,7 @@ class FeedStatusGUI:
         # Add Text widget to display Team Names
         for i, (team, name) in enumerate(self.teams.items()):
             team_label_text = f"{team}"
-            self.team_labels[team] = tk.Label(self.center_frame, text=team_label_text,font=tkfont.Font(weight='bold'))
+            self.team_labels[team] = tk.Label(self.center_frame, text=team_label_text, font=tkfont.Font(weight='bold'))
             self.team_labels[team].grid(row=0, column=i + 3, padx=10, pady=5, sticky="nsew")
             self.team_labels[team].configure(bg="#2F4F4F", fg="#98FB98")
         # Add Text widget to display Team Distances
@@ -400,10 +421,12 @@ class FeedStatusGUI:
         self.update_team_possession('Home Possession', list(kpis.values())[0]['Possession'])
         self.update_team_possession('Away Possession', list(kpis.values())[1]['Possession'])
         home_topspeed = np.max(list(list(kpis.values())[0]['TopSpeedPlayer'].values()))
-        home_topspeed_player = list(list(kpis.values())[0]['TopSpeedPlayer'].keys())[list(list(kpis.values())[0]['TopSpeedPlayer'].values()).index(home_topspeed)]
+        home_topspeed_player = list(list(kpis.values())[0]['TopSpeedPlayer'].keys())[
+            list(list(kpis.values())[0]['TopSpeedPlayer'].values()).index(home_topspeed)]
         self.update_team_speed('Home Speed', f'{home_topspeed_player}: {home_topspeed}')
         away_topspeed = np.max(list(list(kpis.values())[1]['TopSpeedPlayer'].values()))
-        away_topspeed_player = list(list(kpis.values())[1]['TopSpeedPlayer'].keys())[list(list(kpis.values())[1]['TopSpeedPlayer'].values()).index(away_topspeed)]
+        away_topspeed_player = list(list(kpis.values())[1]['TopSpeedPlayer'].keys())[
+            list(list(kpis.values())[1]['TopSpeedPlayer'].values()).index(away_topspeed)]
         self.update_team_speed('Away Speed', f'{away_topspeed_player}: {away_topspeed}')
         self.adjust_window_size()
 
@@ -415,4 +438,142 @@ class FeedStatusGUI:
         logging.info(f'The values for {self.game_id} have been updated')
 
 
+class FootballDataProcessor:
+    def __init__(self, game_id, vendor_id, protocol):
+        self.data_queue = queue.Queue()
+        self.game_id = game_id
+        self.vendor_id = vendor_id
+        self.protocol = protocol
 
+    def fetch_data(self):
+        while True:
+            try:
+                # Get temporary API key for live subscription
+                tmp_url = f'https://api.tracab.com/api/internal/generatetempapikey'
+                r_tmpkey = requests.get(tmp_url, headers=HEADERS)
+                tmpkey = json.loads(r_tmpkey.content.decode('utf8'))['tempApiKey']
+
+                # Define the JSON data for authentication
+                auth_data = {
+                    "TemporaryAPIKey": tmpkey,
+                    "ClassID": "TCMDAuthenticationRequest",
+                    "UserID": 360
+                }
+
+                # Convert JSON data to string
+                json_message = json.dumps(auth_data)
+
+                # Calculate the size of the JSON message
+                message_size = len(json_message)
+
+                # Convert the size to a 32-bit integer (4 bytes)
+                size_bytes = struct.pack('!I', message_size)
+
+                # Check connection with Heartbeat
+                heartbeat_data = {
+                    "ClassID": "TCMDClientHeartBeat",
+                }
+                # Convert JSON data to string
+                heartbeat_message = json.dumps(heartbeat_data)
+
+                # Calculate the size of the JSON message
+                heartbeat_message_size = len(heartbeat_message)
+
+                # Convert the size to a 32-bit integer (4 bytes)
+                heartbeat_size_bytes = struct.pack('!I', heartbeat_message_size)
+
+                # Send StartSubscription
+                startsub_data = {
+                    "GetLive": True,
+                    "GameID": self.game_id,
+                    "ClassID": "TCMDStartGameStreamSubscriptionRequest",
+                    "VendorID": self.vendor_id,
+                    "OutProtocol": self.protocol
+                }
+                # Convert JSON data to string
+                startsub_message = json.dumps(startsub_data)
+
+                # Calculate the size of the JSON message
+                startsub_message_size = len(startsub_message)
+
+                # Convert the size to a 32-bit integer (4 bytes)
+                startsub_size_bytes = struct.pack('!I', startsub_message_size)
+
+                # Define the host and port of the stream API
+                host = 'stream-api.tracab.com'
+                port = 37718
+
+                # Establish a connection to the stream API and send a heartbeat
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((host, port))
+
+                    # Send the size of the JSON message as a 32-bit integer
+                    s.sendall(size_bytes)
+
+                    # Send the JSON message
+                    s.sendall(json_message.encode())
+
+                    # Receive response if needed
+                    response = s.recv(1024)
+
+                    # Process response
+                    print("Response:", response.decode())
+
+                    # Send the size of the JSON message as a 34-bit integer
+                    s.sendall(heartbeat_size_bytes)
+
+                    # Send the JSON message
+                    s.sendall(heartbeat_message.encode())
+
+                    # Receive response if needed
+                    heartbeat_response = s.recv(1024)
+
+                    # Process response
+                    print("Response:", heartbeat_response.decode('iso-8859-1'))
+
+                    # Send the size of the JSON message as a 32-bit integer
+                    s.sendall(startsub_size_bytes)
+
+                    # Send the JSON message
+                    s.sendall(startsub_message.encode())
+
+                    # Receive response if needed
+                    startsub_response = s.recv(1024)
+
+                    # Process response
+                    print("Response:", startsub_response.decode('iso-8859-1'))
+
+                    print("Status ID is 1. Ready to receive data stream.")
+                    # Receive and process data stream
+                    s.settimeout(10)
+                    while True:
+                        try:
+                            data = s.recv(1024)
+                            self.data_queue.put(data)
+                            if not data:
+                                break
+                            # Process the received data as needed
+                            print("Received data:", data.decode())
+                        except socket.timeout:
+                            print("Timeout reached. Stopping receiving process.")
+                            break
+
+            except Exception as e:
+                print(f"Error fetching data: {e}")
+                time.sleep(10)
+
+    def process_data(self):
+        while True:
+            try:
+                # Get data from the queue
+                data = self.data_queue.get()
+
+                # Process the data (Replace with your data processing logic)
+                # For example: print the data
+                print(data)
+
+                # Mark the data task as done
+                self.data_queue.task_done()
+
+            except Exception as e:
+                print(f"Error processing data: {e}")

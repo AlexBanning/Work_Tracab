@@ -26,7 +26,8 @@ v1.0: 2024/04/16 17:00
     - Design and amount of KPIs not final yet.
 """
 
-from TracabModules.Internal.gateway import FeedStatusGUI
+from TracabModules.Internal.gateway import FeedStatusGUI, FootballDataProcessor
+import threading
 
 """
 Definition of game parameters
@@ -39,3 +40,17 @@ Feed-status overview
 """
 app = FeedStatusGUI(DATA_QUALITY, EXTR_VERS)
 
+
+"""
+Live Stream Data
+"""
+if __name__ == "__main__":
+    processor = FootballDataProcessor(game_id=185101, vendor_id=4, protocol='JSON')
+
+    # Start fetching data in a separate thread
+    fetch_thread = threading.Thread(target=processor.fetch_data)
+    fetch_thread.start()
+
+    # Start processing data in another thread
+    process_thread = threading.Thread(target=processor.process_data)
+    process_thread.start()

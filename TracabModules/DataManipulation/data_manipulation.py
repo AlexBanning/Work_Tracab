@@ -59,10 +59,20 @@ class GatewayKPIs:
         return home_possession, away_possession
 
     def extract_topSpeedPlayer_kpi(self, tf08_data):
-        home_speeds = {f'{player['PlayerName'].split(' ')[0][0]}. {player['PlayerName'].split(' ')[1]}':
-                           player['TopSpeed'] for player in self.tf08_data['Periods'][0]['HomeTeam']['Players']}
-        away_speeds = {f'{player['PlayerName'].split(' ')[0][0]}. {player['PlayerName'].split(' ')[1]}':
-                           player['TopSpeed'] for player in self.tf08_data['Periods'][0]['AwayTeam']['Players']}
+        try:
+            home_speeds = {f'{player['PlayerName']}':
+                              player['TopSpeed'] for player in self.tf08_data['Periods'][0]['HomeTeam']['Players']
+                           if len(player['PlayerName']) > 5}
+        except Exception as e:
+            home_speeds = {}
+            (logging.info(f'Error {e} has occured when trying to fetch the HomeTeam TopSpeed'))
+        try:
+            away_speeds = {f'{player['PlayerName']}':
+                           player['TopSpeed'] for player in tf08_data['Periods'][0]['AwayTeam']['Players']
+                           if len(player['PlayerName']) > 5}
+        except Exception as e:
+            away_speeds = {}
+            (logging.info(f'Error {e} has occured when trying to fetch the AwayTeam TopSpeed'))
 
         return home_speeds, away_speeds
 
