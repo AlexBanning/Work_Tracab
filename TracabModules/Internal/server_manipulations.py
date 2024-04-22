@@ -90,26 +90,27 @@ def get_source_folder(feed_type, date, mobile=False):
 
     if mobile:
         folder_map = {
-            'TacticalFeed.mp4': r'E:\\AL',
-            'PanoramicFeed.mp4': r'E:\\AL'
+            'TacticalFeed.mp4': r'D:\\AL',
+            'PanoramicFeed.mp4': r'D:\\AL'
         }
 
     return folder_map.get(feed_type)
 
 
 def copy_files(filepath_new, sts_id, match, feed_type, date, mobile=False):
+    print(f'Starting Copy-Process.')
     if mobile:
         for file in glob.glob("*.mp4"):
             if feed_type == 'PanoramicFeed.mp4':
                 if 'PanoA' in file and date in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                    print(f'{feed_type} copied to: {new_filepath} \n')
                     shutil.copy(file, new_filepath)
+                    print(f'{feed_type} copied to: {new_filepath} \n')
             elif feed_type == 'TacticalFeed.mp4':
                 if 'AutoCam' in file and date in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                    print(f'{feed_type} copied to: {new_filepath} \n')
                     shutil.copy(file, new_filepath)
+                    print(f'{feed_type} copied to: {new_filepath} \n')
 
     else:
         for file in glob.glob("*.mp4"):
@@ -151,15 +152,19 @@ def move_and_rename_feed(filepath_new, sts_id, match, date, mobile=False):
             print(f"No source folder found for feed type: {feed_type}")
 
 
-def get_feed_names(sts_id, match):
+def get_feed_names(sts_id, match, mobile=False):
     """
 
     :param sts_id:
     :param match:
     :return:
     """
-    feeds = {'AutoCam': 'TacticalFeed', 'PanoA': 'PanoramicFeed', 'PanoB': 'HighBehind_2',
-             'PanoD': 'HighBehind_1'}
+
+    if mobile:
+        feeds = {'AutoCam': 'TacticalFeed', 'PanoA': 'PanoramicFeed'}
+    else:
+        feeds = {'AutoCam': 'TacticalFeed', 'PanoA': 'PanoramicFeed', 'PanoB': 'HighBehind_2',
+                 'PanoD': 'HighBehind_1'}
 
     feed_names = []
     for feed_identifier, feed_type in feeds.items():
