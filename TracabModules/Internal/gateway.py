@@ -178,18 +178,6 @@ class GatewayDownloader:
 
 
 class FeedStatusGUI:
-    class TextHandler(logging.Handler):
-        def __init__(self, text_widget):
-            logging.Handler.__init__(self)
-            self.text_widget = text_widget
-
-        def emit(self, record):
-            msg = self.format(record)
-            self.text_widget.configure(state='normal')
-            self.text_widget.insert(tk.END, msg + '\n')
-            self.text_widget.configure(state='disabled')
-            self.text_widget.see(tk.END)
-
     def __init__(self, data_quality, extr_vers):
         self.check_feeds_button = None
         self.data_quality = data_quality
@@ -260,7 +248,35 @@ class FeedStatusGUI:
         # Adjust the window geometry
         self.adjust_window_size()
 
+        # Create a new window for logging
+        self.create_logging_window()
+
+        # Set up logging
+        self.setup_logging()
+
         self.root.mainloop()
+
+    def create_logging_window(self):
+        # Create a new window for logging
+        self.logging_window = tk.Toplevel(self.root)
+        self.logging_window.title("Logging")
+        self.logging_window.geometry("800x400")
+
+        # Create Text widget for logging
+        self.log_text = tk.Text(self.logging_window, wrap=tk.WORD, height=20, width=100)
+        self.log_text.pack(fill=tk.BOTH, expand=True)
+
+    def setup_logging(self):
+        # Create handler and add to root logger
+        self.logging_handler = TextHandler(self.log_text)
+        logging.getLogger().addHandler(self.logging_handler)
+        logging.getLogger().setLevel(logging.INFO)
+
+    def toggle_logging_window(self):
+        if self.logging_window.state() == "withdrawn":
+            self.logging_window.deiconify()  # Show the window
+        else:
+            self.logging_window.withdraw()  # Hide the window
 
     def adjust_window_size(self):
         self.root.update_idletasks()  # Update the GUI to finish arranging widgets
@@ -285,6 +301,9 @@ class FeedStatusGUI:
         # Button to set GameID and VendorID
         self.set_ids_button = tk.Button(self.center_frame, text="Get Feeds", command=self.set_ids)
         self.set_ids_button.grid(row=2, column=0, pady=5, sticky="ew")
+
+        self.toggle_button = tk.Button(self.center_frame, text="Toggle Log-Info", command=self.toggle_logging_window)
+        self.toggle_button.grid(row=len(self.feed_status) + 5, column=6, columnspan=1, pady=10, sticky="ew")
 
         for i, (feed, status) in enumerate(self.feed_status.items()):
             feed_label_text = f"{feed} {'Available' if status else ''}"
@@ -442,6 +461,16 @@ class FeedStatusGUI:
         self.update_feed_status('TF08', tf08_success)
         self.get_kpi_function(tf08_data)
         logging.info(f'The values for {self.game_id} have been updated')
+
+
+class TextHandler(logging.Handler):
+    def __init__(self, widget):
+        super().__init__()
+        self.widget = widget
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.widget.insert(tk.END, msg + '\n')
 
 
 class FootballDataProcessor:
