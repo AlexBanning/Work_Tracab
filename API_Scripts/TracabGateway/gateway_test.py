@@ -42,6 +42,51 @@ r_json = requests.get(json_url, headers=headers)
 
 # Parse the request content into a string that can be loaded as json and saved as a DF
 json_file = json.loads(r_json.content.decode('utf8'))
+with open('data.json', 'w') as f:
+    json.dump(json_file, f)
+
+"""
+JSON TO DAT TEST
+
+"""
+# Initialize an empty list to store DAT strings for each frame
+dat_frames = []
+
+# Iterate through each frame
+for frame_data in json_file['FrameData']:
+    frame_count = frame_data["FrameCount"]
+    player_positions = frame_data.get("PlayerPositions", [])
+    ball_position = frame_data.get("BallPosition", [])[0] if frame_data.get("BallPosition") else {}
+
+    # Convert PlayerPositions to DAT format
+    player_dat_parts = []
+    for player in player_positions:
+        player_part = "{Team},{JerseyNumber},{X},{Y},{Speed}".format(**player)
+        player_dat_parts.append(player_part)
+    player_dat_str = ';'.join(player_dat_parts)
+
+    # Convert BallPosition to DAT format
+    if ball_position:
+        ball_dat_str = "{X},{Y},{Z},{Speed:},{BallOwningTeam},{BallStatus}".format(**ball_position)
+    else:
+        ball_dat_str = ""
+
+    # Combine frame count, player, and ball data into final DAT string for this frame
+    dat_frame_str = "{}:{}:{};:".format(frame_count, player_dat_str, ball_dat_str)
+
+    # Append the DAT string for this frame to the list
+    dat_frames.append(dat_frame_str)
+
+# Join all the DAT strings for each frame with newline characters
+dat_file_content = '\n'.join(dat_frames)
+
+# Write to DAT file
+with open('soccer_data_converted.dat', 'w') as dat_file:
+    dat_file.write(dat_file_content)
+
+"""
+Test End
+"""
 frames = pd.DataFrame(json_file['FrameData'])
 player_frames = frames['PlayerPositions']
 
@@ -49,7 +94,7 @@ player_frames = frames['PlayerPositions']
 dfs = [pd.DataFrame(fr) for fr in player_frames]
 
 # Get raw data in binary-format (No permissions)
-url = f'https://api.tracab.com/api/V1/downloads/tbf?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
+bin_url = f'https://api.tracab.com/api/V1/downloads/tbf?GameID={game_id}&VendorID={vendor_id}&ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0'
 r_bin = requests.get(bin_url, headers=headers)
 
 # Get raw data in dat file (ASCII format)

@@ -7,7 +7,7 @@ from TracabModules.Internal.scheduleFunctions import get_STSID
 import os
 
 
-match_folder = newest_folder(r'C:\\Rec')
+match_folder = newest_folder(r'C:\Rec')
 # newest(r'\\192.168.7.72\Rec ')
 print(f'Matchfolder: {match_folder} \n')
 
@@ -62,10 +62,11 @@ elif comp == str(100):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
                + folder_new + '" --recursive')
-
 print(command)
+
 try:
     os.system(command)
     input('Upload has finished. Press enter to exit')
+    sys.exit()
 except:
     input('Upload was not successful. Please try again and submit the error code!')
