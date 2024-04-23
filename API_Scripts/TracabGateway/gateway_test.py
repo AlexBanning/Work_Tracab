@@ -2,6 +2,7 @@ from requests.structures import CaseInsensitiveDict
 import requests
 
 import pandas as pd
+from TracabModules.DataManipulation.data_manipulation import GatewayKPIs
 
 import socket
 import struct
@@ -239,3 +240,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 json_url = (f'https://stream-api.tracab.com/api/V1/downloads/tf10?GameID={game_id}&VendorID={vendor_id}&'
             f'ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0')
 r_json = requests.get(json_url, headers=headers, stream=True, timeout=5)
+
+
+"""
+TF08-KPIs
+"""
+calculator = GatewayKPIs(tf08_data, kpi_list_tf08=['Possession', 'TopSpeedPlayer', 'Distance'])
+kpis = calculator.get_tf08_kpis()
+home_topspeeds = list(kpis.values())[0]['TopSpeedPlayer']
+away_topspeeds = list(kpis.values())[1]['TopSpeedPlayer']

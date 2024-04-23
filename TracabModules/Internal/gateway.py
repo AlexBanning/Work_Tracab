@@ -1,6 +1,7 @@
 from requests.structures import CaseInsensitiveDict
 from TracabModules.DataManipulation.data_manipulation import GatewayKPIs
 import numpy as np
+import pandas as pd
 import requests
 import logging
 import json
@@ -260,7 +261,10 @@ class FeedStatusGUI:
         # Create a new window for logging
         self.logging_window = tk.Toplevel(self.root)
         self.logging_window.title("Logging")
-        self.logging_window.geometry("800x400")
+        self.logging_window.geometry("500x200")
+
+        # Initially withdraw the window
+        self.logging_window.withdraw()
 
         # Create Text widget for logging
         self.log_text = tk.Text(self.logging_window, wrap=tk.WORD, height=20, width=100)
@@ -303,7 +307,7 @@ class FeedStatusGUI:
         self.set_ids_button.grid(row=2, column=0, pady=5, sticky="ew")
 
         self.toggle_button = tk.Button(self.center_frame, text="Toggle Log-Info", command=self.toggle_logging_window)
-        self.toggle_button.grid(row=len(self.feed_status) + 5, column=6, columnspan=1, pady=10, sticky="ew")
+        self.toggle_button.grid(row=len(self.feed_status) + 5, column=5, columnspan=1, pady=10, sticky="ew")
 
         for i, (feed, status) in enumerate(self.feed_status.items()):
             feed_label_text = f"{feed} {'Available' if status else ''}"
@@ -312,10 +316,6 @@ class FeedStatusGUI:
 
             color = "green" if status else "red"
             self.status_labels[feed].configure(bg=color, fg="white")
-
-        # # Create button to check all feeds
-        # self.check_feeds_button = tk.Button(self.center_frame, text="Check All Feeds", command=self.check_feeds)
-        # self.check_feeds_button.grid(row=len(self.feed_status) + 1, column=0, pady=10, sticky="nsew")
 
         # Add Text widget to display Team Names
         for i, (team, name) in enumerate(self.teams.items()):
@@ -346,21 +346,15 @@ class FeedStatusGUI:
         self.update_button = tk.Button(self.center_frame, text='Update', command=self.update_kpi_function)
         self.update_button.grid(row=4, column=3, padx=10, pady=5, sticky="nsew")
 
+        # Add button to toggle speed window
+        self.toggle_speed_button = tk.Button(self.center_frame, text="Toggle Speeds", command=self.toggle_speed_window)
+        self.toggle_speed_button.grid(row=5, column=3, padx=10, pady=5, sticky="nsew")
+
         # Adjust the window geometry
         self.root.update_idletasks()  # Update the window to get correct sizes
         width = self.root.winfo_reqwidth()
         height = self.root.winfo_reqheight()
         self.root.geometry(f"{width}x{height}")
-
-    def check_json_feed(self):
-        # Execute function to check JSON feed availability
-        json_response, json_success = self.downloader.download_json_feed()
-        if json_success:
-            self.status_labels['JSON'].config(text="JSON: Available", bg="green", fg="white")
-            self.feed_status['JSON'] = True
-        else:
-            self.status_labels['JSON'].config(text="JSON", bg="red", fg="white")
-            logging.error("JSON feed is not available")
 
     def set_ids(self):
         self.game_id = self.game_id_entry.get()
@@ -439,21 +433,31 @@ class FeedStatusGUI:
     def get_kpi_function(self, tf08_data):
         self.calculator = GatewayKPIs(tf08_data, kpi_list_tf08=['Possession', 'TopSpeedPlayer', 'Distance'])
         kpis = self.calculator.get_tf08_kpis()
+
+        # Team Names
         self.update_team_name('Home', list(kpis.keys())[0])
         self.update_team_name('Away', list(kpis.keys())[1])
+        # Team Distances
         self.update_team_distance('Home Distance', list(kpis.values())[0]['Distance'])
         self.update_team_distance('Away Distance', list(kpis.values())[1]['Distance'])
+        # Team Possessions
         self.update_team_possession('Home Possession', list(kpis.values())[0]['Possession'])
         self.update_team_possession('Away Possession', list(kpis.values())[1]['Possession'])
+        # TopSpeed Home
         home_topspeed = np.max(list(list(kpis.values())[0]['TopSpeedPlayer'].values()))
         home_topspeed_player = list(list(kpis.values())[0]['TopSpeedPlayer'].keys())[
             list(list(kpis.values())[0]['TopSpeedPlayer'].values()).index(home_topspeed)]
         self.update_team_speed('Home Speed', f'{home_topspeed_player}: {home_topspeed}')
+        # TopSpeed Away
         away_topspeed = np.max(list(list(kpis.values())[1]['TopSpeedPlayer'].values()))
         away_topspeed_player = list(list(kpis.values())[1]['TopSpeedPlayer'].keys())[
             list(list(kpis.values())[1]['TopSpeedPlayer'].values()).index(away_topspeed)]
         self.update_team_speed('Away Speed', f'{away_topspeed_player}: {away_topspeed}')
         self.adjust_window_size()
+
+        # All speeds
+        self.home_topspeeds = list(kpis.values())[0]['TopSpeedPlayer']
+        self.away_topspeeds = list(kpis.values())[1]['TopSpeedPlayer']
 
     def update_kpi_function(self):
         logging.basicConfig(level=logging.INFO)
@@ -462,6 +466,68 @@ class FeedStatusGUI:
         self.get_kpi_function(tf08_data)
         logging.info(f'The values for {self.game_id} have been updated')
 
+    def create_speed_window(self, home_topspeeds, away_topspeeds):
+        # Create a new Toplevel window
+        self.speed_window = tk.Toplevel(self.root)
+        self.speed_window.title("Player Top Speeds")
+
+        # Create a Notebook (tabs)
+        self.speed_notebook = ttk.Notebook(self.speed_window)
+        self.speed_notebook.pack(expand=True, fill="both")
+
+        # Create tabs for home and away speeds
+        self.home_speed_frame = ttk.Frame(self.speed_notebook)
+        self.away_speed_frame = ttk.Frame(self.speed_notebook)
+
+        self.speed_notebook.add(self.home_speed_frame, text="Home Speeds")
+        self.speed_notebook.add(self.away_speed_frame, text="Away Speeds")
+
+        # Populate home speeds tab
+        self.populate_speed_tab(self.home_speed_frame, home_topspeeds)
+
+        # Populate away speeds tab
+        self.populate_speed_tab(self.away_speed_frame, away_topspeeds)
+
+    def populate_speed_tab(self, frame, topspeeds):
+        # Create a DataFrame from the topspeeds dictionary
+        df = pd.DataFrame(list(topspeeds.items()), columns=['Name', 'Speed'])
+
+        # Sort DataFrame by Speed in descending order
+        df = df.sort_values(by='Speed', ascending=False)
+
+        # Format the DataFrame string with center-aligned names
+        df_str = df.to_string(index=False)
+
+        # Convert the DataFrame string to list of lines
+        lines = df_str.split('\n')
+
+        # Find the width of the 'Name' column to center-align the text
+        name_width = df['Name'].str.len().max()
+
+        # Center-align the 'Name' column
+        centered_lines = [f"{line[:name_width].center(name_width)}  {line[name_width:].lstrip()}" for line in lines]
+
+        # Join the centered lines back into a single string
+        centered_df_str = '\n'.join(centered_lines)
+
+        # Create a Text widget to display the centered DataFrame
+        self.speed_text = tk.Text(frame, wrap=tk.WORD)
+
+        # Insert centered DataFrame string into Text widget
+        self.speed_text.insert(tk.END, centered_df_str)
+
+        # Configure the text widget to fit the content width
+        self.speed_text.configure(width=name_width + 10)
+
+        # Pack the text widget
+        self.speed_text.pack(padx=10, pady=10, fill="both", expand=True)
+
+    def toggle_speed_window(self):
+        if hasattr(self, 'speed_window') and self.speed_window:
+            self.speed_window.destroy()
+            del self.speed_window
+        else:
+            self.create_speed_window(self.home_topspeeds, self.away_topspeeds)
 
 class TextHandler(logging.Handler):
     def __init__(self, widget):
