@@ -1,79 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, font as tkfont
-import pandas as pd
-from TracabModules.External.DataHub import DataHub
-
-
-# Sample data for Bayern Munich players (Approximate top speed values in km/h)
-bayern_players = [
-    "Lewandowski", "Neuer", "Müller", "Kimmich", "Goretzka",
-    "Davies", "Süle", "Sané", "Boateng", "Coman",
-    "Alaba", "Hernández", "Pavard", "Gnabry", "Martínez",
-    "Musiala", "Choupo-Moting", "Roca", "Richards", "Zirkzee",
-    "Sarr"
-]
-
-bayern_speeds = [
-    33.5, 33.0, 32.3, 32.8, 33.2,
-    35.0, 31.5, 34.7, 32.0, 34.0,
-    31.8, 32.5, 32.2, 34.3, 32.7,
-    33.5, 32.0, 31.0, 32.5, 33.8,
-    32.5
-]
-
-bayern_data = {
-    'Player': bayern_players,
-    'Top Speed': bayern_speeds
-}
-
-bayern_df = pd.DataFrame(bayern_data)
-
-# Sample data for Bayer Leverkusen players (Approximate top speed values in km/h)
-leverkusen_players = [
-    "Hradecky", "Schick", "Diaby", "Amiri", "Wirtz",
-    "Tapsoba", "Araujo", "Palacios", "Bender", "Frantz",
-    "Bell", "Grill", "Weiser", "Alario", "Sinkgraven",
-    "Dragovic", "Baumgartlinger", "Frimpong", "Paulinho", "Aránguiz",
-    "Bellarabi"
-]
-
-leverkusen_speeds = [
-    32.8, 33.5, 33.7, 33.0, 33.4,
-    31.5, 32.0, 32.7, 31.8, 32.5,
-    30.0, 29.5, 31.2, 33.2, 32.0,
-    30.5, 31.0, 33.0, 32.8, 32.0,
-    32.5
-]
-
-leverkusen_data = {
-    'Player': leverkusen_players,
-    'Top Speed': leverkusen_speeds
-}
-
-leverkusen_df = pd.DataFrame(leverkusen_data)
-
-
-datahub_download = DataHub()
-season_id = datahub_download.season_id()
-comp_id = datahub_download.sts_competition_id(tracab_id='51')
-matchday_ids = datahub_download.matchday_ids(season_id, comp_id)
-speeds = datahub_download.speeds(season_id, comp_id, matchday_ids['30'])
-
-home = 'TSG Hoffenheim'
-speeds_home = pd.DataFrame(
-    list({f'{x['PlayerFirstName'][0]}. {x['PlayerLastName']}': x['Absolute'] for x in speeds.find_all('ListEntry')
-          if x.contents[1]['TeamName'] == home}.items()), columns=['Name', 'Speed']
-)
-
-away = 'RB Leipzig'
-speeds_away = pd.DataFrame(
-    list({f'{x['PlayerFirstName'][0]}. {x['PlayerLastName']}': x['Absolute'] for x in speeds.find_all('ListEntry')
-          if x.contents[1]['TeamName'] == away}.items()), columns=['Name', 'Speed']
-)
+from TracabModules.External.DataHub import get_dfl_highspeeds, BL1, BL2
 
 
 class HighSpeedGUI:
     def __init__(self):
+        self.leagues = ['1.Bundesliga', '2.Bundesliga']
+        self.teams = {
+            '1.Bundesliga': BL1,
+            '2.Bundesliga': BL2
+        }
+
         self.root = tk.Tk()
         self.root.title("Highspeed Fetcher")
         self.root.iconbitmap("Tracab.ico")
@@ -91,20 +28,29 @@ class HighSpeedGUI:
         self.center_frame.grid_rowconfigure(0, weight=1)
         self.center_frame.grid_columnconfigure(0, weight=1)
 
-        # Team name entries
-        tk.Label(self.center_frame, text="Home Team:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
+        # Dropdown list for selecting the league
+        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
                                                                                         sticky="nw")
-        self.home_team_entry = tk.Entry(self.center_frame)
-        self.home_team_entry.grid(row=0, column=1, padx=5, pady=2, sticky="ew")
+        self.league_var = tk.StringVar(self.root)
+        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues, state='readonly')
+        self.league_dropdown.grid(row=0, column=1, padx=5, pady=2, sticky="nw")
 
-        tk.Label(self.center_frame, text="Away Team:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5, pady=2,
+        # Dropdown lists for selecting home and away teams
+        tk.Label(self.center_frame, text="Home Team:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5, pady=2,
                                                                                         sticky="nw")
-        self.away_team_entry = tk.Entry(self.center_frame)
-        self.away_team_entry.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+        self.home_team_var = tk.StringVar(self.root)
+        self.home_team_dropdown = ttk.Combobox(self.center_frame, textvariable=self.home_team_var, values=[])
+        self.home_team_dropdown.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+
+        tk.Label(self.center_frame, text="Away Team:", fg="#98FB98", bg="#2F4F4F").grid(row=2, column=0, padx=5, pady=2,
+                                                                                        sticky="nw")
+        self.away_team_var = tk.StringVar(self.root)
+        self.away_team_dropdown = ttk.Combobox(self.center_frame, textvariable=self.away_team_var, values=[])
+        self.away_team_dropdown.grid(row=2, column=1, padx=5, pady=2, sticky="nw")
 
         # Button to fetch highspeed dataframes
         self.fetch_button = tk.Button(self.center_frame, text="Fetch Highspeeds", command=self.fetch_highspeeds)
-        self.fetch_button.grid(row=2, column=0, columnspan=2, pady=0, sticky="nw")
+        self.fetch_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="nw")
 
         # Dataframes to display highspeeds
         self.home_df_text = tk.Text(self.center_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
@@ -134,15 +80,24 @@ class HighSpeedGUI:
         # Adjust the window geometry
         self.adjust_window_size()
 
+        self.league_dropdown.bind("<<ComboboxSelected>>", self.update_team_dropdowns)
         self.root.mainloop()
 
+    def update_team_dropdowns(self, event):
+        selected_league = self.league_var.get()
+        teams_for_selected_league = self.teams.get(selected_league, [])
+        self.home_team_dropdown.config(values=teams_for_selected_league)
+        self.away_team_dropdown.config(values=teams_for_selected_league)
+
     def fetch_highspeeds(self):
-        home_team = self.home_team_entry.get()
-        away_team = self.away_team_entry.get()
+        league = self.league_var.get()
+        home_team = self.home_team_var.get()
+        away_team = self.away_team_var.get()
 
         # Replace with your function to fetch highspeed dataframes based on home_team and away_team
-        home_df = bayern_df.sort_values(by='Top Speed', ascending=False).reset_index(drop=True)
-        away_df = leverkusen_df.sort_values(by='Top Speed', ascending=False).reset_index(drop=True)
+        home_df, away_df = get_dfl_highspeeds(league, home_team, away_team)
+        # home_df = bayern_df
+        # away_df = leverkusen_df
 
         if home_df is not None and away_df is not None:
             # Display highspeed dataframes in the text widgets
@@ -155,16 +110,8 @@ class HighSpeedGUI:
             # Show the text widgets
             self.home_df_text.grid()
             self.away_df_text.grid()
-            # self.home_scrollbar.grid()
-            # self.away_scrollbar.grid()
             # Adjust the window geometry
             self.adjust_window_size()
-
-    def get_highspeed_dataframes(self, home_team, away_team):
-        # Placeholder function to return sample dataframes
-        home_df = pd.DataFrame({'Player': ['Player1', 'Player2'], 'Highspeed': [20, 22]})
-        away_df = pd.DataFrame({'Player': ['PlayerA', 'PlayerB'], 'Highspeed': [21, 23]})
-        return home_df, away_df
 
     def display_dataframe(self, df, text_widget):
         text_widget.config(state=tk.NORMAL)
@@ -191,3 +138,4 @@ class HighSpeedGUI:
 
 if __name__ == "__main__":
     HighSpeedGUI()
+

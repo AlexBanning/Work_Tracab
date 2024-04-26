@@ -1,9 +1,51 @@
+import pandas as pd
 import requests
 import logging
 from bs4 import BeautifulSoup
 
 
+BL1 = [
+    "FC Bayern München",
+    "RB Leipzig",
+    "Borussia Dortmund",
+    "Borussia Mönchengladbach",
+    "Bayer 04 Leverkusen",
+    "VfL Wolfsburg",
+    "Eintracht Frankfurt",
+    "1. FC Union Berlin",
+    "1. FC Köln",
+    "1. FC Heidenheim 1846",
+    "TSG Hoffenheim",
+    "FC Augsburg",
+    "Sport-Club Freiburg",
+    "VfB Stuttgart",
+    "SV Darmstadt 98",
+    "1. FSV Mainz 05",
+    "VfL Bochum 1848",
+    "SV Werder Bremen"
+]
 
+
+BL2 = [
+    "FC St. Pauli",
+    "Holstein Kiel",
+    "Karlsruher SC",
+    "Hamburger SV",
+    "SpVgg Greuther Fürth",
+    "SV Elversberg",
+    "SV Wehen Wiesbaden",
+    "1. FC Magdeburg",
+    "VfL Osnabrück",
+    "1. FC Nürnberg",
+    "F.C. Hansa Rostock",
+    "FC Schalke 04",
+    "1. FC Kaiserslautern",
+    "Hannover 96",
+    "SC Paderborn 07",
+    "Hertha BSC",
+    "Eintracht Braunschweig",
+    "Fortuna Düsseldorf"
+]
 class DataHub:
     def __init__(self):
         self.client_id = 'ChyronHego-2fac-9065-53ed'
@@ -59,7 +101,7 @@ class DataHub:
 
         return matchday_ids
 
-    def speeds(self, season_id, comp_id, matchday_id):
+    def positionalfeed(self, season_id, comp_id, matchday_id):
         logging.basicConfig(level=logging.INFO)
         url = (f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/{self.client_id}/'
                     f'DFL-07.03.01-Ranglisten-Saison_Spieler_Positionsdaten/{season_id}_{comp_id}_{matchday_id}')
@@ -73,4 +115,16 @@ class DataHub:
             speeds = [x for x in soup.find_all('Ranking') if x['Type'] == 'MaximumSpeed'][0]
 
         return speeds
+
+
+def get_dfl_highspeeds(league, home, away):
+    if league == '1.Bundesliga':
+        data = pd.read_csv('speeds_BL1.csv')
+    elif league == '2.Bundesliga':
+        data = pd.read_csv('speeds_BL2.csv')
+
+    home_data = data[data['Team'] == home].drop(columns=data.columns[[0,3]]).sort_values(by='Speed', ascending=False)
+    away_data = data[data['Team'] == away].drop(columns=data.columns[[0,3]]).sort_values(by='Speed', ascending=False)
+
+    return home_data, away_data
 
