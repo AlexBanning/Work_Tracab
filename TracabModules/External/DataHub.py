@@ -164,7 +164,10 @@ class HighSpeedGUI:
 
         self.root = tk.Tk()
         self.root.title("Highspeed Fetcher")
-        # self.root.iconbitmap("Tracab.ico")
+        # Load Tracab Icon
+        exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
+        self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+        # Set Background colour
         self.root.configure(bg='#2F4F4F')
 
         # Adjust the size of the GUI window
