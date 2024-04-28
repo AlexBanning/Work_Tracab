@@ -461,10 +461,13 @@ class FeedStatusGUI:
 
     def update_kpi_function(self):
         logging.basicConfig(level=logging.INFO)
+        self.downloader = GatewayDownloader(self.game_id, self.vendor_id, self.data_quality, self.extr_version)
         tf08_data, tf08_success = self.downloader.download_tf08_feed()
         self.update_feed_status('TF08', tf08_success)
         self.get_kpi_function(tf08_data)
         logging.info(f'The values for {self.game_id} have been updated')
+        # Schedule the update_kpi_function to be called again after 1 minute (60,000 milliseconds)
+        self.root.after(30000, self.update_kpi_function)
 
     def create_speed_window(self, home_topspeeds, away_topspeeds):
         # Create a new Toplevel window
