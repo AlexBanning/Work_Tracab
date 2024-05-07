@@ -4,7 +4,6 @@ import TracabModules.External.apiFunctions as af
 import requests
 import string
 import tkinter as tk
-from tkinter import messagebox
 import pandas as pd
 import sys
 

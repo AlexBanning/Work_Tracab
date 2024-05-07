@@ -314,7 +314,7 @@ class DataFrameSelectorApp:
         self.selected_index = None
 
         # Create and place widgets
-        self.label_info = ttk.Label(root, text='Please enter the row index of the match(1 to ' + str(len(df)) +
+        self.label_info = ttk.Label(root, text='Please enter the row index of the match (1 to ' + str(len(df)) +
                                                '):')
         self.label_info.pack(pady=10)
 
@@ -327,15 +327,14 @@ class DataFrameSelectorApp:
         # Display DataFrame
         self.tree = ttk.Treeview(root)
         self.tree["columns"] = list(df.columns)
-        self.tree["show"] = "headings"
+        self.tree["show"] = ""
 
         # Currently not displaying the column name
         for col in df.columns:
-            #     self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col)
             self.tree.column(col, width=300, anchor=tk.CENTER)
-        #
-        #     # Display the column name in bold
-        #     self.tree.tag_configure(f"{col}_tag", font=('Helvetica', 10, 'bold'))
+            # Display the column name in bold
+            self.tree.tag_configure(f"{col}_tag", font=('Helvetica', 10, 'bold'))
 
         for i, row in df.iterrows():
             self.tree.insert("", i, values=list(row))
