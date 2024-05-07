@@ -99,8 +99,11 @@ class DataHub:
         else:
             xml_data = response.text
             soup = BeautifulSoup(xml_data, 'xml')
-            matchday_ids = {x['MatchDay']: x['MatchDayId'] for x in soup.find_all('Fixtures')[0].contents[1::2]
-                        if x['CompetitionId'] == comp_id}
+            matchday_ids = {
+                x['MatchDay']: {'MatchDayId': x['MatchDayId'],'Date': x['StartDate'][:10]}
+                for x in soup.find_all('Fixtures')[0].contents[1::2]
+                if x['CompetitionId'] == comp_id
+                }
 
         return matchday_ids
 
