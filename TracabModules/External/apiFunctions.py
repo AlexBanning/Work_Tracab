@@ -40,23 +40,8 @@ def api_lineups(token, match_id):
     headers['accept'] = 'application/json'
     headers['Authorization'] = "Bearer " + token
     # r =  requests.get(line_up_url, headers=headers)
-    lineup = requests.get(line_up_url, headers=headers).json()
+    lineups = requests.get(line_up_url, headers=headers).json()
 
-    return lineup
-
-
-def get_both_lineups(token, match_id_ere, home_team):
-    """
-    A function, that fetches lineup information for a single match specified by match_id and our own gamestats to the
-    match. Returns four pd.DataFrames containing gamestats information and official lineup information.
-
-    :param token:
-    :param match_id_ere:
-    :param home_team:
-    :return:
-    """
-
-    lineups = api_lineups(token, match_id_ere)
     try:
         # Changed to now check if a valid matchShirtNumber is available for the player before adding them to the pd.DF
         home = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
@@ -78,6 +63,22 @@ def get_both_lineups(token, match_id_ere, home_team):
         # to fetch all possible exceptions
         home = pd.DataFrame()
         away = pd.DataFrame()
+
+    return home, away
+
+
+def get_both_lineups(token, match_id_ere, home_team):
+    """
+    A function, that fetches lineup information for a single match specified by match_id and our own gamestats to the
+    match. Returns four pd.DataFrames containing gamestats information and official lineup information.
+
+    :param token:
+    :param match_id_ere:
+    :param home_team:
+    :return:
+    """
+
+    home, away = api_lineups(token, match_id_ere)
 
     # Get Tracab matchID to download and open Tracab gamestats
     match_id_trac = get_tracabID(home_team)

@@ -1,18 +1,23 @@
 from requests.structures import CaseInsensitiveDict
+from TracabModules.Internal.server_manipulations import display_popup
 import TracabModules.External.apiFunctions as af
 import requests
 import string
 import tkinter as tk
+from tkinter import messagebox
 import pandas as pd
+import sys
 
 
-# Version 1.2
+# Version 1.3
 # 2023/08/28: Updated that a message is shown when no lineups are available yet.
 # 2023/08/31: Updated, that players with differences are directly displayed as well
 # 2023/09/04: Updated, that players are not parsed based on their player status anymore. This information is only
 #             available post KO. Now implementing players based on an existing jerseyNumber.
 # 2023/10/11: Updated, wrong_player_function was extracted as a module and now only the function remains in line 39
 #             to shorten the code.
+# 2024/05/07: Excluded Tracab Gamestats until requested otherwise and the encoding issues have been fixed.
+#             Currently only the API information are processed and displayed
 
 login_url = 'https://data.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
@@ -43,19 +48,24 @@ if home_team == 'AFC Ajax':
     home_team = 'Ajax'
 elif home_team == 'Almere City':
     home_team = 'Almere City FC'
-home, away = af.get_both_lineups(token, md_info[app.selected_index]['matchNumber'], home_team=home_team)
+home, away = af.api_lineups(token, md_info[app.selected_index]['matchNumber'])
 
 # Adjust column names for the user
-home[0] = home[0].rename(columns={'jerseyNumber': '# Home'})
-home[1] = home[1].rename(columns={'jerseyNumber': '# Home'})
-away[0] = away[0].rename(columns={'jerseyNumber': '# Away'})
-away[1] = away[1].rename(columns={'jerseyNumber': '# Away'})
+home = home.rename(columns={'jerseyNumber': '# Home'})
+# home[1] = home[1].rename(columns={'jerseyNumber': '# Home'})
+away = away.rename(columns={'jerseyNumber': '# Away'})
+# away[1] = away[1].rename(columns={'jerseyNumber': '# Away'})
 
 
-if not home[0].empty or not away[0].empty:
+if not home.empty or not away.empty:
     # Create and run the DataFrameViewer
-    app = af.DataFrameViewer(home[0], away[0], home_team, away_team)
+    if len(home) > 21:
+        display_popup(title='API Lineups', message='The API Information for the home team might not be final yet!')
+    if len(away) > 21:
+        display_popup(title='API Lineups', message='The API Information for the away team might not be final yet!')
+    app = af.DataFrameViewer(home, away, home_team, away_team)
     app.mainloop()
-elif home[0].empty or away[0].empty:
-    print('The API lineup information for this match are not available yet!')
-input('\n Press Enter to exit;')
+    sys.exit()
+elif home.empty or away.empty:
+    display_popup(title='API Lineups', message='The API Information are not available yet!')
+sys.exit()
