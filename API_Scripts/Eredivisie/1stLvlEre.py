@@ -43,19 +43,19 @@ if home_team == 'AFC Ajax':
     home_team = 'Ajax'
 elif home_team == 'Almere City':
     home_team = 'Almere City FC'
-home, away = af.get_both_lineups(token, md_info[app.selected_index]['matchNumber'], home_team=home_team)
+home, away = af.api_lineups(token, md_info[app.selected_index]['matchNumber'])
 
 # Adjust column names for the user
-home[0] = home[0].rename(columns={'jerseyNumber': '# Home'})
-home[1] = home[1].rename(columns={'jerseyNumber': '# Home'})
-away[0] = away[0].rename(columns={'jerseyNumber': '# Away'})
-away[1] = away[1].rename(columns={'jerseyNumber': '# Away'})
+home = home.rename(columns={'jerseyNumber': '# Home'})
+# home[1] = home[1].rename(columns={'jerseyNumber': '# Home'})
+away = away.rename(columns={'jerseyNumber': '# Away'})
+# away[1] = away[1].rename(columns={'jerseyNumber': '# Away'})
 
 
-if not home[0].empty or not away[0].empty:
+if not home.empty or not away.empty:
     # Create and run the DataFrameViewer
-    app = af.DataFrameViewer(home[0], away[0], home_team, away_team)
+    app = af.DataFrameViewer(home, away, home_team, away_team)
     app.mainloop()
-elif home[0].empty or away[0].empty:
+elif home.empty or away.empty:
     print('The API lineup information for this match are not available yet!')
 input('\n Press Enter to exit;')
