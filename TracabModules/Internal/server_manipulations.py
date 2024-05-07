@@ -67,7 +67,7 @@ def display_popup(title, message):
     root = tk.Tk()
     root.withdraw()
     messagebox.showinfo(title=title, message=message)
-    root.mainloop()
+    #root.mainloop()
 
 
 def rename_htf_files(source_path, destination_path, new_filename):

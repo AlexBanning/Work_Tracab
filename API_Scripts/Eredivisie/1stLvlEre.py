@@ -1,9 +1,12 @@
 from requests.structures import CaseInsensitiveDict
+from TracabModules.Internal.server_manipulations import display_popup
 import TracabModules.External.apiFunctions as af
 import requests
 import string
 import tkinter as tk
+from tkinter import messagebox
 import pandas as pd
+import sys
 
 
 # Version 1.3
@@ -56,8 +59,13 @@ away = away.rename(columns={'jerseyNumber': '# Away'})
 
 if not home.empty or not away.empty:
     # Create and run the DataFrameViewer
+    if len(home) > 21:
+        display_popup(title='API Lineups', message='The API Information for the home team might not be final yet!')
+    if len(away) > 21:
+        display_popup(title='API Lineups', message='The API Information for the away team might not be final yet!')
     app = af.DataFrameViewer(home, away, home_team, away_team)
     app.mainloop()
+    sys.exit()
 elif home.empty or away.empty:
-    print('The API lineup information for this match are not available yet!')
-input('\n Press Enter to exit;')
+    display_popup(title='API Lineups', message='The API Information are not available yet!')
+sys.exit()
