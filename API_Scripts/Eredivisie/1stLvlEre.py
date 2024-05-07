@@ -6,13 +6,15 @@ import tkinter as tk
 import pandas as pd
 
 
-# Version 1.2
+# Version 1.3
 # 2023/08/28: Updated that a message is shown when no lineups are available yet.
 # 2023/08/31: Updated, that players with differences are directly displayed as well
 # 2023/09/04: Updated, that players are not parsed based on their player status anymore. This information is only
 #             available post KO. Now implementing players based on an existing jerseyNumber.
 # 2023/10/11: Updated, wrong_player_function was extracted as a module and now only the function remains in line 39
 #             to shorten the code.
+# 2024/05/07: Excluded Tracab Gamestats until requested otherwise and the encoding issues have been fixed.
+#             Currently only the API information are processed and displayed
 
 login_url = 'https://data.voetbaldatacentre.nl/api/login'
 creds = '{"username": "chryonhego@archimedict.nl", "password": "34$h$kKs8y9Gqadp"}'
