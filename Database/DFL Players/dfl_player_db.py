@@ -23,7 +23,7 @@ for league in ['51', '52']:
         speeds_df['League'] = '1.Bundesliga'
     elif league == '52':
         speeds_df['League'] = '2.Bundesliga'
-    data = pd.concat([data, speeds_df], axis=0).drop(columns=speeds_df.columns[[0]])
+    data = pd.concat([data, speeds_df], axis=0)
 
 # Connect to DB
 conn = sql.connect(r'N:\07_QC\Alex\DFLPlayerDatabase.db')

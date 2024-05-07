@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 import sys, os
+import sqlite3
 
 
 BL1 = [
@@ -126,33 +127,26 @@ class DataHub:
 def get_dfl_highspeeds(league, home, away):
     logging.basicConfig(level=logging.INFO)
 
-    # Get the path to the directory containing the executable
-    exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
-
-    # Construct the path to the CSV files
-    csv_path1 = os.path.join(exe_dir, 'speeds_BL1.csv')
-    csv_path2 = os.path.join(exe_dir, 'speeds_BL2.csv')
 
     try:
-        if league == '1.Bundesliga':
-            data = pd.read_csv(csv_path1)
-        elif league == '2.Bundesliga':
-            data = pd.read_csv(csv_path2)
-        else:
-            raise ValueError("Invalid league selected")
-
-        # Continue processing the data if loading is successful
-        logging.info("Data loaded successfully")
-
-    except FileNotFoundError as e:
-        logging.error(f"File not found: {e.filename}")
-
+        # Connect to the SQLite database
+        conn = sqlite3.connect(r'N:\07_QC\Alex\DFLPlayerDatabase.db')
     except Exception as e:
         logging.error(f"An error occurred: {e}")
 
-    home_data = data[data['Team'] == home].drop(columns=data.columns[[0,3]]).sort_values(by='Speed', ascending=False)
-    away_data = data[data['Team'] == away].drop(columns=data.columns[[0,3]]).sort_values(by='Speed', ascending=False)
-    top_ten = data.head(10).drop(columns=data.columns[[0,3]]).sort_values(by='Speed', ascending=False)
+    # Load the entire DataFrame from the database
+    query = "SELECT * FROM DFLPlayerStats"
+    data = pd.read_sql_query(query, conn)
+
+    home_data = data[data['Team'] == home].drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+    away_data = data[data['Team'] == away].drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+    if league == '1.Bundesliga':
+        top_ten = data[data['League'] == '1.Bundesliga'].head(10).drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+    elif league == '2.Bundesliga':
+        top_ten = data[data['League'] == '2.Bundesliga'].head(10).drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+
+    # Close the database connection
+    conn.close()
 
     return home_data, away_data, top_ten
 
