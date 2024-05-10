@@ -50,6 +50,7 @@ BL2 = [
     "Eintracht Braunschweig",
     "Fortuna Düsseldorf"
 ]
+
 class DataHub:
     def __init__(self):
         self.client_id = 'ChyronHego-2fac-9065-53ed'
@@ -175,9 +176,10 @@ class HighSpeedGUI:
         self.center_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.center_frame.configure(bg='#2F4F4F')
 
-        # Configure row and column weights for center_frame
-        self.center_frame.grid_rowconfigure(0, weight=1)
-        self.center_frame.grid_columnconfigure(0, weight=1)
+        # Grid configuration for the two dataframes including their headers
+        self.dataframe_frame = tk.Frame(self.root)
+        self.dataframe_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+        self.dataframe_frame.configure(bg='#2F4F4F')
 
         # Dropdown list for selecting the league
         tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
@@ -204,24 +206,24 @@ class HighSpeedGUI:
         self.fetch_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="nw")
 
         # Dataframes to display highspeeds
-        self.home_df_text = tk.Text(self.center_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
+        self.home_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
         self.home_df_text.grid(row=1, column=2, padx=(5,0), pady=0, sticky="nsew", columnspan=2)
         self.home_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
         self.home_df_text.grid_remove()
 
         # Vertical Scrollbar for home_df_text
-        self.home_scrollbar = ttk.Scrollbar(self.center_frame, orient="vertical", command=self.home_df_text.yview)
+        self.home_scrollbar = ttk.Scrollbar(self.dataframe_frame, orient="vertical", command=self.home_df_text.yview)
         self.home_scrollbar.grid(row=1, column=4, pady=(0), sticky="nse")
         self.home_df_text.config(yscrollcommand=self.home_scrollbar.set)
         self.home_scrollbar.grid_remove()  # Hide the scrollbar initially
 
-        self.away_df_text = tk.Text(self.center_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
+        self.away_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
         self.away_df_text.grid(row=1, column=4, padx=0, pady=0, sticky="nsew", columnspan=2)
         self.away_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
         self.away_df_text.grid_remove()
 
         # Vertical Scrollbar for away_df_text
-        self.away_scrollbar = ttk.Scrollbar(self.center_frame, orient="vertical", command=self.away_df_text.yview)
+        self.away_scrollbar = ttk.Scrollbar(self.dataframe_frame, orient="vertical", command=self.away_df_text.yview)
         self.away_scrollbar.grid(row=1, column=7, pady=(0, 2), sticky="nse")
         self.away_df_text.config(yscrollcommand=self.away_scrollbar.set)
 
@@ -288,10 +290,11 @@ class HighSpeedGUI:
 
     def update_headers(self, home_team, away_team):
         bold_font = tkfont.Font(weight='bold')
-        self.home_df_text_header = tk.Label(self.center_frame, text=home_team, font=bold_font, fg="white", bg="#2F4F4F",
+        self.home_df_text_header = tk.Label(self.dataframe_frame, text=home_team, font=bold_font, fg="white", bg="#2F4F4F",
                                             anchor='center')
         self.home_df_text_header.grid(row=0, column=2, padx=5, pady=(0,5), sticky="nsew")
 
-        self.away_df_text_header = tk.Label(self.center_frame, text=away_team, font=bold_font, fg="white", bg="#2F4F4F",
+        self.away_df_text_header = tk.Label(self.dataframe_frame, text=away_team, font=bold_font, fg="white", bg="#2F4F4F",
                                             anchor='center')
         self.away_df_text_header.grid(row=0, column=4, padx=5, pady=(0,5), sticky="nsew")
+
