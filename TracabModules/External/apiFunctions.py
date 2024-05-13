@@ -266,7 +266,8 @@ class DataFrameViewer(tk.Tk):
             self.tree1.column(col, anchor=tk.CENTER)
 
         for i, row in df1.iterrows():
-            self.tree1.insert("", i, values=list(row))
+            values = [row[col] for col in df1.columns]
+            self.tree1.insert("", "end", values=values)
 
         yscrollbar1.config(command=self.tree1.yview)
         xscrollbar1.config(command=self.tree1.xview)
@@ -297,7 +298,8 @@ class DataFrameViewer(tk.Tk):
             self.tree2.column(col, anchor=tk.CENTER)
 
         for i, row in df2.iterrows():
-            self.tree2.insert("", i, values=list(row))
+            values = [row[col] for col in df2.columns]
+            self.tree2.insert("", "end", values=values)
 
         yscrollbar2.config(command=self.tree2.yview)
         xscrollbar2.config(command=self.tree2.xview)

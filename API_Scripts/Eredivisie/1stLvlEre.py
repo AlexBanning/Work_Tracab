@@ -48,6 +48,7 @@ if home_team == 'AFC Ajax':
 elif home_team == 'Almere City':
     home_team = 'Almere City FC'
 home, away = af.api_lineups(token, md_info[app.selected_index]['matchNumber'])
+home = home.sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
 # Adjust column names for the user
 home = home.rename(columns={'jerseyNumber': '# Home'})
@@ -58,9 +59,9 @@ away = away.rename(columns={'jerseyNumber': '# Away'})
 
 if not home.empty or not away.empty:
     # Create and run the DataFrameViewer
-    if len(home) > 21:
+    if len(home) > 22:
         display_popup(title='API Lineups', message='The API Information for the home team might not be final yet!')
-    if len(away) > 21:
+    if len(away) > 22:
         display_popup(title='API Lineups', message='The API Information for the away team might not be final yet!')
     app = af.DataFrameViewer(home, away, home_team, away_team)
     app.mainloop()
