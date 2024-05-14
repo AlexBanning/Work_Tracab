@@ -28,7 +28,7 @@ def get_player_name(gamelog, team_id, player_id):
     return player_name
 
 
-def get_match_info(gamelog):
+def get_match_info_bvb(gamelog):
     """
     This function aims to fetch the TeamID, TeamName, GameID, CompID and Matchday out of a gamelog.
     :param gamelog:
@@ -53,3 +53,14 @@ def get_match_info(gamelog):
     return dict({'bvb_id': bvb_id, 'bvb_name': bvb_name, 'oppo_id': oppo_id, 'oppo_name': oppo_name,
                  'match_id': match_id, 'md': matchday, 'comp_id': comp_id})
 
+def get_match_info(gamelog):
+    xml_doc = parse(gamelog)
+    teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
+    home_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+              x.attributes['TeamId'].childNodes[0].data == '18'][0]
+    away_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+              x.attributes['TeamId'].childNodes[0].data != '18'][0]
+    home_name = [x for x in teams if
+                x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
+    away_name = [x for x in teams if
+                x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data

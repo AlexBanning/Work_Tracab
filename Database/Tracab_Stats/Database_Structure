@@ -1,0 +1,11 @@
+Tracab Stats-DB
+
+Purpose of this DB should be to include basic stats for each team of the major leagues that are covered by Tracab.
+Each league should have their own database file containing statistic-tables for each individual club.
+
+LeagueX.db
+| - team1_stats
+| - team2_stats
+| - team3_stats
+| - ...
+| - league_stats

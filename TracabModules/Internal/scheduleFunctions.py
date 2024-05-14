@@ -76,8 +76,6 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
         pass
 
 
-
-
 def get_fifa_schedule(comp_id, filename):
     """
     Parse the schedule.xml of the fifa tournament into a pd.DataFrame that can be pushed to the Google Sheet.
