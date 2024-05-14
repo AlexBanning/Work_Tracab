@@ -9,7 +9,8 @@ matchday_ids = datahub_download.matchday_ids(season_id, comp_id)
 speeds = datahub_download.positionalfeed(season_id, comp_id, matchday_ids['31'])
 
 speeds_df = pd.DataFrame(
-    [{'Name': f"{x['PlayerAlias']}" if 'PlayerAlias' in x.attrs else f"{x['PlayerFirstName'][0]}. {x['PlayerLastName']}",
+    [{'ObjectId': x['PlayerId'],
+      'Name': f"{x['PlayerAlias']}" if 'PlayerAlias' in x.attrs else f"{x['PlayerFirstName'][0]}. {x['PlayerLastName']}",
       'Speed': x['Absolute'],
       'Team': x.contents[1]['TeamName']}
      for x in speeds.find_all('ListEntry') if x.contents[1]['TeamName']]

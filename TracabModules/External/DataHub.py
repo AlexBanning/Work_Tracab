@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import requests
 import logging
@@ -6,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 import sys, os
 import sqlite3
+from TracabModules.Internal.tools import is_date_in_current_week
 
 
 BL1 = [
@@ -139,17 +141,20 @@ def get_dfl_highspeeds(league, home, away):
     query = "SELECT * FROM DFLPlayerStats"
     data = pd.read_sql_query(query, conn)
 
-    home_data = data[data['Team'] == home].drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
-    away_data = data[data['Team'] == away].drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+    home_data = data[data['Team'] == home].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+    home_data = home_data.rename(columns={'ShirtNumber': '#'})
+    away_data = data[data['Team'] == away].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+    away_data = away_data.rename(columns={'ShirtNumber': '#'})
     if league == '1.Bundesliga':
-        top_ten = data[data['League'] == '1.Bundesliga'].head(10).drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+        top_ten = data[data['League'] == '1.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
     elif league == '2.Bundesliga':
-        top_ten = data[data['League'] == '2.Bundesliga'].head(10).drop(columns=data.columns[[0, 1]]).sort_values(by='Speed', ascending=False)
+        top_ten = data[data['League'] == '2.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
 
     # Close the database connection
     conn.close()
 
     return home_data, away_data, top_ten
+
 
 
 class HighSpeedGUI:
@@ -206,7 +211,7 @@ class HighSpeedGUI:
         self.fetch_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="nw")
 
         # Dataframes to display highspeeds
-        self.home_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
+        self.home_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=50, relief='flat')
         self.home_df_text.grid(row=1, column=2, padx=(5,0), pady=0, sticky="nsew", columnspan=2)
         self.home_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
         self.home_df_text.grid_remove()
@@ -217,7 +222,7 @@ class HighSpeedGUI:
         self.home_df_text.config(yscrollcommand=self.home_scrollbar.set)
         self.home_scrollbar.grid_remove()  # Hide the scrollbar initially
 
-        self.away_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=35, relief='flat')
+        self.away_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=50, relief='flat')
         self.away_df_text.grid(row=1, column=4, padx=0, pady=0, sticky="nsew", columnspan=2)
         self.away_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
         self.away_df_text.grid_remove()
@@ -297,4 +302,66 @@ class HighSpeedGUI:
         self.away_df_text_header = tk.Label(self.dataframe_frame, text=away_team, font=bold_font, fg="white", bg="#2F4F4F",
                                             anchor='center')
         self.away_df_text_header.grid(row=0, column=4, padx=5, pady=(0,5), sticky="nsew")
+
+
+class DFLDatabase:
+    def __init__(self):
+        self.datahub_download = DataHub()
+
+    def PlayerInfo(self, season_id):
+        data = pd.DataFrame(columns=['ObjectId', 'ShirtNumber'])
+        for league in ['51', '52']:
+            comp_id = self.datahub_download.sts_competition_id(tracab_id=league)
+            club_id_link = (
+                f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/STS1-PROD-UCT1'
+                f'-TEST/DFL-01.04-Stammdaten-Vereine/{season_id}_{comp_id}')
+            club_id_response = requests.get(club_id_link)
+            club_id_xml_data = club_id_response.text
+            club_id_soup = BeautifulSoup(club_id_xml_data, 'xml')
+            club_ids = {x['LongName']: x['ClubId'] for x in club_id_soup.find_all('Club')}
+
+            for club in club_ids:
+                player_info_link = (
+                    f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/datahub'
+                    f'-ftp1-plus-2222/DFL-01.05-Stammdaten-Personen_Spieler/{club_ids[club]}_{season_id}')
+
+                player_info_response = requests.get(player_info_link)
+                player_info_xml_data = player_info_response.text
+                player_info_soup = BeautifulSoup(player_info_xml_data, 'xml')
+                club_df = pd.DataFrame(
+                    [{
+                        'ObjectId': str(x['ObjectId']),
+                        'ShirtNumber': x['ShirtNumber']}
+                        for x in player_info_soup.find_all('Object')
+                        if not 'LeaveDate' in x.attrs and x.get('PrimaryPool') == 'true']
+                )
+                data = pd.concat([data, club_df], axis=0)
+
+        return data
+
+
+    def HighSpeeds(self, season_id):
+        data = pd.DataFrame(columns=['League', 'Team', 'Name', 'ObjectId', 'Speed'])
+        for league in ['51', '52']:
+            comp_id = self.datahub_download.sts_competition_id(tracab_id=league)
+            matchday_ids = self.datahub_download.matchday_ids(season_id, comp_id)
+            current_md = matchday_ids[
+                str(int([x for x in matchday_ids if is_date_in_current_week(matchday_ids[x]['Date'])][0]) - 1)][
+                'MatchDayId']
+            speeds = self.datahub_download.positionalfeed(season_id, comp_id, current_md)
+
+            speeds_df = pd.DataFrame(
+                [{'ObjectId': str(x['PlayerId']),
+                  'Name': f"{x['PlayerAlias']}" if 'PlayerAlias' in x.attrs else f"{x['PlayerFirstName'][0]}. {x['PlayerLastName']}",
+                  'Speed': np.round(float(x['Absolute']),2),
+                  'Team': str(x.contents[1]['TeamName'])}
+                 for x in speeds.find_all('ListEntry') if x.contents[1]['TeamName']]
+            )
+            if league == '51':
+                speeds_df['League'] = '1.Bundesliga'
+            elif league == '52':
+                speeds_df['League'] = '2.Bundesliga'
+            data = pd.concat([data, speeds_df], axis=0)
+
+        return data
 

@@ -1,29 +1,19 @@
 import sqlite3 as sql
 import pandas as pd
-from TracabModules.External.DataHub import DataHub
-from TracabModules.Internal.tools import is_date_in_current_week
+from TracabModules.External.DataHub import DataHub, DFLDatabase
 
 
 datahub_download = DataHub()
 season_id = datahub_download.season_id()
-data = pd.DataFrame(columns=['League', 'Team', 'Name', 'Speed'])
-for league in ['51', '52']:
-    comp_id = datahub_download.sts_competition_id(tracab_id=league)
-    matchday_ids = datahub_download.matchday_ids(season_id, comp_id)
-    current_md = matchday_ids[str(int([x for x in matchday_ids  if is_date_in_current_week(matchday_ids[x]['Date'])][0])-1)]['MatchDayId']
-    speeds = datahub_download.positionalfeed(season_id, comp_id, current_md)
+database = DFLDatabase()
+# Download all necessary data for the database table, currently highspeeds and shirtnumbers
+highspeed_df = database.HighSpeeds(season_id=season_id)
+info_df = database.PlayerInfo(season_id=season_id)
 
-    speeds_df = pd.DataFrame(
-        [{'Name': f"{x['PlayerAlias']}" if 'PlayerAlias' in x.attrs else f"{x['PlayerFirstName'][0]}. {x['PlayerLastName']}",
-          'Speed': x['Absolute'],
-          'Team': x.contents[1]['TeamName']}
-         for x in speeds.find_all('ListEntry') if x.contents[1]['TeamName']]
-    )
-    if league == '51':
-        speeds_df['League'] = '1.Bundesliga'
-    elif league == '52':
-        speeds_df['League'] = '2.Bundesliga'
-    data = pd.concat([data, speeds_df], axis=0)
+# Merge the DFs based on the 'ObjectId' column and reorder the DF.
+data = pd.merge(highspeed_df, info_df, on='ObjectId', how='left')[['League', 'Team', 'Name', 'ObjectId',
+                                                                   'ShirtNumber', 'Speed']]
+data['ShirtNumber'] = data['ShirtNumber'].fillna('-')
 
 # Connect to DB
 conn = sql.connect(r'N:\07_QC\Alex\DFLPlayerDatabase.db')
