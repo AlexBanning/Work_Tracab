@@ -307,14 +307,15 @@ class HighSpeedGUI:
 class DFLDatabase:
     def __init__(self):
         self.datahub_download = DataHub()
+        self.client_id = 'ChyronHego-2fac-9065-53ed'
 
     def PlayerInfo(self, season_id):
         data = pd.DataFrame(columns=['ObjectId', 'ShirtNumber'])
         for league in ['51', '52']:
             comp_id = self.datahub_download.sts_competition_id(tracab_id=league)
             club_id_link = (
-                f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/STS1-PROD-UCT1'
-                f'-TEST/DFL-01.04-Stammdaten-Vereine/{season_id}_{comp_id}')
+                f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/'
+                f'{self.client_id}/DFL-01.04-Stammdaten-Vereine/{season_id}_{comp_id}')
             club_id_response = requests.get(club_id_link)
             club_id_xml_data = club_id_response.text
             club_id_soup = BeautifulSoup(club_id_xml_data, 'xml')
@@ -322,8 +323,8 @@ class DFLDatabase:
 
             for club in club_ids:
                 player_info_link = (
-                    f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/datahub'
-                    f'-ftp1-plus-2222/DFL-01.05-Stammdaten-Personen_Spieler/{club_ids[club]}_{season_id}')
+                    f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/'
+                    f'{self.client_id}/DFL-01.05-Stammdaten-Personen_Spieler/{club_ids[club]}_{season_id}')
 
                 player_info_response = requests.get(player_info_link)
                 player_info_xml_data = player_info_response.text
