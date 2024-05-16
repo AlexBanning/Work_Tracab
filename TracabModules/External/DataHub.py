@@ -472,7 +472,7 @@ class HighSpeedGUItest:
 
             # Configure Treeview style with desired background and foreground colors
             style.configure("Treeview", background='#2F4F4F',
-                            foreground="black")  # Light gray background, black text color
+                            foreground="#98FB98")  # Light gray background, black text color
 
             # Apply the style to the Treeview widgets
             self.home_treeview.configure(style="Treeview")
@@ -483,8 +483,8 @@ class HighSpeedGUItest:
             self.away_treeview.pack(side="right", padx=5, pady=5)
 
             # Display dataframes in TreeView
-            self.display_dataframe("Home Team Data", home_df, self.home_treeview)
-            self.display_dataframe("Away Team Data", away_df, self.away_treeview)
+            self.display_dataframe(home_df, self.home_treeview, top_ten)
+            self.display_dataframe(away_df, self.away_treeview, top_ten)
 
             # Adjust the window geometry
             self.adjust_window_size()
@@ -504,7 +504,7 @@ class HighSpeedGUItest:
         height = self.root.winfo_reqheight()  # Get the required height of the GUI
         self.root.geometry(f"{width}x{height}")  # Set the GUI window size
 
-    def display_dataframe(self, name, dataframe, treeview):
+    def display_dataframe(self,dataframe, treeview, top_ten_dataframe):
         # Clear previous data
         treeview.delete(*treeview.get_children())
 
@@ -516,11 +516,24 @@ class HighSpeedGUItest:
 
         # Adjust column widths based on content
         for col in dataframe.columns:
-            treeview.column(col, width=75)
+            if col == '#':
+                treeview.column(col, width=20)
+            elif col == 'Speed':
+                treeview.column(col, width=40)
+            else:
+                treeview.column(col, width=120)
 
-        # Display dataframe rows
+        top_ten_speeds = set(top_ten_dataframe['Speed'])
+
         for index, row in dataframe.iterrows():
-            treeview.insert('', 'end', text='', values=list(row))
+            values = list(row)
+            # Display dataframe rows
+            if row['Speed'] in top_ten_speeds:  # Replace YOUR_CONDITION_HERE with your condition
+                # Configure a tag to set row color to red
+                treeview.tag_configure('red', background='red', foreground='white')
+                treeview.insert('', 'end', text='', values=values, tags=('red',))
+            else:
+                treeview.insert('', 'end', text='', values=values)
 
         # Remove the first column completely
         treeview["show"] = "headings"
