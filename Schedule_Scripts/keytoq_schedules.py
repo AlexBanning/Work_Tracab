@@ -17,4 +17,4 @@ filename = 'main.xml'
 schedule = sf.get_keytoq_schedule(filename)
 
 # Push schedule to Google Sheets
-sf.push_to_google(schedule, league= schedule[5].iloc[0])
+sf.push_to_google(schedule, league=schedule['League'].iloc[0])
