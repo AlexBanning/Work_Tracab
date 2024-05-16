@@ -57,7 +57,7 @@ except FileExistsError:
 # create the name for the folder as it should be named on the S3 bucket for the upload command
 folder_new = str(sts_id) + '_' + match
 
-move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date=date, stl=True)
+move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date=date, nsh=True)
 
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):

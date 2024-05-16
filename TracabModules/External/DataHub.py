@@ -156,7 +156,6 @@ def get_dfl_highspeeds(league, home, away):
     return home_data, away_data, top_ten
 
 
-
 class HighSpeedGUI:
     def __init__(self):
         self.leagues = ['1.Bundesliga', '2.Bundesliga']
@@ -366,3 +365,162 @@ class DFLDatabase:
 
         return data
 
+
+
+class HighSpeedGUItest:
+    def __init__(self):
+        self.leagues = ['1.Bundesliga', '2.Bundesliga']
+        self.teams = {
+            '1.Bundesliga': BL1,
+            '2.Bundesliga': BL2
+        }
+
+        self.root = tk.Tk()
+        self.root.title("Highspeed Fetcher")
+        # Load Tracab Icon
+        exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
+        self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+        # Set Background colour
+        self.root.configure(bg='#2F4F4F')
+
+        # Adjust the size of the GUI window
+        self.root.geometry("700x250")
+
+        # Create a frame to contain the labels and buttons
+        self.center_frame = tk.Frame(self.root)
+        self.center_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.center_frame.configure(bg='#2F4F4F')
+
+        # Dropdown list for selecting the league
+        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
+                                                                                        sticky="nw")
+        self.league_var = tk.StringVar(self.root)
+        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues, state='readonly')
+        self.league_dropdown.grid(row=0, column=1, padx=5, pady=2, sticky="nw")
+
+        # Dropdown lists for selecting home and away teams
+        tk.Label(self.center_frame, text="Home Team:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5, pady=2,
+                                                                                        sticky="nw")
+        self.home_team_var = tk.StringVar(self.root)
+        self.home_team_dropdown = ttk.Combobox(self.center_frame, textvariable=self.home_team_var, values=[])
+        self.home_team_dropdown.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+
+        tk.Label(self.center_frame, text="Away Team:", fg="#98FB98", bg="#2F4F4F").grid(row=2, column=0, padx=5, pady=2,
+                                                                                        sticky="nw")
+        self.away_team_var = tk.StringVar(self.root)
+        self.away_team_dropdown = ttk.Combobox(self.center_frame, textvariable=self.away_team_var, values=[])
+        self.away_team_dropdown.grid(row=2, column=1, padx=5, pady=2, sticky="nw")
+
+        # Button to fetch highspeed dataframes
+        self.fetch_button = tk.Button(self.center_frame, text="Fetch Highspeeds", command=self.fetch_highspeeds)
+        self.fetch_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="nw")
+
+        # Create a frame to contain the TreeView for displaying dataframes
+        self.dataframe_frame = tk.Frame(self.root)
+        self.dataframe_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
+        self.dataframe_frame.configure(bg='#2F4F4F')
+
+        # Adjust the window geometry
+        self.adjust_window_size()
+
+        self.league_dropdown.bind("<<ComboboxSelected>>", self.update_team_dropdowns)
+        self.root.mainloop()
+
+    def update_team_dropdowns(self, event):
+        selected_league = self.league_var.get()
+        teams_for_selected_league = self.teams.get(selected_league, [])
+        self.home_team_dropdown.config(values=teams_for_selected_league)
+        self.away_team_dropdown.config(values=teams_for_selected_league)
+
+    def fetch_highspeeds(self):
+        league = self.league_var.get()
+        home_team = self.home_team_var.get()
+        away_team = self.away_team_var.get()
+
+        # Replace with your function to fetch highspeed dataframes based on home_team and away_team
+        try:
+            home_df, away_df, top_ten = get_dfl_highspeeds(league, home_team, away_team)
+
+            # Check if Treeview widgets already exist, if not, create new ones
+            if not hasattr(self, 'home_treeview') or not hasattr(self, 'away_treeview'):
+                # Create a TreeView to display dataframes
+                self.home_treeview = ttk.Treeview(self.dataframe_frame)
+                self.away_treeview = ttk.Treeview(self.dataframe_frame)
+
+                # Pack Treeview widgets into the frame
+                self.home_treeview.pack(side="left", padx=5, pady=5)
+                self.away_treeview.pack(side="right", padx=5, pady=5)
+
+                # Create a style object
+                style = ttk.Style()
+
+                # Configure Treeview style with desired background and foreground colors
+                style.configure("Treeview", background='#2F4F4F',
+                                foreground="#98FB98")  # Light gray background, black text color
+
+                # Apply the style to the Treeview widgets
+                self.home_treeview.configure(style="Treeview")
+                self.away_treeview.configure(style="Treeview")
+
+            # Otherwise, clear existing contents of Treeview widgets
+            else:
+                self.home_treeview.delete(*self.home_treeview.get_children())
+                self.away_treeview.delete(*self.away_treeview.get_children())
+
+            # Create a style object
+            style = ttk.Style()
+
+            # Configure Treeview style with desired background and foreground colors
+            style.configure("Treeview", background='#2F4F4F',
+                            foreground="black")  # Light gray background, black text color
+
+            # Apply the style to the Treeview widgets
+            self.home_treeview.configure(style="Treeview")
+            self.away_treeview.configure(style="Treeview")
+
+            # Pack Treeview widgets into the frame
+            self.home_treeview.pack(side="left", padx=5, pady=5)
+            self.away_treeview.pack(side="right", padx=5, pady=5)
+
+            # Display dataframes in TreeView
+            self.display_dataframe("Home Team Data", home_df, self.home_treeview)
+            self.display_dataframe("Away Team Data", away_df, self.away_treeview)
+
+            # Adjust the window geometry
+            self.adjust_window_size()
+        except FileNotFoundError as e:
+            error_msg = f"File not found: {e.filename}"
+            logging.error(error_msg)
+            messagebox.showerror("Error", error_msg)
+
+        except Exception as e:
+            error_msg = f"An error occurred: {e}"
+            logging.error(error_msg)
+            messagebox.showerror("Error", error_msg)
+
+    def adjust_window_size(self):
+        self.root.update_idletasks()  # Update the GUI to finish arranging widgets
+        width = self.root.winfo_reqwidth()  # Get the required width of the GUI
+        height = self.root.winfo_reqheight()  # Get the required height of the GUI
+        self.root.geometry(f"{width}x{height}")  # Set the GUI window size
+
+    def display_dataframe(self, name, dataframe, treeview):
+        # Clear previous data
+        treeview.delete(*treeview.get_children())
+
+        # Display dataframe columns as headers
+        treeview["columns"] = list(dataframe.columns)
+        # treeview.heading('#0', text=name)
+        for col in dataframe.columns:
+            treeview.heading(col, text=col)
+
+        # Adjust column widths based on content
+        for col in dataframe.columns:
+            treeview.column(col, width=75)
+
+        # Display dataframe rows
+        for index, row in dataframe.iterrows():
+            treeview.insert('', 'end', text='', values=list(row))
+
+        # Remove the first column completely
+        treeview["show"] = "headings"
