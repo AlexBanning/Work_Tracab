@@ -2,11 +2,11 @@ import ftputil
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import timedelta, datetime, date
+from TracabModules.Internal.tools import is_date_in_current_week
 import gspread
 import os
 import xml.etree.ElementTree as ET
 import sys
-
 
 def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     """
@@ -360,7 +360,7 @@ def get_STSID(comp_id, home_team, away_team):
     # Define matchID and date in case of undefined values
 
     match_id = 0
-    date = 0
+    correct_date = 0
 
     try:
         filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False)
@@ -379,21 +379,29 @@ def get_STSID(comp_id, home_team, away_team):
 
     # MatchIds of all matches of the home_team
     matches_schedule = data.find_all('Fixture')
+
     while True:
         try:
-            match_id = [x['MatchId'] for x in matches_schedule if
-                        str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team][0]
-            date = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
-                    str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team][0].replace('-', '_')
+            match_ids = [x['MatchId'] for x in matches_schedule if
+                        str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team]
+            dates = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
+                    str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team]
+            for n, date in enumerate(dates):
+                if is_date_in_current_week(date, mls=True):
+                    correct_date = date.replace('-', '_')
+                    match_id = match_ids[n]
+                    print(f'\n Match-ID: {match_id} \n')
+            break
+
         except IndexError:
-            print('The home/away team cannot be found in the competition. Please give the correct names: \n')
+            print('The home/away team cannot be found in the competition. Please give the correct (full) names: \n')
             home_team = str(input('Home Team: '))
             away_team = str(input('Away Team: '))
             continue
         else:
             break
 
-    return match_id, date
+    return match_id, correct_date
 
 
 def get_tracabID(home_team):

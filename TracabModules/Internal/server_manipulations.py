@@ -80,7 +80,7 @@ def rename_htf_files(source_path, destination_path, new_filename):
         logging.error(f"Error renaming file: {e}")
 
 
-def get_source_folder(feed_type, date, mobile=False):
+def get_source_folder(feed_type, date, mobile=False, nsh=False):
     folder_map = {
         'TacticalFeed.mp4': r'\\192.168.7.75\d\TraCamVideoAndSetupXML' + '\\' + date,
         'PanoramicFeed.mp4': r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date,
@@ -94,57 +94,64 @@ def get_source_folder(feed_type, date, mobile=False):
             'PanoramicFeed.mp4': r'D:\\AL'
         }
 
+    if nsh:
+        folder_map = {
+            'TacticalFeed.mp4': r'D:\\TraCamVideoAndSetupXML' + '\\' + date,
+            'PanoramicFeed.mp4': r'\\192.168.7.74\d\TraCamVideoAndSetupXML' + '\\' + date,
+            'HighBehind_1.mp4': r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date,
+            'HighBehind_2.mp4': r'\\192.168.7.76\d\TraCamVideoAndSetupXML' + '\\' + date
+        }
+
     return folder_map.get(feed_type)
 
 
 def copy_files(filepath_new, sts_id, match, feed_type, date, mobile=False):
-    print(f'Starting Copy-Process.')
     if mobile:
         for file in glob.glob("*.mp4"):
             if feed_type == 'PanoramicFeed.mp4':
                 if 'PanoA' in file and date in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
                     shutil.copy(file, new_filepath)
-                    print(f'{feed_type} copied to: {new_filepath} \n')
+                    print(f'{feed_type} copied to: {new_filepath}')
             elif feed_type == 'TacticalFeed.mp4':
                 if 'AutoCam' in file and date in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
                     shutil.copy(file, new_filepath)
-                    print(f'{feed_type} copied to: {new_filepath} \n')
+                    print(f'{feed_type} copied to: {new_filepath}')
 
     else:
         for file in glob.glob("*.mp4"):
             if feed_type == 'HighBehind_1.mp4':
                 if 'PanoD' in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                    print(f'{feed_type} copied to: {new_filepath} \n')
+                    print(f'{feed_type} copied to: {new_filepath}')
                     shutil.copy(file, new_filepath)
             elif feed_type == 'HighBehind_2.mp4':
                 if 'PanoB' in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                    print(f'{feed_type} copied to: {new_filepath} \n')
+                    print(f'{feed_type} copied to: {new_filepath}')
                     shutil.copy(file, new_filepath)
             elif feed_type == 'PanoramicFeed.mp4':
                 if 'PanoA' in file:
                     new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                    print(f'{feed_type} copied to: {new_filepath} \n')
+                    print(f'{feed_type} copied to: {new_filepath}')
                     shutil.copy(file, new_filepath)
             else:
                 new_filepath = os.path.join(filepath_new, f"{sts_id}_{match}_{feed_type}")
-                print(f'{feed_type} copied to: {new_filepath} \n')
+                print(f'{feed_type} copied to: {new_filepath}')
                 shutil.copy(file, new_filepath)
 
 
-def move_and_rename_feed(filepath_new, sts_id, match, date, mobile=False):
+def move_and_rename_feed(filepath_new, sts_id, match, date, mobile=False, nsh=False):
     if mobile:
         feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4'}
     else:
         feeds = {'AutoCam': 'TacticalFeed.mp4', 'PanoA': 'PanoramicFeed.mp4', 'PanoB': 'HighBehind_2.mp4',
                  'PanoD': 'HighBehind_1.mp4'}
 
-    print(date)
+    print(f'Starting copying process \n')
     for feed_identifier, feed_type in feeds.items():
-        source_folder = get_source_folder(feed_type, date, mobile)
+        source_folder = get_source_folder(feed_type, date, mobile, nsh)
         if source_folder:
             os.chdir(source_folder)
             copy_files(filepath_new, sts_id, match, feed_type, date=date, mobile=mobile)

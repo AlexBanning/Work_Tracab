@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 
-def is_date_in_current_week(date_str):
+def is_date_in_current_week(date_str, mls=False):
     # Convert the date string to a datetime object
     date_to_check = datetime.strptime(date_str, '%Y-%m-%d')
 
@@ -14,5 +14,12 @@ def is_date_in_current_week(date_str):
     # Calculate the end date of the current week
     end_of_week = start_of_week + timedelta(days=6)
 
-    # Check if the given date falls within the current week
-    return start_of_week <= date_to_check <= end_of_week
+    if not mls:
+        # Check if the given date falls within the current week
+        return start_of_week <= date_to_check <= end_of_week
+    elif mls:
+        # Calculate the start date of the week before the current week
+        start_of_last_week = start_of_week - timedelta(days=7)
+
+        # Check if the given date falls within the last two weeks
+        return start_of_last_week <= date_to_check <= end_of_week
