@@ -390,7 +390,7 @@ def get_STSID(comp_id, home_team, away_team):
                 if is_date_in_current_week(date, mls=True):
                     correct_date = date.replace('-', '_')
                     match_id = match_ids[n]
-                    print(f'\n Match-ID: {match_id} \n')
+                    print(f'Match-ID: {match_id} \n')
             break
 
         except IndexError:

@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as eT
 from xml.dom.minidom import parse
+from tkinter import messagebox
 import sys
 
 
@@ -133,8 +134,9 @@ def get_match_info(match_folder):
         comp_id = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iCompetitionId'])
 
     except FileNotFoundError:
-        print('The newest folder in "C:\\Rec" is no matchID folder. \n'
-              'Please adjust the folders or delete newer ones and restart the software!')
+        messagebox.showwarning('MAH Upload',
+                               f'The newest folder on C:\\Rec is no MatchID-Folder. Please have a look and '
+                               f'restart.')
         sys.exit()
 
     return home_team_name, away_team_name, matchday, comp_id

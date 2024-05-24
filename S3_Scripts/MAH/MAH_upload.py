@@ -70,7 +70,7 @@ elif comp == str(100):
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
                + folder_new + '" --recursive')
 
-print(f'\n Executing S3 Command: {command}\n')
+print(f'\nExecuting S3 Command: {command}\n')
 try:
     os.system(command)
     input('Upload has finished. Press enter to exit')
