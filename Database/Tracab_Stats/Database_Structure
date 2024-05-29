@@ -5,7 +5,12 @@ Each league should have their own database file containing statistic-tables for 
 
 LeagueX.db
 | - team1_stats
+    - Table that contains all kpi-values of team1 for each matchday of the season
 | - team2_stats
 | - team3_stats
 | - ...
 | - league_stats
+
+
+team1_stats --Columns: Matchday, Season, Total Distance, Num. Sprints, Num. SpeedRuns
+league_stats --Columns: TeamId, Total Distance, Num. Sprints, Num. SpeedRuns

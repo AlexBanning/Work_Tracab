@@ -18,9 +18,7 @@ from xml.dom.minidom import parse
 import sqlite3 as sql
 import matplotlib.pyplot as plt
 from plottable import ColumnDefinition, Table
-from plottable.cmap import normed_cmap
 from plottable.plots import image
-
 
 """
 Club Mappings
@@ -82,6 +80,7 @@ bl1_path = r'N:\01_Tracking-Data\Season_23-24\52 - 2.Bundesliga 2_BL'
 # List all MD folders
 contents = os.listdir(bl1_path)
 
+i = 1
 for md in contents:
     print(md)
     match_folders = os.listdir(f'{bl1_path}\\{md}')
@@ -94,17 +93,23 @@ for md in contents:
             continue
         try:
             gamelog = [file for file in os.listdir(os.getcwd()) if 'Gamelog' in file][0]
+            if i == 1:
+                break
         except IndexError:
             print(f'The observed folder of {match} does not contain a gamelog!')
             continue
         xml_doc_gamelog = parse(gamelog)
         try:
             matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
+            season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
+                                                                                        'SeasonId'].childNodes[0].data
             teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[0:2]
             home_id = teams[0].attributes['TeamId'].childNodes[0].data
             away_id = teams[1].attributes['TeamId'].childNodes[0].data
         except TypeError:
             matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
+            season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
+                                                                                        'SeasonId'].childNodes[0].data
             teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[1:4:2]
             home_id = teams[0].attributes['TeamId'].childNodes[0].data
             away_id = teams[1].attributes['TeamId'].childNodes[0].data
@@ -133,27 +138,28 @@ for md in contents:
         )
 
         home_stats = pd.DataFrame(
-            {'TeamID': home_id, 'Matchday': int(matchday), 'TotalDistance': home_tdist, 'Num. Sprints': home_nsprints,
+            {'Matchday': int(matchday), 'Season': season_id, 'TotalDistance': home_tdist, 'Num. Sprints': home_nsprints,
              'Num. SpeedRuns': home_nspeedruns}, index=[0])
         away_stats = pd.DataFrame(
-            {'TeamID': away_id, 'Matchday': int(matchday), 'TotalDistance': away_tdist, 'Num. Sprints': away_nsprints,
+            {'Matchday': int(matchday), 'Season': season_id, 'TotalDistance': away_tdist, 'Num. Sprints': away_nsprints,
              'Num. SpeedRuns': away_nspeedruns}, index=[0])
 
         # Use a single database connection for all teams
-        with sql.connect(r'N:\07_QC\Alex\bl2_team_stats.db') as conn:
+        with sql.connect(r'N:\07_QC\Alex\bl2_stats.db') as conn:
             home_stats.to_sql(home_id, conn, if_exists='append', index=False)
             away_stats.to_sql(away_id, conn, if_exists='append', index=False)
-
 
 """
 Construction of league-wide stats overviews 
 """
 
 VALID_LEAGUES = {'bl1', 'bl2', 'mls'}
+
+
 def calculate_avg_stats(team_id, league):
     if league not in VALID_LEAGUES:
         raise ValueError("results: league must be one of %r." % VALID_LEAGUES)
-    with sql.connect(f'C:\\Users\\alexa\\Desktop\\Tracab_Databases\\{league}_team_stats.db') as conn:
+    with sql.connect(f'C:\\Users\\alexa\\Desktop\\Tracab_Databases\\{league}_stats.db') as conn:
         query = f"SELECT * FROM '{team_id}'"
         team_stats = pd.read_sql_query(query, conn)
         avg_distance = team_stats['TotalDistance'].mean()
@@ -171,8 +177,8 @@ for team in club_mapping.iterrows():
     average_stats = pd.DataFrame(calculate_avg_stats(team_id=team[1]['TeamId'], league='mls'), index=[0])
     average_stats['TeamName'] = team[1]['TeamName']
     league_stats = pd.concat([league_stats, average_stats])
-with sql.connect(r'N:\07_QC\Alex\avg_league_stats.db') as conn:
-    league_stats.to_sql('mls_stats', conn, if_exists='replace', index=False)
+with sql.connect(r'N:\07_QC\Alex\mls_stats.db') as conn:
+    league_stats.to_sql('league_overview', conn, if_exists='replace', index=False)
 
 """
 Get League Stats to create printable tables
@@ -223,7 +229,7 @@ with sql.connect(r'N:\07_QC\Alex\avg_league_stats.db') as conn:
             textprops={"ha": "center", "weight": "bold"},
             width=0.01,
         )
-        ]
+    ]
 
     fig, ax = plt.subplots(figsize=(15, 22))
     fig.set_facecolor(bg_color)
