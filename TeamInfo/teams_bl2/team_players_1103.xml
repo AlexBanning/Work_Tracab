@@ -1,0 +1,2979 @@
+<?xml version="1.0" encoding="UTF-8" standalone='no'?>
+<!--
+    Copyright (c) 2003 - 2024 proFILE Computersysteme GmbH.
+    All Rights Reserved.
+    proFILE MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF
+    THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+    OR NON-INFRINGEMENT. proFILE SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED
+    BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE
+    OR ITS DERIVATIVES.
+-->
+<sports-content xmlns:imp="http://web.impire.de/SportsML/v1.5/doc/index.html">
+    <sports-metadata date-time="20240520T000000+0200"
+                     doc-id="squad_2023-01-01_52_1103"
+                     publisher="impire"
+                     language="de-DE"
+                     >
+        <sports-title>Kader 2. Bundesliga SV Wehen Wiesbaden</sports-title>
+    </sports-metadata>
+    <statistic>
+        <statistic-metadata/>
+        <team>
+            <team-metadata team-key="1103">
+                <name full="SV Wehen Wiesbaden"
+                      nickname="Wiesbaden"
+                      imp:dfl-name-international="SV Wehen Wiesbaden"
+                      imp:dfl-nickname-international="Wiesbaden"
+                      imp:dfl-3-letter-code="WIE"
+                      official-3-letter-code=""/>
+            </team-metadata>
+            <player>
+                <player-metadata player-key="62551"
+                                 date-of-birth="20000519T000000+0200"
+                                 height="190"
+                                 weight="88"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="1"
+                                 position-regular="goalie">
+                        <name first="Arthur" 
+                              last="Lyska" 
+                              full="Arthur Lyska" 
+                              nickname="A. Lyska"
+                              imp:extensive="Arthur Lyska"/>
+                        <career-phase start-date="20160701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20160630T000000+0200" 
+                                      name="1. FSV Mainz 05"
+                                      imp:team-nickname="Mainz"
+                                      imp:team-key="36" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="0"
+                              score="0" events-won="0"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="0"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="0"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="0"
+                              score="0"
+			      events-won="0"
+			      events-bench-only="29">
+                    <player-stats-soccer imp:balls-touched="0"
+                                         imp:tracking-distance=""
+                                         imp:tracking-sprints=""
+                                         imp:tracking-sprints-distance=""
+                                         imp:tracking-fast-runs=""
+                                         imp:tracking-fast-runs-distance=""
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="0"
+                                                imp:duels-won="0"
+                                                imp:duels-lost="0"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless=""
+                                                imp:duels-won-ground="0"
+                                                imp:duels-lost-ground="0"
+                                                imp:passes="0"
+                                                imp:passes-completed="0"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless=""
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-defensive save-percentage="0"
+                                                imp:saves-penalty-shot="0"
+                                                imp:saves-extraordinary="0"
+                                                shutouts="0"
+                                                saves="0"
+                                                goals-against-total="0"
+                                                imp:punt-completed="0"
+                                                imp:throw-completed="0"
+                                                imp:catches-punches-crosses="0"
+                                                imp:catches-punches-corners="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="0"
+                                           fouls-suffered="0"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="48895"
+                                 date-of-birth="19940122T000000+0100"
+                                 height="187"
+                                 weight="81"
+                                 nationality="Schweiz"
+                                 imp:nationality-en="Switzerland"
+                                 imp:nationality-key="16"
+                                 imp:native-country="Kongo DR" imp:native-country-en="Congo DR" imp:native-country-key="152"
+                                 uniform-number="2"
+                                 position-regular="defenseman">
+                        <name first="Martin" 
+                              last="Angha" 
+                              full="Martin Angha" 
+                              nickname="M. Angha"
+                              imp:extensive="Martin Yves Angha-L&#xF6;tscher"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220701T000000+0200"  end-date="20221231T000000+0100" 
+                                      name="Al-Adalah Football Club"
+                                      imp:team-nickname="Al-Adalah"
+                                      imp:team-key="9391" />
+                        <career-phase start-date="20190826T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="Fortuna Sittard"
+                                      imp:team-nickname="Fortuna Sittard"
+                                      imp:team-key="851" />
+                        <career-phase start-date="20170911T000000+0200"  end-date="20190825T000000+0200" 
+                                      name="FC Sion"
+                                      imp:team-nickname="Sion"
+                                      imp:team-key="194" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20170910T000000+0200" 
+                                      name="FC Sankt Gallen"
+                                      imp:team-nickname="St. Gallen"
+                                      imp:team-key="1214" />
+                        <career-phase start-date="20140830T000000+0200"  end-date="20150630T000000+0200" 
+                                      name="TSV 1860 M&#xFC;nchen"
+                                      imp:team-nickname="1860 M&#xFC;nchen"
+                                      imp:team-key="35" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20140830T000000+0200" 
+                                      name="1. FC N&#xFC;rnberg"
+                                      imp:team-nickname="N&#xFC;rnberg"
+                                      imp:team-key="22" />
+                        <career-phase start-date="20100122T000000+0100"  end-date="20130630T000000+0200" 
+                                      name="Arsenal FC"
+                                      imp:team-nickname="Arsenal"
+                                      imp:team-key="247" />
+                        <career-phase start-date="20030701T000000+0200"  end-date="20100121T000000+0100" 
+                                      name="FC Z&#xFC;rich"
+                                      imp:team-nickname="FC Z&#xFC;rich"
+                                      imp:team-key="333" />
+                        <career-phase start-date="20020701T000000+0200"  end-date="20030630T000000+0200" 
+                                      name="Grasshopper Z&#xFC;rich"
+                                      imp:team-nickname="Grasshopper"
+                                      imp:team-key="197" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="40"
+                              score="0" events-won="11"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="24"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="24"
+                              imp:substitutions-in="2"
+                              imp:substitutions-out="1"
+                              time-played-total="2020"
+                              score="0"
+			      events-won="7"
+			      events-bench-only="4">
+                    <player-stats-soccer imp:balls-touched="1200"
+                                         imp:tracking-distance="223528.23"
+                                         imp:tracking-sprints="206"
+                                         imp:tracking-sprints-distance="3913.31"
+                                         imp:tracking-fast-runs="596"
+                                         imp:tracking-fast-runs-distance="8265.13"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="8"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="14"
+                                                imp:duels-won="163"
+                                                imp:duels-lost="155"
+                                                imp:duels-won-percentage="51.26"
+						imp:duels-won-percentage-limitless="51.26"
+                                                imp:duels-won-ground="118"
+                                                imp:duels-lost-ground="114"
+                                                imp:passes="879"
+                                                imp:passes-completed="724"
+                                                imp:passes-completions-percentage="82.37"
+						imp:passes-completions-percentage-limitless="82.37"
+                                                imp:crosses="8"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="1"
+                                                imp:shots-right-leg="3"
+                                                imp:shots-head="4"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="26"
+                                           fouls-suffered="15"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="1"
+                                           imp:yellow-cards="6"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="51158"
+                                 date-of-birth="19910910T000000+0200"
+                                 height="187"
+                                 weight="87"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="4"
+                                 position-regular="defenseman">
+                        <name first="Sascha" 
+                              last="Mockenhaupt" 
+                              full="Sascha Mockenhaupt" 
+                              nickname="S. Mockenhaupt"
+                              imp:extensive="Sascha Mockenhaupt"/>
+                        <career-phase start-date="20170104T000000+0100" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20160816T000000+0200"  end-date="20161231T000000+0100" 
+                                      name="FK Bod&#xF6;/Glimt"
+                                      imp:team-nickname="Bod&#xF6;/Glimt"
+                                      imp:team-key="958" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20160815T000000+0200" 
+                                      name="1. FC Kaiserslautern"
+                                      imp:team-nickname="K&#x27;lautern"
+                                      imp:team-key="9" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20150630T000000+0200" 
+                                      name="VfR Aalen"
+                                      imp:team-nickname="Aalen"
+                                      imp:team-key="1712" />
+                        <career-phase start-date="20120701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="1. FC Kaiserslautern"
+                                      imp:team-nickname="K&#x27;lautern"
+                                      imp:team-key="9" />
+                        <career-phase start-date="20060701T000000+0200"  end-date="20120630T000000+0200" 
+                                      name="SG 06 Betzdorf"
+                                      imp:team-nickname="Betzdorf"
+                                      imp:team-key="3091" />
+                        <career-phase start-date="20040701T000000+0200"  end-date="20060630T000000+0200" 
+                                      name="Bayer 04 Leverkusen"
+                                      imp:team-nickname="Leverkusen"
+                                      imp:team-key="16" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="108"
+                              score="1" events-won="31"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="64"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="32"
+                              imp:substitutions-in="11"
+                              imp:substitutions-out="9"
+                              time-played-total="1928"
+                              score="0"
+			      events-won="8"
+			      events-bench-only="2">
+                    <player-stats-soccer imp:balls-touched="1195"
+                                         imp:tracking-distance="210237.03"
+                                         imp:tracking-sprints="338"
+                                         imp:tracking-sprints-distance="6534.43"
+                                         imp:tracking-fast-runs="652"
+                                         imp:tracking-fast-runs-distance="9114.94"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="6"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="21"
+                                                imp:duels-won="196"
+                                                imp:duels-lost="136"
+                                                imp:duels-won-percentage="59.04"
+						imp:duels-won-percentage-limitless="59.04"
+                                                imp:duels-won-ground="152"
+                                                imp:duels-lost-ground="117"
+                                                imp:passes="791"
+                                                imp:passes-completed="590"
+                                                imp:passes-completions-percentage="74.59"
+						imp:passes-completions-percentage-limitless="74.59"
+                                                imp:crosses="24"
+                                                imp:crosses-completed="8"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="5"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="17"
+                                           fouls-suffered="8"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="3"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="54275"
+                                 date-of-birth="19950224T000000+0100"
+                                 height="177"
+                                 weight="75"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="5"
+                                 position-regular="mid-fielder">
+                        <name first="Emanuel" 
+                              last="Taffertshofer" 
+                              full="Emanuel Taffertshofer" 
+                              nickname="E. Taffertshofer"
+                              imp:extensive="Emanuel Taffertshofer"/>
+                        <career-phase start-date="20210701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20180701T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="SV Sandhausen"
+                                      imp:team-nickname="Sandhausen"
+                                      imp:team-key="1100" />
+                        <career-phase start-date="20160119T000000+0100"  end-date="20180630T000000+0200" 
+                                      name="FC W&#xFC;rzburger Kickers"
+                                      imp:team-nickname="W&#xFC;rzburg"
+                                      imp:team-key="1317" />
+                        <career-phase start-date="20030701T000000+0200"  end-date="20151231T000000+0100" 
+                                      name="TSV 1860 M&#xFC;nchen"
+                                      imp:team-nickname="1860 M&#xFC;nchen"
+                                      imp:team-key="35" />
+                        <career-phase start-date="20020701T000000+0200"  end-date="20030630T000000+0200" 
+                                      name="SV S&#xF6;chering"
+                                      imp:team-nickname="SV S&#xF6;chering"
+                                      imp:team-key="6567" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="83"
+                              score="0" events-won="22"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="7"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="7"
+                              imp:substitutions-in="7"
+                              imp:substitutions-out="0"
+                              time-played-total="118"
+                              score="0"
+			      events-won="1"
+			      events-bench-only="6">
+                    <player-stats-soccer imp:balls-touched="106"
+                                         imp:tracking-distance="18251.64"
+                                         imp:tracking-sprints="24"
+                                         imp:tracking-sprints-distance="486.14"
+                                         imp:tracking-fast-runs="96"
+                                         imp:tracking-fast-runs-distance="1477.17"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="3"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="3"
+                                                imp:duels-won="19"
+                                                imp:duels-lost="17"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="52.78"
+                                                imp:duels-won-ground="18"
+                                                imp:duels-lost-ground="15"
+                                                imp:passes="81"
+                                                imp:passes-completed="64"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="79.01"
+                                                imp:crosses="2"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="2"
+                                                imp:shots-right-leg="1"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="2"
+                                           fouls-suffered="5"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="55655"
+                                 date-of-birth="19970905T000000+0200"
+                                 height="189"
+                                 weight="82"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="6"
+                                 position-regular="mid-fielder">
+                        <name first="Gino" 
+                              last="Fechner" 
+                              full="Gino Fechner" 
+                              nickname="G. Fechner"
+                              imp:extensive="Gino Fechner"/>
+                        <career-phase start-date="20210701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200825T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="KFC Uerdingen 05"
+                                      imp:team-nickname="Uerdingen"
+                                      imp:team-key="26" />
+                        <career-phase start-date="20170701T000000+0200"  end-date="20200714T000000+0200" 
+                                      name="1. FC Kaiserslautern"
+                                      imp:team-nickname="K&#x27;lautern"
+                                      imp:team-key="9" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20170630T000000+0200" 
+                                      name="RB Leipzig"
+                                      imp:team-nickname="Leipzig"
+                                      imp:team-key="5100" />
+                        <career-phase start-date="20040701T000000+0200"  end-date="20150630T000000+0200" 
+                                      name="VfL Bochum 1848"
+                                      imp:team-nickname="Bochum"
+                                      imp:team-key="21" />
+                        <career-phase start-date="20030701T000000+0200"  end-date="20040630T000000+0200" 
+                                      name="SV Eintracht Grumme"
+                                      imp:team-nickname="Eintracht Grumme"
+                                      imp:team-key="10529" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="42"
+                              score="0" events-won="11"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="25"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="25"
+                              imp:substitutions-in="4"
+                              imp:substitutions-out="12"
+                              time-played-total="1659"
+                              score="0"
+			      events-won="6"
+			      events-bench-only="7">
+                    <player-stats-soccer imp:balls-touched="997"
+                                         imp:tracking-distance="215728.89"
+                                         imp:tracking-sprints="296"
+                                         imp:tracking-sprints-distance="5528.30"
+                                         imp:tracking-fast-runs="806"
+                                         imp:tracking-fast-runs-distance="10971.26"
+                                         >
+                        <stats-soccer-offensive assists-total="2"
+                                                shots-total="9"
+                                                points="2"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="18"
+                                                imp:duels-won="180"
+                                                imp:duels-lost="118"
+                                                imp:duels-won-percentage="60.40"
+						imp:duels-won-percentage-limitless="60.40"
+                                                imp:duels-won-ground="149"
+                                                imp:duels-lost-ground="111"
+                                                imp:passes="705"
+                                                imp:passes-completed="587"
+                                                imp:passes-completions-percentage="83.26"
+						imp:passes-completions-percentage-limitless="83.26"
+                                                imp:crosses="4"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="8"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="2"
+                                                />
+                        <stats-soccer-foul fouls-commited="21"
+                                           fouls-suffered="8"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="7"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="64295"
+                                 date-of-birth="19980523T000000+0200"
+                                 height="170"
+                                 weight="73"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="7"
+                                 position-regular="mid-fielder">
+                        <name first="Robin" 
+                              last="Heu&#xDF;er" 
+                              full="Robin Heu&#xDF;er" 
+                              nickname="R. Heu&#xDF;er"
+                              imp:extensive="Robin Heu&#xDF;er"/>
+                        <career-phase start-date="20220701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200715T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="SSV Ulm 1846"
+                                      imp:team-nickname="Ulm"
+                                      imp:team-key="301" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20200714T000000+0200" 
+                                      name="1. FC N&#xFC;rnberg"
+                                      imp:team-nickname="N&#xFC;rnberg"
+                                      imp:team-key="22" />
+                        <career-phase start-date="20120701T000000+0200"  end-date="20130630T000000+0200" 
+                                      name="SV Viktoria Aschaffenburg"
+                                      imp:team-nickname="Vikt. Aschaffenburg"
+                                      imp:team-key="276" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="34"
+                              score="1" events-won="8"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="34"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="34"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="8"
+                              time-played-total="3002"
+                              score="1"
+			      events-won="8"
+			      events-bench-only="0">
+                    <player-stats-soccer imp:balls-touched="2077"
+                                         imp:tracking-distance="411821.64"
+                                         imp:tracking-sprints="430"
+                                         imp:tracking-sprints-distance="7323.01"
+                                         imp:tracking-fast-runs="1636"
+                                         imp:tracking-fast-runs-distance="23752.70"
+                                         >
+                        <stats-soccer-offensive assists-total="10"
+                                                shots-total="46"
+                                                points="11"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="146"
+                                                imp:duels-won="371"
+                                                imp:duels-lost="390"
+                                                imp:duels-won-percentage="48.75"
+						imp:duels-won-percentage-limitless="48.75"
+                                                imp:duels-won-ground="351"
+                                                imp:duels-lost-ground="344"
+                                                imp:passes="1365"
+                                                imp:passes-completed="1082"
+                                                imp:passes-completions-percentage="79.27"
+						imp:passes-completions-percentage-limitless="79.27"
+                                                imp:crosses="17"
+                                                imp:crosses-completed="4"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="1"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="4"
+                                                imp:shots-right-leg="42"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="6"
+                                                />
+                        <stats-soccer-foul fouls-commited="32"
+                                           fouls-suffered="41"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="2"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="74050"
+                                 date-of-birth="20000315T000000+0100"
+                                 height="175"
+                                 weight="66"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="8"
+                                 position-regular="mid-fielder">
+                        <name first="Nick" 
+                              last="B&#xE4;tzner" 
+                              full="Nick B&#xE4;tzner" 
+                              nickname="N. B&#xE4;tzner"
+                              imp:extensive="Nick B&#xE4;tzner"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200716T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="KV Oostende"
+                                      imp:team-nickname="KV Oostende"
+                                      imp:team-key="729" />
+                        <career-phase start-date="20120701T000000+0200"  end-date="20200714T000000+0200" 
+                                      name="VfB Stuttgart"
+                                      imp:team-nickname="Stuttgart"
+                                      imp:team-key="14" />
+                        <career-phase start-date="20110701T000000+0200"  end-date="20120630T000000+0200" 
+                                      name="FV L&#xF6;chgau"
+                                      imp:team-nickname="L&#xF6;chgau"
+                                      imp:team-key="4161" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="24"
+                              score="1" events-won="5"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="24"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="24"
+                              imp:substitutions-in="6"
+                              imp:substitutions-out="13"
+                              time-played-total="1551"
+                              score="1"
+			      events-won="5"
+			      events-bench-only="2">
+                    <player-stats-soccer imp:balls-touched="838"
+                                         imp:tracking-distance="203752.13"
+                                         imp:tracking-sprints="469"
+                                         imp:tracking-sprints-distance="8846.07"
+                                         imp:tracking-fast-runs="1012"
+                                         imp:tracking-fast-runs-distance="13999.15"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="19"
+                                                points="2"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="36"
+                                                imp:duels-won="151"
+                                                imp:duels-lost="243"
+                                                imp:duels-won-percentage="38.32"
+						imp:duels-won-percentage-limitless="38.32"
+                                                imp:duels-won-ground="144"
+                                                imp:duels-lost-ground="217"
+                                                imp:passes="606"
+                                                imp:passes-completed="463"
+                                                imp:passes-completions-percentage="76.40"
+						imp:passes-completions-percentage-limitless="76.40"
+                                                imp:crosses="11"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="1"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="4"
+                                                imp:shots-right-leg="14"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="22"
+                                           fouls-suffered="9"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="3"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="71603"
+                                 date-of-birth="19970216T000000+0100"
+                                 height="180"
+                                 weight="74"
+                                 nationality="Niederlande"
+                                 imp:nationality-en="Netherlands"
+                                 imp:nationality-key="5"
+                                 uniform-number="9"
+                                 position-regular="mid-fielder">
+                        <name first="Thijmen" 
+                              last="Goppel" 
+                              full="Thijmen Goppel" 
+                              nickname="T. Goppel"
+                              imp:extensive="Thijmen Goppel"/>
+                        <career-phase start-date="20210720T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200701T000000+0200"  end-date="20210720T000000+0200" 
+                                      name="Roda JC Kerkrade"
+                                      imp:team-nickname="Kerkrade"
+                                      imp:team-key="955" />
+                        <career-phase start-date="20190902T000000+0200"  end-date="20200630T000000+0200" 
+                                      name="MVV Maastricht"
+                                      imp:team-nickname="MVV Maastricht"
+                                      imp:team-key="2440" />
+                        <career-phase start-date="20170701T000000+0200"  end-date="20190902T000000+0200" 
+                                      name="ADO Den Haag"
+                                      imp:team-nickname="Den Haag"
+                                      imp:team-key="767" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20170630T000000+0200" 
+                                      name="NEC Nijmegen"
+                                      imp:team-nickname="Nijmegen"
+                                      imp:team-key="954" />
+                        <career-phase start-date="20070701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="Alphense Boys"
+                                      imp:team-nickname="Alphense Boys"
+                                      imp:team-key="8816" />
+                        <career-phase start-date="20060701T000000+0200"  end-date="20070630T000000+0200" 
+                                      name="SV Alkmania"
+                                      imp:team-nickname="Alkmania"
+                                      imp:team-key="10530" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="32"
+                              score="3" events-won="8"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="32"
+                              score="3" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="32"
+                              imp:substitutions-in="6"
+                              imp:substitutions-out="18"
+                              time-played-total="2204"
+                              score="3"
+			      events-won="8"
+			      events-bench-only="1">
+                    <player-stats-soccer imp:balls-touched="1300"
+                                         imp:tracking-distance="269412.60"
+                                         imp:tracking-sprints="815"
+                                         imp:tracking-sprints-distance="19512.91"
+                                         imp:tracking-fast-runs="944"
+                                         imp:tracking-fast-runs-distance="12547.29"
+                                         >
+                        <stats-soccer-offensive assists-total="5"
+                                                shots-total="29"
+                                                points="8"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="79"
+                                                imp:duels-won="202"
+                                                imp:duels-lost="270"
+                                                imp:duels-won-percentage="42.80"
+						imp:duels-won-percentage-limitless="42.80"
+                                                imp:duels-won-ground="191"
+                                                imp:duels-lost-ground="253"
+                                                imp:passes="635"
+                                                imp:passes-completed="500"
+                                                imp:passes-completions-percentage="78.74"
+						imp:passes-completions-percentage-limitless="78.74"
+                                                imp:crosses="112"
+                                                imp:crosses-completed="15"
+                                                imp:goals-left-leg="2"
+                                                imp:goals-right-leg="1"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="6"
+                                                imp:shots-right-leg="23"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="4"
+                                                />
+                        <stats-soccer-foul fouls-commited="24"
+                                           fouls-suffered="16"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="4"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="62001"
+                                 date-of-birth="19990802T000000+0200"
+                                 height="184"
+                                 weight="83"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 imp:native-country="Kroatien" imp:native-country-en="Croatia" imp:native-country-key="33"
+                                 uniform-number="10"
+                                 position-regular="forward">
+                        <name first="Antonio" 
+                              last="Jonjic" 
+                              full="Antonio Jonjic" 
+                              nickname="A. Jonjic"
+                              imp:extensive="Antonio Jonjic"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20201005T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="FC Erzgebirge Aue"
+                                      imp:team-nickname="Aue"
+                                      imp:team-key="892" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20201004T000000+0200" 
+                                      name="1. FC Kaiserslautern"
+                                      imp:team-nickname="K&#x27;lautern"
+                                      imp:team-key="9" />
+                        <career-phase start-date="20120701T000000+0200"  end-date="20130630T000000+0200" 
+                                      name="TSG Hoffenheim"
+                                      imp:team-nickname="Hoffenheim"
+                                      imp:team-key="3084" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="47"
+                              score="6" events-won="8"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="11"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="11"
+                              imp:substitutions-in="10"
+                              imp:substitutions-out="1"
+                              time-played-total="278"
+                              score="0"
+			      events-won="3"
+			      events-bench-only="5">
+                    <player-stats-soccer imp:balls-touched="144"
+                                         imp:tracking-distance="41661.21"
+                                         imp:tracking-sprints="145"
+                                         imp:tracking-sprints-distance="2972.00"
+                                         imp:tracking-fast-runs="172"
+                                         imp:tracking-fast-runs-distance="2396.36"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="3"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="4"
+                                                imp:duels-won="33"
+                                                imp:duels-lost="85"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="27.97"
+                                                imp:duels-won-ground="29"
+                                                imp:duels-lost-ground="58"
+                                                imp:passes="88"
+                                                imp:passes-completed="58"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="65.91"
+                                                imp:crosses="7"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="3"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="10"
+                                           fouls-suffered="4"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="60564"
+                                 date-of-birth="19990309T000000+0100"
+                                 height="178"
+                                 weight="84"
+                                 nationality="England"
+                                 imp:nationality-en="England"
+                                 imp:nationality-key="8"
+                                 imp:native-country="Deutschland" imp:native-country-en="Germany" imp:native-country-key="1"
+                                 uniform-number="11"
+                                 position-regular="mid-fielder">
+                        <name first="Keanan" 
+                              last="Bennetts" 
+                              full="Keanan Bennetts" 
+                              nickname="K. Bennetts"
+                              imp:extensive="Keanan Bennetts"/>
+                        <career-phase start-date="20230707T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20221021T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="SV Darmstadt 98"
+                                      imp:team-nickname="Darmstadt"
+                                      imp:team-key="34" />
+                        <career-phase start-date="20210701T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="Borussia M&#x27;gladbach"
+                                      imp:team-nickname="M&#x27;gladbach"
+                                      imp:team-key="17" />
+                        <career-phase start-date="20201002T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="Ipswich Town FC"
+                                      imp:team-nickname="Ipswich"
+                                      imp:team-key="251" />
+                        <career-phase start-date="20180701T000000+0200"  end-date="20201002T000000+0200" 
+                                      name="Borussia M&#x27;gladbach"
+                                      imp:team-nickname="M&#x27;gladbach"
+                                      imp:team-key="17" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20180630T000000+0200" 
+                                      name="Tottenham Hotspur FC"
+                                      imp:team-nickname="Tottenham"
+                                      imp:team-key="252" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="24"
+                              score="0" events-won="10"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="9"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="9"
+                              imp:substitutions-in="6"
+                              imp:substitutions-out="4"
+                              time-played-total="342"
+                              score="0"
+			      events-won="1"
+			      events-bench-only="2">
+                    <player-stats-soccer imp:balls-touched="198"
+                                         imp:tracking-distance="39451.56"
+                                         imp:tracking-sprints="74"
+                                         imp:tracking-sprints-distance="1469.55"
+                                         imp:tracking-fast-runs="140"
+                                         imp:tracking-fast-runs-distance="1934.26"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="0"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="8"
+                                                imp:duels-won="34"
+                                                imp:duels-lost="34"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="50.00"
+                                                imp:duels-won-ground="34"
+                                                imp:duels-lost-ground="32"
+                                                imp:passes="112"
+                                                imp:passes-completed="95"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="84.82"
+                                                imp:crosses="14"
+                                                imp:crosses-completed="3"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="3"
+                                           fouls-suffered="7"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="2"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="35423"
+                                 date-of-birth="19890207T000000+0100"
+                                 height="186"
+                                 weight="92"
+                                 nationality="Marokko"
+                                 imp:nationality-en="Morocco"
+                                 imp:nationality-key="58"
+                                 imp:native-country="Deutschland" imp:native-country-en="Germany" imp:native-country-key="1"
+                                 uniform-number="13"
+                                 position-regular="goalie">
+                        <name first="Mohamed" 
+                              last="Amsif" 
+                              full="Mohamed Amsif" 
+                              nickname="M. Amsif"
+                              imp:extensive="Mohamed Amsif"/>
+                        <career-phase start-date="20221205T000000+0100" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20170817T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="FUS Rabat"
+                                      imp:team-nickname="Rabat"
+                                      imp:team-key="2592" />
+                        <career-phase start-date="20160727T000000+0200"  end-date="20170630T000000+0200" 
+                                      name="Ittihad Riadhi de Tanger"
+                                      imp:team-nickname="Ittihad Tanger"
+                                      imp:team-key="7267" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20160630T000000+0200" 
+                                      name="1. FC Union Berlin"
+                                      imp:team-nickname="Union Berlin"
+                                      imp:team-key="297" />
+                        <career-phase start-date="20100701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="FC Augsburg"
+                                      imp:team-nickname="Augsburg"
+                                      imp:team-key="267" />
+                        <career-phase start-date="20050701T000000+0200"  end-date="20100630T000000+0200" 
+                                      name="FC Schalke 04"
+                                      imp:team-nickname="Schalke"
+                                      imp:team-key="24" />
+                        <career-phase start-date="20030701T000000+0200"  end-date="20050630T000000+0200" 
+                                      name="Wuppertaler SV"
+                                      imp:team-nickname="Wuppertal"
+                                      imp:team-key="8721" />
+                        <career-phase start-date="20010701T000000+0200"  end-date="20030630T000000+0200" 
+                                      name="DSV 04 Lierenfeld"
+                                      imp:team-nickname="Lierenfeld"
+                                      imp:team-key="1328" />
+                        <career-phase start-date="19950701T000000+0200"  end-date="20010630T000000+0200" 
+                                      name="TuRU D&#xFC;sseldorf"
+                                      imp:team-nickname="TuRU D&#xFC;sseldorf"
+                                      imp:team-key="511" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="8"
+                              score="0" events-won="2"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="0"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="0"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="0"
+                              score="0"
+			      events-won="0"
+			      events-bench-only="5">
+                    <player-stats-soccer imp:balls-touched="0"
+                                         imp:tracking-distance=""
+                                         imp:tracking-sprints=""
+                                         imp:tracking-sprints-distance=""
+                                         imp:tracking-fast-runs=""
+                                         imp:tracking-fast-runs-distance=""
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="0"
+                                                imp:duels-won="0"
+                                                imp:duels-lost="0"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless=""
+                                                imp:duels-won-ground="0"
+                                                imp:duels-lost-ground="0"
+                                                imp:passes="0"
+                                                imp:passes-completed="0"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless=""
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-defensive save-percentage="0"
+                                                imp:saves-penalty-shot="0"
+                                                imp:saves-extraordinary="0"
+                                                shutouts="0"
+                                                saves="0"
+                                                goals-against-total="0"
+                                                imp:punt-completed="0"
+                                                imp:throw-completed="0"
+                                                imp:catches-punches-crosses="0"
+                                                imp:catches-punches-corners="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="0"
+                                           fouls-suffered="0"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="62601"
+                                 date-of-birth="19990808T000000+0200"
+                                 height="186"
+                                 weight="80"
+                                 nationality="Kroatien"
+                                 imp:nationality-en="Croatia"
+                                 imp:nationality-key="33"
+                                 uniform-number="14"
+                                 position-regular="forward">
+                        <name first="Franko" 
+                              last="Kovacevic" 
+                              full="Franko Kovacevic" 
+                              nickname="F. Kovacevic"
+                              imp:extensive="Franko Kovacevic"/>
+                        <career-phase start-date="20230803T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220812T000000+0200"  end-date="20230803T000000+0200" 
+                                      name="NK Domzale"
+                                      imp:team-nickname="NK Domzale"
+                                      imp:team-key="3012" />
+                        <career-phase start-date="20220701T000000+0200"  end-date="20220812T000000+0200" 
+                                      name="TSG Hoffenheim"
+                                      imp:team-nickname="Hoffenheim"
+                                      imp:team-key="3084" />
+                        <career-phase start-date="20210729T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="Paphos FC"
+                                      imp:team-nickname="Paphos FC"
+                                      imp:team-key="6656" />
+                        <career-phase start-date="20201012T000000+0200"  end-date="20210729T000000+0200" 
+                                      name="FC Cincinnati"
+                                      imp:team-nickname="FC Cincinnati"
+                                      imp:team-key="7379" />
+                        <career-phase start-date="20190702T000000+0200"  end-date="20201012T000000+0200" 
+                                      name="TSG Hoffenheim"
+                                      imp:team-nickname="Hoffenheim"
+                                      imp:team-key="3084" />
+                        <career-phase start-date="20190215T000000+0100"  end-date="20190630T000000+0200" 
+                                      name="NK Rudes Zagreb"
+                                      imp:team-nickname="NK Rudes"
+                                      imp:team-key="6210" />
+                        <career-phase start-date="20170701T000000+0200"  end-date="20190215T000000+0100" 
+                                      name="HNK Hajduk Split"
+                                      imp:team-nickname="Hajduk Split"
+                                      imp:team-key="330" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20170630T000000+0200" 
+                                      name="HNK Rijeka"
+                                      imp:team-nickname="HNK Rijeka"
+                                      imp:team-key="737" />
+                        <career-phase start-date="20100701T000000+0200"  end-date="20150630T000000+0200" 
+                                      name="NK Bjelovar"
+                                      imp:team-nickname="Bjelovar"
+                                      imp:team-key="7839" />
+                        <career-phase start-date="20090701T000000+0200"  end-date="20100630T000000+0200" 
+                                      name="NK Varazdin"
+                                      imp:team-nickname="NK Varazdin"
+                                      imp:team-key="1611" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="23"
+                              score="4" events-won="5"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="23"
+                              score="4" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="23"
+                              imp:substitutions-in="11"
+                              imp:substitutions-out="12"
+                              time-played-total="1051"
+                              score="4"
+			      events-won="5"
+			      events-bench-only="5">
+                    <player-stats-soccer imp:balls-touched="394"
+                                         imp:tracking-distance="139919.71"
+                                         imp:tracking-sprints="307"
+                                         imp:tracking-sprints-distance="6062.68"
+                                         imp:tracking-fast-runs="673"
+                                         imp:tracking-fast-runs-distance="8784.91"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="24"
+                                                points="4"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="38"
+                                                imp:duels-won="89"
+                                                imp:duels-lost="137"
+                                                imp:duels-won-percentage="39.38"
+						imp:duels-won-percentage-limitless="39.38"
+                                                imp:duels-won-ground="77"
+                                                imp:duels-lost-ground="119"
+                                                imp:passes="232"
+                                                imp:passes-completed="190"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="81.90"
+                                                imp:crosses="9"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="3"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="1"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="8"
+                                                imp:shots-right-leg="11"
+                                                imp:shots-head="5"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="13"
+                                           fouls-suffered="27"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="47124"
+                                 date-of-birth="19940131T000000+0100"
+                                 height="197"
+                                 weight="92"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 imp:native-country="&#xD6;sterreich" imp:native-country-en="Austria" imp:native-country-key="10"
+                                 uniform-number="16"
+                                 position-regular="goalie">
+                        <name first="Florian" 
+                              last="Stritzel" 
+                              full="Florian Stritzel" 
+                              nickname="F. Stritzel"
+                              imp:extensive="Florian Stritzel"/>
+                        <career-phase start-date="20210701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20170701T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="SV Darmstadt 98"
+                                      imp:team-nickname="Darmstadt"
+                                      imp:team-key="34" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20170630T000000+0200" 
+                                      name="Karlsruher SC"
+                                      imp:team-nickname="Karlsruhe"
+                                      imp:team-key="20" />
+                        <career-phase start-date="20070701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="Hamburger SV"
+                                      imp:team-nickname="Hamburg"
+                                      imp:team-key="13" />
+                        <career-phase start-date="20040701T000000+0200"  end-date="20070630T000000+0200" 
+                                      name="1.FC Neubrandenburg 04"
+                                      imp:team-nickname="FC Neubrandenburg 04"
+                                      imp:team-key="4656" />
+                        <career-phase start-date="20000701T000000+0200"  end-date="20040630T000000+0200" 
+                                      name="Torgelower SV Greif"
+                                      imp:team-nickname="Torgelow"
+                                      imp:team-key="5102" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="43"
+                              score="0" events-won="9"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="34"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="34"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="3060"
+                              score="0"
+			      events-won="8"
+			      events-bench-only="0">
+                    <player-stats-soccer imp:balls-touched="1261"
+                                         imp:tracking-distance="185089.35"
+                                         imp:tracking-sprints="12"
+                                         imp:tracking-sprints-distance="131.06"
+                                         imp:tracking-fast-runs="110"
+                                         imp:tracking-fast-runs-distance="1135.39"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="3"
+                                                imp:duels-won="20"
+                                                imp:duels-lost="3"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="86.96"
+                                                imp:duels-won-ground="13"
+                                                imp:duels-lost-ground="3"
+                                                imp:passes="636"
+                                                imp:passes-completed="391"
+                                                imp:passes-completions-percentage="61.48"
+						imp:passes-completions-percentage-limitless="61.48"
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-defensive save-percentage="70.24"
+                                                imp:saves-penalty-shot="1"
+                                                imp:saves-extraordinary="11"
+                                                shutouts="5"
+                                                saves="118"
+                                                goals-against-total="50"
+                                                imp:punt-completed="9"
+                                                imp:throw-completed="126"
+                                                imp:catches-punches-crosses="33"
+                                                imp:catches-punches-corners="7"
+                                                />
+                        <stats-soccer-foul fouls-commited="1"
+                                           fouls-suffered="3"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="2"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="59698"
+                                 date-of-birth="19981108T000000+0100"
+                                 height="192"
+                                 weight="89"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="17"
+                                 position-regular="defenseman">
+                        <name first="Florian" 
+                              last="Carstens" 
+                              full="Florian Carstens" 
+                              nickname="F. Carstens"
+                              imp:extensive="Florian Horst Carstens"/>
+                        <career-phase start-date="20200721T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20200721T000000+0200" 
+                                      name="FC St. Pauli"
+                                      imp:team-nickname="St. Pauli"
+                                      imp:team-key="42" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="MTV Treubund L&#xFC;neburg"
+                                      imp:team-nickname="Treubund L&#xFC;neburg"
+                                      imp:team-key="5532" />
+                        <career-phase start-date="20110701T000000+0200"  end-date="20130630T000000+0200" 
+                                      name="TV Meckelfeld 1920"
+                                      imp:team-nickname="TV Meckelfeld"
+                                      imp:team-key="8341" />
+                        <career-phase start-date="20020701T000000+0200"  end-date="20110630T000000+0200" 
+                                      name="Eintracht Elbmarsch"
+                                      imp:team-nickname="Eintracht Elbmarsch"
+                                      imp:team-key="8342" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="41"
+                              score="1" events-won="12"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="19"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="19"
+                              imp:substitutions-in="7"
+                              imp:substitutions-out="6"
+                              time-played-total="1076"
+                              score="0"
+			      events-won="4"
+			      events-bench-only="5">
+                    <player-stats-soccer imp:balls-touched="844"
+                                         imp:tracking-distance="119965.65"
+                                         imp:tracking-sprints="161"
+                                         imp:tracking-sprints-distance="3269.23"
+                                         imp:tracking-fast-runs="410"
+                                         imp:tracking-fast-runs-distance="5375.03"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="8"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="18"
+                                                imp:duels-won="108"
+                                                imp:duels-lost="103"
+                                                imp:duels-won-percentage="51.18"
+						imp:duels-won-percentage-limitless="51.18"
+                                                imp:duels-won-ground="84"
+                                                imp:duels-lost-ground="92"
+                                                imp:passes="627"
+                                                imp:passes-completed="533"
+                                                imp:passes-completions-percentage="85.01"
+						imp:passes-completions-percentage-limitless="85.01"
+                                                imp:crosses="5"
+                                                imp:crosses-completed="2"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="2"
+                                                imp:shots-right-leg="5"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="17"
+                                           fouls-suffered="8"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="5"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="80462"
+                                 date-of-birth="19960514T000000+0200"
+                                 height="189"
+                                 weight="89"
+                                 nationality="Kroatien"
+                                 imp:nationality-en="Croatia"
+                                 imp:nationality-key="33"
+                                 uniform-number="18"
+                                 position-regular="forward">
+                        <name first="Ivan" 
+                              last="Prtajin" 
+                              full="Ivan Prtajin" 
+                              nickname="I. Prtajin"
+                              imp:extensive="Ivan Prtajin"/>
+                        <career-phase start-date="20220812T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220121T000000+0100"  end-date="20220811T000000+0200" 
+                                      name="NK Olimpija Ljubljana"
+                                      imp:team-nickname="Ljubljana Olimpija"
+                                      imp:team-key="6987" />
+                        <career-phase start-date="20200727T000000+0200"  end-date="20220120T000000+0100" 
+                                      name="FC Schaffhausen"
+                                      imp:team-nickname="Schaffhausen"
+                                      imp:team-key="1399" />
+                        <career-phase start-date="20190802T000000+0200"  end-date="20200630T000000+0200" 
+                                      name="Roda JC Kerkrade"
+                                      imp:team-nickname="Kerkrade"
+                                      imp:team-key="955" />
+                        <career-phase start-date="20180701T000000+0200"  end-date="20190801T000000+0200" 
+                                      name="HNK Hajduk Split"
+                                      imp:team-nickname="Hajduk Split"
+                                      imp:team-key="330" />
+                        <career-phase start-date="20180215T000000+0100"  end-date="20180630T000000+0200" 
+                                      name="NK Dugopolje"
+                                      imp:team-nickname="NK Dugopolje"
+                                      imp:team-key="6348" />
+                        <career-phase start-date="20170217T000000+0100"  end-date="20180215T000000+0100" 
+                                      name="HNK Hajduk Split"
+                                      imp:team-nickname="Hajduk Split"
+                                      imp:team-key="330" />
+                        <career-phase start-date="20140911T000000+0200"  end-date="20170216T000000+0100" 
+                                      name="Udinese Calcio"
+                                      imp:team-nickname="Udine"
+                                      imp:team-key="235" />
+                        <career-phase start-date="20120817T000000+0200"  end-date="20140910T000000+0200" 
+                                      name="NK Zagreb"
+                                      imp:team-nickname="NK Zagreb"
+                                      imp:team-key="738" />
+                        <career-phase start-date="20110902T000000+0200"  end-date="20120816T000000+0200" 
+                                      name="NK Tresnjevka Zagreb"
+                                      imp:team-nickname="Tresnjevka Zagreb"
+                                      imp:team-key="941" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="31"
+                              score="13" events-won="7"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="31"
+                              score="13" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="31"
+                              imp:substitutions-in="4"
+                              imp:substitutions-out="9"
+                              time-played-total="2432"
+                              score="13"
+			      events-won="7"
+			      events-bench-only="0">
+                    <player-stats-soccer imp:balls-touched="1084"
+                                         imp:tracking-distance="284830.23"
+                                         imp:tracking-sprints="633"
+                                         imp:tracking-sprints-distance="11928.17"
+                                         imp:tracking-fast-runs="1089"
+                                         imp:tracking-fast-runs-distance="14607.37"
+                                         >
+                        <stats-soccer-offensive assists-total="2"
+                                                shots-total="106"
+                                                points="15"
+                                                shots-penalty-shot-taken="2"
+                                                shots-penalty-shot-scored="2"
+                                                imp:score-attempts-participation="142"
+                                                imp:duels-won="324"
+                                                imp:duels-lost="357"
+                                                imp:duels-won-percentage="47.58"
+						imp:duels-won-percentage-limitless="47.58"
+                                                imp:duels-won-ground="205"
+                                                imp:duels-lost-ground="191"
+                                                imp:passes="639"
+                                                imp:passes-completed="447"
+                                                imp:passes-completions-percentage="69.95"
+						imp:passes-completions-percentage-limitless="69.95"
+                                                imp:crosses="9"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="2"
+                                                imp:goals-right-leg="6"
+                                                imp:goals-head="4"
+                                                imp:goals-other="1"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="24"
+                                                imp:shots-right-leg="45"
+                                                imp:shots-head="36"
+                                                imp:shots-other="1"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="25"
+                                           fouls-suffered="30"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="6"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="70600"
+                                 date-of-birth="19930821T000000+0200"
+                                 height="192"
+                                 weight="90"
+                                 nationality="D&#xE4;nemark"
+                                 imp:nationality-en="Denmark"
+                                 imp:nationality-key="6"
+                                 uniform-number="19"
+                                 position-regular="mid-fielder">
+                        <name first="Bjarke" 
+                              last="Jacobsen" 
+                              full="Bjarke Jacobsen" 
+                              nickname="B. Jacobsen"
+                              imp:extensive="Bjarke Halfdan Jacobsen"/>
+                        <career-phase start-date="20210701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20170802T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="AC Horsens"
+                                      imp:team-nickname="AC Horsens"
+                                      imp:team-key="3316" />
+                        <career-phase start-date="20150202T000000+0100"  end-date="20170630T000000+0200" 
+                                      name="Vendsyssel FF"
+                                      imp:team-nickname="Vendsyssel FF"
+                                      imp:team-key="6850" />
+                        <career-phase start-date="20140708T000000+0200"  end-date="20150201T000000+0100" 
+                                      name="Akademisk Boldklub"
+                                      imp:team-nickname="Akademisk Boldklub"
+                                      imp:team-key="784" />
+                        <career-phase start-date="20120827T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="FC Helsing&#xF6;r"
+                                      imp:team-nickname="FC Helsing&#xF6;r"
+                                      imp:team-key="5822" />
+                        <career-phase start-date="20100701T000000+0200"  end-date="20120630T000000+0200" 
+                                      name="FC Nordsjaelland"
+                                      imp:team-nickname="Nordsjaelland"
+                                      imp:team-key="3693" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="24"
+                              score="0" events-won="7"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="24"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="24"
+                              imp:substitutions-in="11"
+                              imp:substitutions-out="4"
+                              time-played-total="1300"
+                              score="0"
+			      events-won="7"
+			      events-bench-only="6">
+                    <player-stats-soccer imp:balls-touched="874"
+                                         imp:tracking-distance="169402.16"
+                                         imp:tracking-sprints="155"
+                                         imp:tracking-sprints-distance="2828.33"
+                                         imp:tracking-fast-runs="683"
+                                         imp:tracking-fast-runs-distance="10228.58"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="3"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="10"
+                                                imp:duels-won="186"
+                                                imp:duels-lost="137"
+                                                imp:duels-won-percentage="57.59"
+						imp:duels-won-percentage-limitless="57.59"
+                                                imp:duels-won-ground="148"
+                                                imp:duels-lost-ground="115"
+                                                imp:passes="643"
+                                                imp:passes-completed="563"
+                                                imp:passes-completions-percentage="87.56"
+						imp:passes-completions-percentage-limitless="87.56"
+                                                imp:crosses="3"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="2"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="21"
+                                           fouls-suffered="12"
+                                           imp:red-card-ejections="1"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="87386"
+                                 date-of-birth="20030207T000000+0100"
+                                 height="171"
+                                 weight="68"
+                                 nationality="Korea Republik (S&#xFC;dkorea)"
+                                 imp:nationality-en="South Korea"
+                                 imp:nationality-key="56"
+                                 uniform-number="20"
+                                 position-regular="mid-fielder">
+                        <name first="Hyunju" 
+                              last="Lee" 
+                              full="Hyunju Lee" 
+                              nickname="H. Lee"
+                              imp:extensive="Hyunju Lee"/>
+                        <career-phase start-date="20230707T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220114T000000+0100"  end-date="20230707T000000+0200" 
+                                      name="FC Bayern M&#xFC;nchen"
+                                      imp:team-nickname="FC Bayern"
+                                      imp:team-key="10" />
+                        <career-phase start-date="20160101T000000+0100"  end-date="20220114T000000+0100" 
+                                      name="Pohang Steelers FC"
+                                      imp:team-nickname="Pohang Steelers"
+                                      imp:team-key="3026" />
+                        <career-phase start-date="20120101T000000+0100"  end-date="20151231T000000+0100" 
+                                      name="Tree Mers Football Club"
+                                      imp:team-nickname="Tree Mers FC"
+                                      imp:team-key="10716" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="28"
+                              score="4" events-won="8"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="28"
+                              score="4" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="28"
+                              imp:substitutions-in="8"
+                              imp:substitutions-out="17"
+                              time-played-total="1534"
+                              score="4"
+			      events-won="8"
+			      events-bench-only="0">
+                    <player-stats-soccer imp:balls-touched="745"
+                                         imp:tracking-distance="193092.47"
+                                         imp:tracking-sprints="378"
+                                         imp:tracking-sprints-distance="7010.32"
+                                         imp:tracking-fast-runs="925"
+                                         imp:tracking-fast-runs-distance="12944.47"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="25"
+                                                points="5"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="48"
+                                                imp:duels-won="179"
+                                                imp:duels-lost="172"
+                                                imp:duels-won-percentage="51.00"
+						imp:duels-won-percentage-limitless="51.00"
+                                                imp:duels-won-ground="174"
+                                                imp:duels-lost-ground="162"
+                                                imp:passes="496"
+                                                imp:passes-completed="460"
+                                                imp:passes-completions-percentage="92.74"
+						imp:passes-completions-percentage-limitless="92.74"
+                                                imp:crosses="3"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="2"
+                                                imp:goals-right-leg="2"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="4"
+                                                imp:shots-right-leg="20"
+                                                imp:shots-head="1"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="10"
+                                           fouls-suffered="55"
+                                           imp:red-card-ejections="1"
+                                           imp:yellow-red-card-ejections="1"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="56976"
+                                 date-of-birth="19990520T000000+0200"
+                                 height="182"
+                                 weight="67"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="21"
+                                 position-regular="mid-fielder">
+                        <name first="Julius" 
+                              last="Kade" 
+                              full="Julius Kade" 
+                              nickname="J. Kade"
+                              imp:extensive="Julius Kade"/>
+                        <career-phase start-date="20230810T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20210721T000000+0200"  end-date="20230810T000000+0200" 
+                                      name="SG Dynamo Dresden"
+                                      imp:team-nickname="Dresden"
+                                      imp:team-key="23" />
+                        <career-phase start-date="20210701T000000+0200"  end-date="20210721T000000+0200" 
+                                      name="1. FC Union Berlin"
+                                      imp:team-nickname="Union Berlin"
+                                      imp:team-key="297" />
+                        <career-phase start-date="20200806T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="SG Dynamo Dresden"
+                                      imp:team-nickname="Dresden"
+                                      imp:team-key="23" />
+                        <career-phase start-date="20190701T000000+0200"  end-date="20200806T000000+0200" 
+                                      name="1. FC Union Berlin"
+                                      imp:team-nickname="Union Berlin"
+                                      imp:team-key="297" />
+                        <career-phase start-date="20070701T000000+0200"  end-date="20190630T000000+0200" 
+                                      name="Hertha BSC"
+                                      imp:team-nickname="Hertha BSC"
+                                      imp:team-key="43" />
+                        <career-phase start-date="20060701T000000+0200"  end-date="20070630T000000+0200" 
+                                      name="Sportfreunde Kladow"
+                                      imp:team-nickname="SF Kladow"
+                                      imp:team-key="6843" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="37"
+                              score="2" events-won="8"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="8"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="8"
+                              imp:substitutions-in="4"
+                              imp:substitutions-out="4"
+                              time-played-total="259"
+                              score="0"
+			      events-won="3"
+			      events-bench-only="13">
+                    <player-stats-soccer imp:balls-touched="93"
+                                         imp:tracking-distance="37575.22"
+                                         imp:tracking-sprints="74"
+                                         imp:tracking-sprints-distance="1359.47"
+                                         imp:tracking-fast-runs="191"
+                                         imp:tracking-fast-runs-distance="2823.52"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="3"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="6"
+                                                imp:duels-won="26"
+                                                imp:duels-lost="23"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="53.06"
+                                                imp:duels-won-ground="24"
+                                                imp:duels-lost-ground="15"
+                                                imp:passes="53"
+                                                imp:passes-completed="39"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="73.58"
+                                                imp:crosses="3"
+                                                imp:crosses-completed="2"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="2"
+                                                imp:shots-right-leg="1"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="2"
+                                           fouls-suffered="4"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="63389"
+                                 date-of-birth="20030722T000000+0200"
+                                 height="179"
+                                 weight="78"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 imp:native-country="&#xC4;gypten" imp:native-country-en="Egypt" imp:native-country-key="53"
+                                 uniform-number="22"
+                                 position-regular="mid-fielder">
+                        <name first="Amin" 
+                              last="Farouk" 
+                              full="Amin Farouk" 
+                              nickname="A. Farouk"
+                              imp:extensive="Amin Farouk"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20230127T000000+0100"  end-date="20230630T000000+0200" 
+                                      name="FSV Frankfurt"
+                                      imp:team-nickname="FSV Frankfurt"
+                                      imp:team-key="277" />
+                        <career-phase start-date="20190701T000000+0200"  end-date="20200714T000000+0200" 
+                                      name="SV Wehen Wiesbaden U 17"
+                                      imp:team-nickname="Wiesbaden U 17"
+                                      imp:team-key="7866" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20230127T000000+0100" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="1. FSV Mainz 05"
+                                      imp:team-nickname="Mainz"
+                                      imp:team-key="36" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="0"
+                              score="0" events-won="0"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="0"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="0"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="0"
+                              score="0"
+			      events-won="0"
+			      events-bench-only="5">
+                    <player-stats-soccer imp:balls-touched="0"
+                                         imp:tracking-distance=""
+                                         imp:tracking-sprints=""
+                                         imp:tracking-sprints-distance=""
+                                         imp:tracking-fast-runs=""
+                                         imp:tracking-fast-runs-distance=""
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="0"
+                                                imp:duels-won="0"
+                                                imp:duels-lost="0"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless=""
+                                                imp:duels-won-ground="0"
+                                                imp:duels-lost-ground="0"
+                                                imp:passes="0"
+                                                imp:passes-completed="0"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless=""
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="0"
+                                           fouls-suffered="0"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="52441"
+                                 date-of-birth="19960227T000000+0100"
+                                 height="184"
+                                 weight="79"
+                                 nationality="D&#xE4;nemark"
+                                 imp:nationality-en="Denmark"
+                                 imp:nationality-key="6"
+                                 uniform-number="24"
+                                 position-regular="defenseman">
+                        <name first="Marcus" 
+                              last="Mathisen" 
+                              full="Marcus Mathisen" 
+                              nickname="M. Mathisen"
+                              imp:extensive="Marcus Klingenberg Mathisen"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20210104T000000+0100"  end-date="20230630T000000+0200" 
+                                      name="IK Sirius"
+                                      imp:team-nickname="IK Sirius"
+                                      imp:team-key="6944" />
+                        <career-phase start-date="20190112T000000+0100"  end-date="20201231T000000+0100" 
+                                      name="Falkenbergs FF"
+                                      imp:team-nickname="Falkenberg"
+                                      imp:team-key="8210" />
+                        <career-phase start-date="20160802T000000+0200"  end-date="20181231T000000+0100" 
+                                      name="Halmstads BK"
+                                      imp:team-nickname="Halmstad"
+                                      imp:team-key="1211" />
+                        <career-phase start-date="20120701T000000+0200"  end-date="20160801T000000+0200" 
+                                      name="FC Kopenhagen"
+                                      imp:team-nickname="Kopenhagen"
+                                      imp:team-key="108" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="31"
+                              score="0" events-won="7"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="31"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="31"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="3"
+                              time-played-total="2738"
+                              score="0"
+			      events-won="7"
+			      events-bench-only="0">
+                    <player-stats-soccer imp:balls-touched="2230"
+                                         imp:tracking-distance="299431.33"
+                                         imp:tracking-sprints="353"
+                                         imp:tracking-sprints-distance="6748.54"
+                                         imp:tracking-fast-runs="805"
+                                         imp:tracking-fast-runs-distance="10799.75"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="16"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="29"
+                                                imp:duels-won="297"
+                                                imp:duels-lost="203"
+                                                imp:duels-won-percentage="59.40"
+						imp:duels-won-percentage-limitless="59.40"
+                                                imp:duels-won-ground="198"
+                                                imp:duels-lost-ground="154"
+                                                imp:passes="1682"
+                                                imp:passes-completed="1471"
+                                                imp:passes-completions-percentage="87.46"
+						imp:passes-completions-percentage-limitless="87.46"
+                                                imp:crosses="1"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="2"
+                                                imp:shots-right-leg="10"
+                                                imp:shots-head="4"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="28"
+                                           fouls-suffered="6"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="8"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="59679"
+                                 date-of-birth="20000425T000000+0200"
+                                 height="190"
+                                 weight="87"
+                                 nationality="Niederlande"
+                                 imp:nationality-en="Netherlands"
+                                 imp:nationality-key="5"
+                                 imp:native-country="Serbien" imp:native-country-en="Serbia" imp:native-country-key="92"
+                                 uniform-number="25"
+                                 position-regular="forward">
+                        <name first="Nikolas" 
+                              last="Agrafiotis" 
+                              full="Nikolas Agrafiotis" 
+                              nickname="N. Agrafiotis"
+                              imp:extensive="Nikolas Agrafiotis"/>
+                        <career-phase start-date="20240131T000000+0100" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220131T000000+0100"  end-date="20240131T000000+0100" 
+                                      name="SC Excelsior Rotterdam"
+                                      imp:team-nickname="Excelsior"
+                                      imp:team-key="3015" />
+                        <career-phase start-date="20200701T000000+0200"  end-date="20220131T000000+0100" 
+                                      name="FC Dordrecht"
+                                      imp:team-nickname="FC Dordrecht"
+                                      imp:team-key="4223" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20200630T000000+0200" 
+                                      name="Vitesse Arnheim"
+                                      imp:team-nickname="Arnheim"
+                                      imp:team-key="132" />
+                        <career-phase start-date="20130701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="FC Den Bosch"
+                                      imp:team-nickname="Den Bosch"
+                                      imp:team-key="2636" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="12"
+                              score="1" events-won="0"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="12"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="12"
+                              imp:substitutions-in="7"
+                              imp:substitutions-out="5"
+                              time-played-total="434"
+                              score="1"
+			      events-won="0"
+			      events-bench-only="3">
+                    <player-stats-soccer imp:balls-touched="180"
+                                         imp:tracking-distance="54986.51"
+                                         imp:tracking-sprints="135"
+                                         imp:tracking-sprints-distance="2610.32"
+                                         imp:tracking-fast-runs="268"
+                                         imp:tracking-fast-runs-distance="3572.93"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="18"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="25"
+                                                imp:duels-won="56"
+                                                imp:duels-lost="90"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="38.36"
+                                                imp:duels-won-ground="37"
+                                                imp:duels-lost-ground="67"
+                                                imp:passes="103"
+                                                imp:passes-completed="72"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="69.90"
+                                                imp:crosses="2"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="1"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="7"
+                                                imp:shots-right-leg="4"
+                                                imp:shots-head="7"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="17"
+                                           fouls-suffered="1"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="88541"
+                                 date-of-birth="19950722T000000+0200"
+                                 height="201"
+                                 weight="95"
+                                 nationality="Serbien"
+                                 imp:nationality-en="Serbia"
+                                 imp:nationality-key="92"
+                                 imp:native-country="Bosnien und Herzegowina" imp:native-country-en="Bosnia and Herzegovina" imp:native-country-key="52"
+                                 uniform-number="26"
+                                 position-regular="defenseman">
+                        <name first="Aleksandar" 
+                              last="Vukotic" 
+                              full="Aleksandar Vukotic" 
+                              nickname="A. Vukotic"
+                              imp:extensive="Aleksandar Vukotic"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220701T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="SK Beveren"
+                                      imp:team-nickname="Beveren"
+                                      imp:team-key="10682" />
+                        <career-phase start-date="20180701T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="RS Waasland - SK Beveren"
+                                      imp:team-nickname="Waasland-Beveren"
+                                      imp:team-key="5711" />
+                        <career-phase start-date="20150804T000000+0200"  end-date="20180630T000000+0200" 
+                                      name="FK Krupa"
+                                      imp:team-nickname="Krupa"
+                                      imp:team-key="10683" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20150803T000000+0200" 
+                                      name="FK Dolina Padina"
+                                      imp:team-nickname="Dolina Padina"
+                                      imp:team-key="10684" />
+                        <career-phase start-date="20110701T000000+0200"  end-date="20140630T000000+0200" 
+                                      name="FK Sloga Kraljevo"
+                                      imp:team-nickname="Sloga Kraljevo"
+                                      imp:team-key="8042" />
+                        <career-phase start-date="20020701T000000+0200"  end-date="20110630T000000+0200" 
+                                      name="FK Volej Vrnjacka Banja"
+                                      imp:team-nickname="Volej Vrnjacka Banja"
+                                      imp:team-key="10685" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="28"
+                              score="2" events-won="6"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="28"
+                              score="2" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="28"
+                              imp:substitutions-in="1"
+                              imp:substitutions-out="2"
+                              time-played-total="2335"
+                              score="2"
+			      events-won="6"
+			      events-bench-only="4">
+                    <player-stats-soccer imp:balls-touched="1640"
+                                         imp:tracking-distance="243737.62"
+                                         imp:tracking-sprints="281"
+                                         imp:tracking-sprints-distance="4680.62"
+                                         imp:tracking-fast-runs="598"
+                                         imp:tracking-fast-runs-distance="8282.85"
+                                         >
+                        <stats-soccer-offensive assists-total="2"
+                                                shots-total="22"
+                                                points="4"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="35"
+                                                imp:duels-won="320"
+                                                imp:duels-lost="163"
+                                                imp:duels-won-percentage="66.25"
+						imp:duels-won-percentage-limitless="66.25"
+                                                imp:duels-won-ground="179"
+                                                imp:duels-lost-ground="129"
+                                                imp:passes="1050"
+                                                imp:passes-completed="816"
+                                                imp:passes-completions-percentage="77.71"
+						imp:passes-completions-percentage-limitless="77.71"
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="1"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="1"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="6"
+                                                imp:shots-right-leg="1"
+                                                imp:shots-head="15"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="30"
+                                           fouls-suffered="21"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="1"
+                                           imp:yellow-cards="9"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="55921"
+                                 date-of-birth="19950822T000000+0200"
+                                 height="184"
+                                 weight="83"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="27"
+                                 position-regular="defenseman">
+                        <name first="Nico" 
+                              last="Rieble" 
+                              full="Nico Rieble" 
+                              nickname="N. Rieble"
+                              imp:extensive="Nico Rieble"/>
+                        <career-phase start-date="20210701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200721T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="VfB L&#xFC;beck"
+                                      imp:team-nickname="L&#xFC;beck"
+                                      imp:team-key="331" />
+                        <career-phase start-date="20180129T000000+0100"  end-date="20200714T000000+0200" 
+                                      name="FC Hansa Rostock"
+                                      imp:team-nickname="Rostock"
+                                      imp:team-key="28" />
+                        <career-phase start-date="20160701T000000+0200"  end-date="20180128T000000+0100" 
+                                      name="VfL Bochum 1848"
+                                      imp:team-nickname="Bochum"
+                                      imp:team-key="21" />
+                        <career-phase start-date="20100701T000000+0200"  end-date="20160630T000000+0200" 
+                                      name="TSG Hoffenheim"
+                                      imp:team-nickname="Hoffenheim"
+                                      imp:team-key="3084" />
+                        <career-phase start-date="20090701T000000+0200"  end-date="20100630T000000+0200" 
+                                      name="Karlsruher SC"
+                                      imp:team-nickname="Karlsruhe"
+                                      imp:team-key="20" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="35"
+                              score="0" events-won="10"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="14"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="14"
+                              imp:substitutions-in="8"
+                              imp:substitutions-out="2"
+                              time-played-total="666"
+                              score="0"
+			      events-won="3"
+			      events-bench-only="7">
+                    <player-stats-soccer imp:balls-touched="425"
+                                         imp:tracking-distance="83607.24"
+                                         imp:tracking-sprints="126"
+                                         imp:tracking-sprints-distance="2466.41"
+                                         imp:tracking-fast-runs="350"
+                                         imp:tracking-fast-runs-distance="4798.51"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="1"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="7"
+                                                imp:duels-won="68"
+                                                imp:duels-lost="63"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="51.91"
+                                                imp:duels-won-ground="53"
+                                                imp:duels-lost-ground="54"
+                                                imp:passes="263"
+                                                imp:passes-completed="223"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="84.79"
+                                                imp:crosses="12"
+                                                imp:crosses-completed="3"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="1"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="12"
+                                           fouls-suffered="6"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="63045"
+                                 date-of-birth="20030321T000000+0100"
+                                 height="181"
+                                 weight="83"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="29"
+                                 position-regular="mid-fielder">
+                        <name first="Lasse" 
+                              last="G&#xFC;nther" 
+                              full="Lasse G&#xFC;nther" 
+                              nickname="L. G&#xFC;nther"
+                              imp:extensive="Lasse G&#xFC;nther"/>
+                        <career-phase start-date="20230725T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20230701T000000+0200"  end-date="20230725T000000+0200" 
+                                      name="FC Augsburg"
+                                      imp:team-nickname="Augsburg"
+                                      imp:team-key="267" />
+                        <career-phase start-date="20220809T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="SSV Jahn Regensburg"
+                                      imp:team-nickname="Regensburg"
+                                      imp:team-key="497" />
+                        <career-phase start-date="20210701T000000+0200"  end-date="20220809T000000+0200" 
+                                      name="FC Augsburg"
+                                      imp:team-nickname="Augsburg"
+                                      imp:team-key="267" />
+                        <career-phase start-date="20190701T000000+0200"  end-date="20200714T000000+0200" 
+                                      name="FC Bayern M&#xFC;nchen U 19"
+                                      imp:team-nickname="FC Bayern U 19"
+                                      imp:team-key="7831" />
+                        <career-phase start-date="20160701T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="FC Bayern M&#xFC;nchen"
+                                      imp:team-nickname="FC Bayern"
+                                      imp:team-key="10" />
+                        <career-phase start-date="20160701T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="FC Bayern M&#xFC;nchen II"
+                                      imp:team-nickname="FC Bayern II"
+                                      imp:team-key="1340" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20160630T000000+0200" 
+                                      name="FC Augsburg"
+                                      imp:team-nickname="Augsburg"
+                                      imp:team-key="267" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="38"
+                              score="1" events-won="10"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="22"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="22"
+                              imp:substitutions-in="8"
+                              imp:substitutions-out="14"
+                              time-played-total="1032"
+                              score="1"
+			      events-won="7"
+			      events-bench-only="1">
+                    <player-stats-soccer imp:balls-touched="635"
+                                         imp:tracking-distance="129775.87"
+                                         imp:tracking-sprints="341"
+                                         imp:tracking-sprints-distance="7913.30"
+                                         imp:tracking-fast-runs="556"
+                                         imp:tracking-fast-runs-distance="7942.87"
+                                         >
+                        <stats-soccer-offensive assists-total="2"
+                                                shots-total="8"
+                                                points="3"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="28"
+                                                imp:duels-won="125"
+                                                imp:duels-lost="102"
+                                                imp:duels-won-percentage="55.07"
+						imp:duels-won-percentage-limitless="55.07"
+                                                imp:duels-won-ground="113"
+                                                imp:duels-lost-ground="85"
+                                                imp:passes="340"
+                                                imp:passes-completed="263"
+                                                imp:passes-completions-percentage="77.35"
+						imp:passes-completions-percentage-limitless="77.35"
+                                                imp:crosses="28"
+                                                imp:crosses-completed="7"
+                                                imp:goals-left-leg="1"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="6"
+                                                imp:shots-right-leg="2"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="2"
+                                                />
+                        <stats-soccer-foul fouls-commited="11"
+                                           fouls-suffered="5"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="2"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="58589"
+                                 date-of-birth="19960416T000000+0200"
+                                 height="176"
+                                 weight="82"
+                                 nationality="Kanada"
+                                 imp:nationality-en="Canada"
+                                 imp:nationality-key="80"
+                                 imp:native-country="Kuba" imp:native-country-en="Cuba" imp:native-country-key="86"
+                                 uniform-number="30"
+                                 position-regular="mid-fielder">
+                        <name first="Kianz" 
+                              last="Froese" 
+                              full="Kianz Froese" 
+                              nickname="K. Froese"
+                              imp:extensive="Kianz Gonzalez-Froese"/>
+                        <career-phase start-date="20220701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20210817T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="TSV Havelse"
+                                      imp:team-nickname="Havelse"
+                                      imp:team-key="318" />
+                        <career-phase start-date="20190712T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="1. FC Saarbr&#xFC;cken"
+                                      imp:team-nickname="Saarbr&#xFC;cken"
+                                      imp:team-key="25" />
+                        <career-phase start-date="20170131T000000+0100"  end-date="20190630T000000+0200" 
+                                      name="Fortuna D&#xFC;sseldorf"
+                                      imp:team-nickname="D&#xFC;sseldorf"
+                                      imp:team-key="27" />
+                        <career-phase start-date="20120101T000000+0100"  end-date="20170130T000000+0100" 
+                                      name="Vancouver Whitecaps FC"
+                                      imp:team-nickname="Vancouver Whitecaps"
+                                      imp:team-key="1586" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="22"
+                              score="1" events-won="6"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="22"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="22"
+                              imp:substitutions-in="13"
+                              imp:substitutions-out="9"
+                              time-played-total="782"
+                              score="1"
+			      events-won="6"
+			      events-bench-only="6">
+                    <player-stats-soccer imp:balls-touched="363"
+                                         imp:tracking-distance="109512.21"
+                                         imp:tracking-sprints="239"
+                                         imp:tracking-sprints-distance="4530.84"
+                                         imp:tracking-fast-runs="478"
+                                         imp:tracking-fast-runs-distance="6466.14"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="20"
+                                                points="2"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="37"
+                                                imp:duels-won="77"
+                                                imp:duels-lost="144"
+                                                imp:duels-won-percentage="34.84"
+						imp:duels-won-percentage-limitless="34.84"
+                                                imp:duels-won-ground="71"
+                                                imp:duels-lost-ground="111"
+                                                imp:passes="239"
+                                                imp:passes-completed="183"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="76.57"
+                                                imp:crosses="3"
+                                                imp:crosses-completed="1"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="1"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="2"
+                                                imp:shots-right-leg="18"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="16"
+                                           fouls-suffered="9"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="3"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="69104"
+                                 date-of-birth="19990801T000000+0200"
+                                 height="188"
+                                 weight="86"
+                                 nationality="Australien"
+                                 imp:nationality-en="Australia"
+                                 imp:nationality-key="55"
+                                 uniform-number="33"
+                                 position-regular="forward">
+                        <name first="John" 
+                              last="Iredale" 
+                              full="John Iredale" 
+                              nickname="J. Iredale"
+                              imp:extensive="John Warwick Iredale"/>
+                        <career-phase start-date="20220802T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20220701T000000+0200"  end-date="20220801T000000+0200" 
+                                      name="SC Paderborn 07"
+                                      imp:team-nickname="Paderborn"
+                                      imp:team-key="2321" />
+                        <career-phase start-date="20210826T000000+0200"  end-date="20220630T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20210701T000000+0200"  end-date="20210826T000000+0200" 
+                                      name="SC Paderborn 07"
+                                      imp:team-nickname="Paderborn"
+                                      imp:team-key="2321" />
+                        <career-phase start-date="20190716T000000+0200"  end-date="20210630T000000+0200" 
+                                      name="VfL Wolfsburg"
+                                      imp:team-nickname="Wolfsburg"
+                                      imp:team-key="56" />
+                        <career-phase start-date="20170831T000000+0200"  end-date="20190630T000000+0200" 
+                                      name="SC Heerenveen"
+                                      imp:team-nickname="Heerenveen"
+                                      imp:team-key="1414" />
+                        <career-phase start-date="20150701T000000+0200"  end-date="20170830T000000+0200" 
+                                      name="Sydney FC"
+                                      imp:team-nickname="Sydney FC"
+                                      imp:team-key="4232" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="23"
+                              score="3" events-won="5"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="23"
+                              score="3" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="23"
+                              imp:substitutions-in="17"
+                              imp:substitutions-out="6"
+                              time-played-total="723"
+                              score="3"
+			      events-won="5"
+			      events-bench-only="1">
+                    <player-stats-soccer imp:balls-touched="336"
+                                         imp:tracking-distance="99516.44"
+                                         imp:tracking-sprints="259"
+                                         imp:tracking-sprints-distance="5369.58"
+                                         imp:tracking-fast-runs="476"
+                                         imp:tracking-fast-runs-distance="6584.87"
+                                         >
+                        <stats-soccer-offensive assists-total="1"
+                                                shots-total="33"
+                                                points="4"
+                                                shots-penalty-shot-taken="1"
+                                                shots-penalty-shot-scored="1"
+                                                imp:score-attempts-participation="42"
+                                                imp:duels-won="95"
+                                                imp:duels-lost="159"
+                                                imp:duels-won-percentage="37.40"
+						imp:duels-won-percentage-limitless="37.40"
+                                                imp:duels-won-ground="82"
+                                                imp:duels-lost-ground="119"
+                                                imp:passes="170"
+                                                imp:passes-completed="116"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="68.24"
+                                                imp:crosses="4"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="3"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="5"
+                                                imp:shots-right-leg="22"
+                                                imp:shots-head="6"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="1"
+                                                />
+                        <stats-soccer-foul fouls-commited="8"
+                                           fouls-suffered="9"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="61696"
+                                 date-of-birth="19990121T000000+0100"
+                                 height="178"
+                                 weight="75"
+                                 nationality="Bosnien und Herzegowina"
+                                 imp:nationality-en="Bosnia and Herzegovina"
+                                 imp:nationality-key="52"
+                                 imp:native-country="Niederlande" imp:native-country-en="Netherlands" imp:native-country-key="5"
+                                 uniform-number="34"
+                                 position-regular="mid-fielder">
+                        <name first="Amar" 
+                              last="Catic" 
+                              full="Amar Catic" 
+                              nickname="A. Catic"
+                              imp:extensive="Amar Catic"/>
+                        <career-phase start-date="20230701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20200701T000000+0200"  end-date="20230630T000000+0200" 
+                                      name="ADO Den Haag"
+                                      imp:team-nickname="Den Haag"
+                                      imp:team-key="767" />
+                        <career-phase start-date="20100701T000000+0200"  end-date="20200630T000000+0200" 
+                                      name="PSV Eindhoven"
+                                      imp:team-nickname="Eindhoven"
+                                      imp:team-key="129" />
+                        <career-phase start-date="20090701T000000+0200"  end-date="20100630T000000+0200" 
+                                      name="Willem II Tilburg"
+                                      imp:team-nickname="Willem II"
+                                      imp:team-key="956" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="22"
+                              score="1" events-won="5"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="22"
+                              score="1" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="22"
+                              imp:substitutions-in="14"
+                              imp:substitutions-out="7"
+                              time-played-total="910"
+                              score="1"
+			      events-won="5"
+			      events-bench-only="7">
+                    <player-stats-soccer imp:balls-touched="525"
+                                         imp:tracking-distance="121220.43"
+                                         imp:tracking-sprints="289"
+                                         imp:tracking-sprints-distance="5659.78"
+                                         imp:tracking-fast-runs="371"
+                                         imp:tracking-fast-runs-distance="4801.45"
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="6"
+                                                points="1"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="24"
+                                                imp:duels-won="100"
+                                                imp:duels-lost="86"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless="53.76"
+                                                imp:duels-won-ground="96"
+                                                imp:duels-lost-ground="81"
+                                                imp:passes="279"
+                                                imp:passes-completed="220"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless="78.85"
+                                                imp:crosses="28"
+                                                imp:crosses-completed="8"
+                                                imp:goals-left-leg="1"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="1"
+                                                imp:shots-right-leg="5"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="11"
+                                           fouls-suffered="9"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="1"
+                                           imp:yellow-cards="1"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="81409"
+                                 date-of-birth="20050112T000000+0100"
+                                 height="180"
+                                 weight="76"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 imp:native-country="Marokko" imp:native-country-en="Morocco" imp:native-country-key="58"
+                                 uniform-number="36"
+                                 position-regular="mid-fielder">
+                        <name first="Nassim" 
+                              last="El Ouarti" 
+                              full="Nassim El Ouarti" 
+                              nickname="N. El Ouarti"
+                              imp:extensive="Nassim El Ouarti"/>
+                        <career-phase start-date="20180701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                        <career-phase start-date="20160701T000000+0200"  end-date="20180630T000000+0200" 
+                                      name="1. FSV Mainz 05"
+                                      imp:team-nickname="Mainz"
+                                      imp:team-key="36" />
+                        <career-phase start-date="20140701T000000+0200"  end-date="20160630T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="0"
+                              score="0" events-won="0"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="0"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="0"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="0"
+                              score="0"
+			      events-won="0"
+			      events-bench-only="2">
+                    <player-stats-soccer imp:balls-touched="0"
+                                         imp:tracking-distance=""
+                                         imp:tracking-sprints=""
+                                         imp:tracking-sprints-distance=""
+                                         imp:tracking-fast-runs=""
+                                         imp:tracking-fast-runs-distance=""
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="0"
+                                                imp:duels-won="0"
+                                                imp:duels-lost="0"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless=""
+                                                imp:duels-won-ground="0"
+                                                imp:duels-lost-ground="0"
+                                                imp:passes="0"
+                                                imp:passes-completed="0"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless=""
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="0"
+                                           fouls-suffered="0"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <player>
+                <player-metadata player-key="93003"
+                                 date-of-birth="20070704T000000+0200"
+                                 height="185"
+                                 weight="77"
+                                 nationality="Deutschland"
+                                 imp:nationality-en="Germany"
+                                 imp:nationality-key="1"
+                                 uniform-number="37"
+                                 position-regular="defenseman">
+                        <name first="Ben" 
+                              last="Nink" 
+                              full="Ben Nink" 
+                              nickname="B. Nink"
+                              imp:extensive="Ben Nink"/>
+                        <career-phase start-date="20200701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                </player-metadata>
+                <player-stats date-coverage-type="career" 
+                              events-played="0"
+                              score="0" events-won="0"/>
+                <player-stats date-coverage-type="career-team" 
+                              events-played="0"
+                              score="0" />
+                <player-stats date-coverage-type="season-full" 
+                              events-played="0"
+                              imp:substitutions-in="0"
+                              imp:substitutions-out="0"
+                              time-played-total="0"
+                              score="0"
+			      events-won="0"
+			      events-bench-only="2">
+                    <player-stats-soccer imp:balls-touched="0"
+                                         imp:tracking-distance=""
+                                         imp:tracking-sprints=""
+                                         imp:tracking-sprints-distance=""
+                                         imp:tracking-fast-runs=""
+                                         imp:tracking-fast-runs-distance=""
+                                         >
+                        <stats-soccer-offensive assists-total="0"
+                                                shots-total="0"
+                                                points="0"
+                                                shots-penalty-shot-taken="0"
+                                                shots-penalty-shot-scored="0"
+                                                imp:score-attempts-participation="0"
+                                                imp:duels-won="0"
+                                                imp:duels-lost="0"
+                                                imp:duels-won-percentage=""
+						imp:duels-won-percentage-limitless=""
+                                                imp:duels-won-ground="0"
+                                                imp:duels-lost-ground="0"
+                                                imp:passes="0"
+                                                imp:passes-completed="0"
+                                                imp:passes-completions-percentage=""
+						imp:passes-completions-percentage-limitless=""
+                                                imp:crosses="0"
+                                                imp:crosses-completed="0"
+                                                imp:goals-left-leg="0"
+                                                imp:goals-right-leg="0"
+                                                imp:goals-head="0"
+                                                imp:goals-other="0"
+                                                imp:own-goal="0"
+                                                imp:shots-left-leg="0"
+                                                imp:shots-right-leg="0"
+                                                imp:shots-head="0"
+                                                imp:shots-other="0"
+                                                imp:dfl-assists-total="0"
+                                                />
+                        <stats-soccer-foul fouls-commited="0"
+                                           fouls-suffered="0"
+                                           imp:red-card-ejections="0"
+                                           imp:yellow-red-card-ejections="0"
+                                           imp:yellow-cards="0"/>
+                    </player-stats-soccer>
+                </player-stats>
+            </player>
+            <associate>
+                <associate-metadata associate-key="24358"
+                                    date-of-birth="19800423T000000+0200"
+                                    height="192"
+                                    weight="0"
+                                    nationality="Deutschland"
+				    imp:nationality-en="Germany"
+                                    imp:nationality-key="1"
+                                    position-regular="coach">
+                        <name first="Nils" 
+                              last="D&#xF6;ring" 
+                              full="Nils D&#xF6;ring" 
+                              nickname="N. D&#xF6;ring"
+                              imp:extensive="Nils D&#xF6;ring"/>
+                        <career-phase start-date="20240428T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                </associate-metadata>
+            </associate>
+            <associate>
+                <associate-metadata associate-key="24675"
+                                    date-of-birth="19790522T000000+0100"
+                                    height="186"
+                                    weight="0"
+                                    nationality="Deutschland"
+                                    imp:nationality-en="Germany"
+                                    imp:nationality-key="1"
+                                    position-regular="assistant-coach">
+                        <name first="Marjan" 
+                              last="Petkovic" 
+                              full="Marjan Petkovic" 
+                              nickname="M. Petkovic"
+                              imp:extensive="Marjan Petkovic"/>
+                </associate-metadata>
+            </associate>
+            <associate>
+                <associate-metadata associate-key="27756"
+                                    date-of-birth="19811221T000000+0100"
+                                    height="180"
+                                    weight="79"
+                                    nationality="Deutschland"
+                                    imp:nationality-en="Germany"
+                                    imp:nationality-key="1"
+                                    position-regular="assistant-coach">
+                        <name first="Alf" 
+                              last="Mintzel" 
+                              full="Alf Mintzel" 
+                              nickname="A. Mintzel"
+                              imp:extensive="Alf Mintzel"/>
+                        <career-phase start-date="20240430T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                </associate-metadata>
+            </associate>
+            <associate>
+                <associate-metadata associate-key="52108"
+                                    date-of-birth="19910312T000000+0100"
+                                    height="184"
+                                    weight=""
+                                    nationality="Argentinien"
+                                    imp:nationality-en="Argentina"
+                                    imp:nationality-key="44"
+                                    imp:native-country="Italien"
+                                    imp:native-country-en="Italy"
+                                    imp:native-country-key="2"
+                                    position-regular="assistant-coach">
+                        <name first="Giuliano" 
+                              last="Modica" 
+                              full="Giuliano Modica" 
+                              nickname="G. Modica"
+                              imp:extensive="G. Franco Modica Malagnini"/>
+                        <career-phase start-date="20220701T000000+0200" 
+                                      name="SV Wehen Wiesbaden"
+                                      imp:team-nickname="Wiesbaden"
+                                      imp:team-key="1103" />
+                </associate-metadata>
+            </associate>
+        </team>
+    </statistic>
+</sports-content>
+
