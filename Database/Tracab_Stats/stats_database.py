@@ -19,6 +19,8 @@ import sqlite3 as sql
 import matplotlib.pyplot as plt
 from plottable import ColumnDefinition, Table
 from plottable.plots import image
+from TracabModules.Internal.tracab_output import get_observed_stats
+from TracabModules.Internal.gamelog_functions import get_gamelog_info
 
 """
 Club Mappings
@@ -47,27 +49,27 @@ club_mapping = pd.DataFrame([{
 ]).sort_values(by='TeamId', ascending=True)
 
 # Club Mapping BL1
-team_info_path = r'C:\Users\alexa\Desktop\teams_bl1'
+team_info_path = r'C:\Users\a.banning\PycharmProjects\Work_Tracab\TeamInfo\teams_bl1'
 team_info_files = os.listdir(team_info_path)
 
 club_mapping_bl1 = []
 for file in team_info_files:
-    xml_doc_gamelog = parse(f'{team_info_path}\\{file}')
-    team_id = int(xml_doc_gamelog.getElementsByTagName('team-metadata')[0].attributes['team-key'].value)
-    team_name = str(xml_doc_gamelog.getElementsByTagName('team-metadata')[0].childNodes[1].attributes['full'].value)
+    xml_doc_info = parse(f'{team_info_path}\\{file}')
+    team_id = int(xml_doc_info.getElementsByTagName('team-metadata')[0].attributes['team-key'].value)
+    team_name = str(xml_doc_info.getElementsByTagName('team-metadata')[0].childNodes[1].attributes['full'].value)
     club_mapping_bl1.append({'TeamId': team_id, 'TeamName': team_name})
 
 club_mapping_bl1 = pd.DataFrame(club_mapping_bl1).sort_values(by='TeamId', ascending=True)
 
 # Club Mapping BL2
-team_info_path = r'C:\Users\alexa\Desktop\teams_bl2'
+team_info_path = r'C:\Users\a.banning\PycharmProjects\Work_Tracab\TeamInfo\teams_bl2'
 team_info_files = os.listdir(team_info_path)
 
 club_mapping_bl2 = []
 for file in team_info_files:
-    xml_doc_gamelog = parse(f'{team_info_path}\\{file}')
-    team_id = int(xml_doc_gamelog.getElementsByTagName('team-metadata')[0].attributes['team-key'].value)
-    team_name = str(xml_doc_gamelog.getElementsByTagName('team-metadata')[0].childNodes[1].attributes['full'].value)
+    xml_doc = parse(f'{team_info_path}\\{file}')
+    team_id = int(xml_doc.getElementsByTagName('team-metadata')[0].attributes['team-key'].value)
+    team_name = str(xml_doc.getElementsByTagName('team-metadata')[0].childNodes[1].attributes['full'].value)
     club_mapping_bl2.append({'TeamId': team_id, 'TeamName': team_name})
 
 club_mapping_bl2 = pd.DataFrame(club_mapping_bl2).sort_values(by='TeamId', ascending=True)
@@ -76,11 +78,11 @@ club_mapping_bl2 = pd.DataFrame(club_mapping_bl2).sort_values(by='TeamId', ascen
 Database cunstruction
 """
 # Specify match directory
-bl1_path = r'N:\01_Tracking-Data\Season_23-24\52 - 2.Bundesliga 2_BL'
+bl1_path = r'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL'
 # List all MD folders
 contents = os.listdir(bl1_path)
 
-i = 1
+
 for md in contents:
     print(md)
     match_folders = os.listdir(f'{bl1_path}\\{md}')
@@ -93,61 +95,26 @@ for md in contents:
             continue
         try:
             gamelog = [file for file in os.listdir(os.getcwd()) if 'Gamelog' in file][0]
-            if i == 1:
-                break
         except IndexError:
             print(f'The observed folder of {match} does not contain a gamelog!')
             continue
-        xml_doc_gamelog = parse(gamelog)
-        try:
-            matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
-            season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
-                                                                                        'SeasonId'].childNodes[0].data
-            teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[0:2]
-            home_id = teams[0].attributes['TeamId'].childNodes[0].data
-            away_id = teams[1].attributes['TeamId'].childNodes[0].data
-        except TypeError:
-            matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
-            season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
-                                                                                        'SeasonId'].childNodes[0].data
-            teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[1:4:2]
-            home_id = teams[0].attributes['TeamId'].childNodes[0].data
-            away_id = teams[1].attributes['TeamId'].childNodes[0].data
 
+        gamelog_info = get_gamelog_info(gamelog)
+
+        # Get report statistics
         stats = f'{os.getcwd()}\\Stats\\ReportData.xml'
-        xml_doc_stats = parse(stats)
-        home_tdist = float(
-            xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
-                0]
-        )
-        away_tdist = float(
-            xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
-                0]
-        )
-        home_nsprints = int(
-            xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSprints'].childNodes[0].data
-        )
-        away_nsprints = int(
-            xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSprints'].childNodes[0].data
-        )
-        home_nspeedruns = int(
-            xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
-        )
-        away_nspeedruns = int(
-            xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
-        )
-
-        home_stats = pd.DataFrame(
-            {'Matchday': int(matchday), 'Season': season_id, 'TotalDistance': home_tdist, 'Num. Sprints': home_nsprints,
-             'Num. SpeedRuns': home_nspeedruns}, index=[0])
-        away_stats = pd.DataFrame(
-            {'Matchday': int(matchday), 'Season': season_id, 'TotalDistance': away_tdist, 'Num. Sprints': away_nsprints,
-             'Num. SpeedRuns': away_nspeedruns}, index=[0])
+        home_stats, away_stats = get_observed_stats(stats)
+        home_stats['Matchday'] = int(gamelog_info['Matchday'])
+        home_stats['Season'] = str(gamelog_info['SeasonId'])
+        away_stats['Matchday'] = int(gamelog_info['Matchday'])
+        away_stats['Season'] = str(gamelog_info['SeasonId'])
+        home_stats = home_stats[['Matchday', 'Season', 'TotalDistance', 'Num. Sprints', 'Num. SpeedRuns']]
+        away_stats = away_stats[['Matchday', 'Season', 'TotalDistance', 'Num. Sprints', 'Num. SpeedRuns']]
 
         # Use a single database connection for all teams
-        with sql.connect(r'N:\07_QC\Alex\bl2_stats.db') as conn:
-            home_stats.to_sql(home_id, conn, if_exists='append', index=False)
-            away_stats.to_sql(away_id, conn, if_exists='append', index=False)
+        with sql.connect(r'N:\07_QC\Alex\Databases\bl1_stats.db') as conn:
+            home_stats.to_sql(gamelog_info['HomeId'], conn, if_exists='append', index=False)
+            away_stats.to_sql(gamelog_info['AwayId'], conn, if_exists='append', index=False)
 
 """
 Construction of league-wide stats overviews 
@@ -159,7 +126,7 @@ VALID_LEAGUES = {'bl1', 'bl2', 'mls'}
 def calculate_avg_stats(team_id, league):
     if league not in VALID_LEAGUES:
         raise ValueError("results: league must be one of %r." % VALID_LEAGUES)
-    with sql.connect(f'C:\\Users\\alexa\\Desktop\\Tracab_Databases\\{league}_stats.db') as conn:
+    with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
         query = f"SELECT * FROM '{team_id}'"
         team_stats = pd.read_sql_query(query, conn)
         avg_distance = team_stats['TotalDistance'].mean()
@@ -173,8 +140,8 @@ def calculate_avg_stats(team_id, league):
 
 
 league_stats = pd.DataFrame(columns=['TeamId', 'TeamName', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns'])
-for team in club_mapping.iterrows():
-    average_stats = pd.DataFrame(calculate_avg_stats(team_id=team[1]['TeamId'], league='mls'), index=[0])
+for team in club_mapping_bl1.iterrows():
+    average_stats = pd.DataFrame(calculate_avg_stats(team_id=team[1]['TeamId'], league='bl1'), index=[0])
     average_stats['TeamName'] = team[1]['TeamName']
     league_stats = pd.concat([league_stats, average_stats])
 with sql.connect(r'N:\07_QC\Alex\mls_stats.db') as conn:
@@ -183,8 +150,8 @@ with sql.connect(r'N:\07_QC\Alex\mls_stats.db') as conn:
 """
 Get League Stats to create printable tables
 """
-with sql.connect(r'N:\07_QC\Alex\avg_league_stats.db') as conn:
-    league = 'bl1'
+league = 'bl1'
+with sql.connect(f'N:\\07_QC\\Alex\\{league}_stats.db') as conn:
     query = f"SELECT * FROM '{league}_stats'"
     team_stats = pd.read_sql_query(query, conn)
     # team_stats['Total Distance'] = np.round(team_stats['Total Distance'] / 1000,2)

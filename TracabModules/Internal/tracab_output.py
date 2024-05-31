@@ -1,5 +1,5 @@
 import pandas as pd
-
+from xml.dom.minidom import parse
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "PlayTime (min)", "Distance (m)", "Distance/min",
@@ -74,3 +74,42 @@ def write_excel(dfl_df, epl_df, match_info, obs):
 
     # Close the Pandas Excel writer and output the Excel file.
     writer.close()
+
+
+def get_observed_stats(report):
+    """
+
+    :param report:
+    :return:
+
+    """
+    xml_doc_stats = parse(report)
+    home_tdist = float(
+        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
+            0]
+    )
+    away_tdist = float(
+        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
+            0]
+    )
+    home_nsprints = int(
+        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSprints'].childNodes[0].data
+    )
+    away_nsprints = int(
+        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSprints'].childNodes[0].data
+    )
+    home_nspeedruns = int(
+        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
+    )
+    away_nspeedruns = int(
+        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
+    )
+
+    home_stats = pd.DataFrame(
+        {'TotalDistance': home_tdist, 'Num. Sprints': home_nsprints,
+         'Num. SpeedRuns': home_nspeedruns}, index=[0])
+    away_stats = pd.DataFrame(
+        {'TotalDistance': away_tdist, 'Num. Sprints': away_nsprints,
+         'Num. SpeedRuns': away_nspeedruns}, index=[0])
+
+    return home_stats, away_stats

@@ -64,3 +64,27 @@ def get_match_info(gamelog):
                 x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
     away_name = [x for x in teams if
                 x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
+
+
+def get_gamelog_info(gamelog):
+    """
+    Get all necessary information of interest out of a Tracab gamelog.
+
+    """
+    xml_doc_gamelog = parse(gamelog)
+    try:
+        matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
+        season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
+                                                                                    'SeasonId'].childNodes[0].data
+        teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[0:2]
+        home_id = teams[0].attributes['TeamId'].childNodes[0].data
+        away_id = teams[1].attributes['TeamId'].childNodes[0].data
+    except TypeError:
+        matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
+        season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
+                                                                                    'SeasonId'].childNodes[0].data
+        teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[1:4:2]
+        home_id = teams[0].attributes['TeamId'].childNodes[0].data
+        away_id = teams[1].attributes['TeamId'].childNodes[0].data
+
+    return {'Matchday': matchday, 'SeasonId': season_id, 'HomeId': home_id, 'AwayId': away_id}
