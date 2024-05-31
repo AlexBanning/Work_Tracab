@@ -1,5 +1,6 @@
 import pandas as pd
 from xml.dom.minidom import parse
+from pathlib import Path
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "PlayTime (min)", "Distance (m)", "Distance/min",
@@ -83,33 +84,22 @@ def get_observed_stats(report):
     :return:
 
     """
-    xml_doc_stats = parse(report)
-    home_tdist = float(
-        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
-            0]
-    )
-    away_tdist = float(
-        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalDistance'].childNodes[0].data.split(' ')[
-            0]
-    )
-    home_nsprints = int(
-        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSprints'].childNodes[0].data
-    )
-    away_nsprints = int(
-        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSprints'].childNodes[0].data
-    )
-    home_nspeedruns = int(
-        xml_doc_stats.getElementsByTagName('HomeTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
-    )
-    away_nspeedruns = int(
-        xml_doc_stats.getElementsByTagName('AwayTeam')[0].attributes['TotalSpeedRuns'].childNodes[0].data
-    )
+    # Ensure report is a Path object
+    report = Path(report)
 
-    home_stats = pd.DataFrame(
-        {'TotalDistance': home_tdist, 'Num. Sprints': home_nsprints,
-         'Num. SpeedRuns': home_nspeedruns}, index=[0])
-    away_stats = pd.DataFrame(
-        {'TotalDistance': away_tdist, 'Num. Sprints': away_nsprints,
-         'Num. SpeedRuns': away_nspeedruns}, index=[0])
+    # Parse the XML document
+    xml_doc_stats = parse(str(report))
+
+    # Helper function to extract statistics
+    def extract_stats(team_tag):
+        team_element = xml_doc_stats.getElementsByTagName(team_tag)[0]
+        total_distance = float(team_element.attributes['TotalDistance'].childNodes[0].data.split(' ')[0])
+        total_sprints = int(team_element.attributes['TotalSprints'].childNodes[0].data)
+        total_speedruns = int(team_element.attributes['TotalSpeedRuns'].childNodes[0].data)
+        return {'TotalDistance': total_distance, 'Num. Sprints': total_sprints, 'Num. SpeedRuns': total_speedruns}
+
+    # Extract stats for home and away teams
+    home_stats = pd.DataFrame([extract_stats('HomeTeam')])
+    away_stats = pd.DataFrame([extract_stats('AwayTeam')])
 
     return home_stats, away_stats

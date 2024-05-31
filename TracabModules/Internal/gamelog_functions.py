@@ -1,5 +1,5 @@
 from xml.dom.minidom import parse
-
+from pathlib import Path
 
 def get_player_name(gamelog, team_id, player_id):
     """
@@ -53,38 +53,56 @@ def get_match_info_bvb(gamelog):
     return dict({'bvb_id': bvb_id, 'bvb_name': bvb_name, 'oppo_id': oppo_id, 'oppo_name': oppo_name,
                  'match_id': match_id, 'md': matchday, 'comp_id': comp_id})
 
-def get_match_info(gamelog):
-    xml_doc = parse(gamelog)
-    teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
-    home_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
-              x.attributes['TeamId'].childNodes[0].data == '18'][0]
-    away_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
-              x.attributes['TeamId'].childNodes[0].data != '18'][0]
-    home_name = [x for x in teams if
-                x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
-    away_name = [x for x in teams if
-                x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
+# def get_match_info(gamelog):
+#     xml_doc = parse(gamelog)
+#     teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
+#     home_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+#               x.attributes['TeamId'].childNodes[0].data == '18'][0]
+#     away_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
+#               x.attributes['TeamId'].childNodes[0].data != '18'][0]
+#     home_name = [x for x in teams if
+#                 x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
+#     away_name = [x for x in teams if
+#                 x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
 
 
 def get_gamelog_info(gamelog):
     """
     Get all necessary information of interest out of a Tracab gamelog.
 
+    Parameters:
+    gamelog (str or Path): Path to the gamelog XML file.
+
+    Returns:
+    dict: A dictionary with matchday, season ID, home team ID, and away team ID.
     """
-    xml_doc_gamelog = parse(gamelog)
+    # Ensure gamelog is a Path object and convert to string for parsing
+    gamelog = Path(gamelog)
+
+    # Parse the XML document
+    xml_doc_gamelog = parse(str(gamelog))
+
+    def get_element_data(tag_name, attribute_name, index=0):
+        try:
+            element = xml_doc_gamelog.getElementsByTagName(tag_name)[index]
+            return element.attributes[attribute_name].value
+        except (IndexError, KeyError, AttributeError):
+            return None
+
+    matchday = get_element_data('TracabData', 'RoundId')
+    season_id = get_element_data('EnvironmentSettings', 'SeasonId')
+
+    # Handling teams data with try-except for different structures
     try:
-        matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
-        season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
-                                                                                    'SeasonId'].childNodes[0].data
         teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[0:2]
         home_id = teams[0].attributes['TeamId'].childNodes[0].data
         away_id = teams[1].attributes['TeamId'].childNodes[0].data
     except TypeError:
-        matchday = xml_doc_gamelog.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
-        season_id = xml_doc_gamelog.getElementsByTagName('EnvironmentSettings')[0].attributes[
-                                                                                    'SeasonId'].childNodes[0].data
-        teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[1:4:2]
-        home_id = teams[0].attributes['TeamId'].childNodes[0].data
-        away_id = teams[1].attributes['TeamId'].childNodes[0].data
+        try:
+            teams = xml_doc_gamelog.getElementsByTagName('Rosters')[0].childNodes[1:4:2]
+            home_id = teams[0].attributes['TeamId'].childNodes[0].data
+            away_id = teams[1].attributes['TeamId'].childNodes[0].data
+        except (IndexError, KeyError, AttributeError):
+            home_id = away_id = None
 
     return {'Matchday': matchday, 'SeasonId': season_id, 'HomeId': home_id, 'AwayId': away_id}
