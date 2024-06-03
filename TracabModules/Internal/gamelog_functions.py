@@ -1,5 +1,4 @@
 from xml.dom.minidom import parse
-from pathlib import Path
 
 def get_player_name(gamelog, team_id, player_id):
     """
@@ -71,13 +70,12 @@ def get_gamelog_info(gamelog):
     Get all necessary information of interest out of a Tracab gamelog.
 
     Parameters:
-    gamelog (str or Path): Path to the gamelog XML file.
+    gamelog (Path): Path to the gamelog XML file.
 
     Returns:
     dict: A dictionary with matchday, season ID, home team ID, and away team ID.
     """
     # Ensure gamelog is a Path object and convert to string for parsing
-    gamelog = Path(gamelog)
 
     # Parse the XML document
     xml_doc_gamelog = parse(str(gamelog))
