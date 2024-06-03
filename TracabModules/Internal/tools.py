@@ -40,7 +40,6 @@ def get_club_id_mapping(team_info_path, league):
     Returns:
     pd.DataFrame: A DataFrame containing the mapping of team IDs to team names.
     """
-    team_info_path = Path(team_info_path)
 
     if league == 'mls':
         team_info_file = [x for x in team_info_path.iterdir()][0]

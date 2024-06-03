@@ -14,3 +14,8 @@ LeagueX.db
 
 team1_stats --Columns: Matchday, Season, Total Distance, Num. Sprints, Num. SpeedRuns
 league_stats --Columns: TeamId, Total Distance, Num. Sprints, Num. SpeedRuns
+
+To update the team stats tables and league_stats table the user should always put in the matchday/matchdays that they want
+to update the tables with. A function that checks whether they are already in the tables and/or if the data is already
+available on the NAS so one can actually perform the update.
+

@@ -84,11 +84,12 @@ def get_observed_stats(report):
     :return:
 
     """
-    # Ensure report is a Path object
-    report = Path(report)
-
-    # Parse the XML document
-    xml_doc_stats = parse(str(report))
+    try:
+        # Parse the XML document
+        xml_doc_stats = parse(str(report))
+    except FileNotFoundError:
+        print(f'The folder {report} does not contain the necessary stats!')
+        return
 
     # Helper function to extract statistics
     def extract_stats(team_tag):
