@@ -29,16 +29,16 @@ club_mapping = get_club_id_mapping(team_info_path, league='bl1')
 Database cunstruction
 """
 # Specify match directory
-bl1_path = r'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL'
+data_path = r'N:\01_Tracking-Data\Season_23-24\52 - 2.Bundesliga 2_BL'
 # List all MD folders
-contents = os.listdir(bl1_path)
+contents = os.listdir(data_path)
 
 
 for md in contents:
     print(md)
-    match_folders = os.listdir(f'{bl1_path}\\{md}')
+    match_folders = os.listdir(f'{data_path}\\{md}')
     for match in match_folders:
-        create_team_stats_table(matchday=md, path=bl1_path, match=match)
+        create_team_stats_table(matchday=md, path=data_path, match=match)
 
 """
 Construction of league-wide stats overviews 
