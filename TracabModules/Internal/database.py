@@ -7,6 +7,7 @@ from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats
 from pathlib import Path
 import sqlite3 as sql
+import logging
 
 
 def create_team_stats_table(league, match_folder):
@@ -15,16 +16,17 @@ def create_team_stats_table(league, match_folder):
     :param league:
     :return:
     """
+    logging.basicConfig(filename='stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
     observed_path = Path(f'{match_folder}\\Observed')
     if not observed_path.exists():
-        print(f'No observed folder exists for {match_folder}!')
+        logging.error(f'No observed folder exists for {match_folder}!')
         return
 
     try:
         gamelog = next(observed_path.glob('*Gamelog*'))
     except StopIteration:
-        print(f'The observed folder of {match_folder} does not contain a gamelog!')
+        logging.error(f'The observed folder of {match_folder} does not contain a gamelog!')
         gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
 
     gamelog_info = get_gamelog_info(gamelog)
@@ -53,16 +55,16 @@ def create_team_stats_table(league, match_folder):
 
                 if result.empty:
                     team_stats.to_sql(team_id, conn, if_exists='append', index=False)
-                    print(
+                    logging.info(
                         f'Tables have been successfully updated for IDs: {gamelog_info["HomeId"]} and {gamelog_info["AwayId"]}')
                 else:
-                    print(
+                    logging.info(
                         f"Record for team {team_id} on Matchday {team_stats['Matchday'].iloc[0]} already exists, "
                         f"skipping.")
 
                 return
     elif not Path(stats).exists():
-        print(f'The folder {stats} does not exist!')
+        logging.error(f'The folder {stats} does not exist!')
         return
 
 

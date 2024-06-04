@@ -30,23 +30,30 @@ Database cunstruction
 data_path = Path(r'N:\01_Tracking-Data\Season_23-24\1 - MLS')
 # List all MD folders
 
-selected_matchday = input('Please insert the matchday to update the database with or the whole season\n'
-                          '1: MD1\n'
-                          'x: MDx\n'
-                          'Season: Whole season\n')
+choice = input('Update whole season or only certain MDs? \n'
+               '- season \n'
+               '1 MD1 \n'
+               '2 MD2 \n'
+               '... \n')
 
-for md in data_path.iterdir():
-    if selected_matchday != 'Season':
-        if md.is_dir() and 'MD' in md.name and md.name.endswith(f'MD{selected_matchday}'):
-            print(md)
-            match_path = Path(f'{md}')
-            for match in match_path.iterdir():
+# Create drop-down list from which the user can choose which matchday to update. Only those for which NAS-Folders
+# already have been created, as this is a condition to be able to update the DB anyway.
+# Users choice should be based on the existing_md_list
+
+existing_md_list =[p.name for p in data_path.iterdir() if p.is_dir() and 'MD' in p.name]
+
+if choice == '-':
+    data_path = Path(r'N:\01_Tracking-Data\Season_23-24\1 - MLS')
+    for md in data_path.iterdir():
+        if md.is_dir() and 'MD' in md.name:
+            for match in md.iterdir():
+                print(match)
                 create_team_stats_table(league='mls', match_folder=match)
-    elif md.is_dir() and 'MD' in md.name:
-        print(md)
-        match_path = Path(f'{md}')
-        for match in match_path.iterdir():
-            create_team_stats_table(league='mls', match_folder=match)
+else:
+    data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\1 - MLS\MD{choice}')
+    for match in data_path.iterdir():
+        print(match)
+        create_team_stats_table(league='mls', match_folder=match)
 
 """
 Construction of league-wide stats overviews 
@@ -63,9 +70,9 @@ print_stats_table(league='mls', kpi='Num. SpeedRuns', season=2024,
 """
 Get stats from a team
 """
-league = 'mls'
-season = 2024
-team_id = 10
+league = 'bl1'
+season = 2023
+team_id = 16
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM '{team_id}' WHERE Season = {season}"
     team_stats = pd.read_sql_query(query, conn)
