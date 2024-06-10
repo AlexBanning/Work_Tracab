@@ -40,8 +40,8 @@ def create_team_stats_table(league, match_folder):
         home_stats['Season'] = str(gamelog_info['SeasonId'])
         away_stats['Matchday'] = int(gamelog_info['Matchday'])
         away_stats['Season'] = str(gamelog_info['SeasonId'])
-        home_stats = home_stats[['Matchday', 'Season', 'TotalDistance', 'Num. Sprints', 'Num. SpeedRuns']]
-        away_stats = away_stats[['Matchday', 'Season', 'TotalDistance', 'Num. Sprints', 'Num. SpeedRuns']]
+        home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+        away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
 
         with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
             for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
@@ -78,9 +78,9 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
             query = f"SELECT * FROM '{team_id}' WHERE Season = {season}"
             try:
                 team_stats = pd.read_sql_query(query, conn)
-                avg_distance = team_stats['TotalDistance'].mean()
-                avg_num_sprints = team_stats['Num. Sprints'].mean()
-                avg_num_speedruns = team_stats['Num. SpeedRuns'].mean()
+                avg_distance = team_stats['Total Distance'].mean().round(2)
+                avg_num_sprints = team_stats['Num. Sprints'].mean().round(2)
+                avg_num_speedruns = team_stats['Num. SpeedRuns'].mean().round(2)
             except sql.DatabaseError as e:
                 print(f"Error accessing stats for team {team_id}: {e}")
                 return None
@@ -179,3 +179,5 @@ def print_stats_table(league, season, kpi, logo_path):
     plt.close(fig)
 
     print(f'The table for {kpi} in the {league} has been created and saved here: {output_path}')
+
+

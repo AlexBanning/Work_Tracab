@@ -1,5 +1,6 @@
 from xml.dom.minidom import parse
 
+
 def get_player_name(gamelog, team_id, player_id):
     """
     This function aims to return the players name (in a specific format) from the gamelog
@@ -16,13 +17,15 @@ def get_player_name(gamelog, team_id, player_id):
         String that contains the player's name in the format 'Lastname, Firstname'
     """
 
-    xml_doc = parse(gamelog)
+    xml_doc = parse(str(gamelog))
     teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
     team = [x for x in teams if x.attributes['TeamId'].childNodes[0].data == team_id][0]
     players = team.childNodes
-    player_name = [f'{x.getElementsByTagName('LastName')[0].firstChild.data}, {
-    x.getElementsByTagName('FirstName')[0].firstChild.data}' for x in players if
-                   x.getElementsByTagName('PlId')[0].firstChild.data == player_id][0]
+    player_name = [
+        f'{f'{x.getElementsByTagName("FirstName")[0].firstChild.data[0:1]}. ' if x.getElementsByTagName("FirstName") and x.getElementsByTagName("FirstName")[0].firstChild else ""}{
+        x.getElementsByTagName("LastName")[0].firstChild.data if x.getElementsByTagName("LastName") and x.getElementsByTagName("LastName")[0].firstChild else ""}'
+        for x in players if x.getElementsByTagName("PlId")[0].firstChild.data == player_id
+    ][0]
 
     return player_name
 
@@ -39,11 +42,11 @@ def get_match_info_bvb(gamelog):
     bvb_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
               x.attributes['TeamId'].childNodes[0].data == '18'][0]
     oppo_id = [x.attributes['TeamId'].childNodes[0].data for x in teams if
-              x.attributes['TeamId'].childNodes[0].data != '18'][0]
+               x.attributes['TeamId'].childNodes[0].data != '18'][0]
     bvb_name = [x for x in teams if
                 x.attributes['TeamId'].childNodes[0].data == bvb_id][0].attributes['Name'].childNodes[0].data
     oppo_name = [x for x in teams if
-                x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
+                 x.attributes['TeamId'].childNodes[0].data == oppo_id][0].attributes['Name'].childNodes[0].data
 
     match_id = xml_doc.getElementsByTagName('TracabData')[0].attributes['GameId'].childNodes[0].data
     matchday = xml_doc.getElementsByTagName('TracabData')[0].attributes['RoundId'].childNodes[0].data
@@ -51,6 +54,7 @@ def get_match_info_bvb(gamelog):
 
     return dict({'bvb_id': bvb_id, 'bvb_name': bvb_name, 'oppo_id': oppo_id, 'oppo_name': oppo_name,
                  'match_id': match_id, 'md': matchday, 'comp_id': comp_id})
+
 
 # def get_match_info(gamelog):
 #     xml_doc = parse(gamelog)
@@ -89,6 +93,7 @@ def get_gamelog_info(gamelog):
 
     matchday = get_element_data('TracabData', 'RoundId')
     season_id = get_element_data('EnvironmentSettings', 'SeasonId')
+    match_id = get_element_data('TracabData', 'GameId')
 
     # Handling teams data with try-except for different structures
     try:
@@ -103,4 +108,4 @@ def get_gamelog_info(gamelog):
         except (IndexError, KeyError, AttributeError):
             home_id = away_id = None
 
-    return {'Matchday': matchday, 'SeasonId': season_id, 'HomeId': home_id, 'AwayId': away_id}
+    return {'Matchday': matchday, 'SeasonId': season_id, 'MatchId': match_id, 'HomeId': home_id, 'AwayId': away_id}
