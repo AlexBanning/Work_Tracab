@@ -18,9 +18,10 @@ def get_player_name(gamelog, team_id, player_id):
     """
 
     xml_doc = parse(str(gamelog))
-    teams = xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:2]
+    teams = [x for x in xml_doc.getElementsByTagName('Rosters')[0].childNodes[0:4] if x.localName == 'HomeTeam' or
+             x.localName == 'AwayTeam']
     team = [x for x in teams if x.attributes['TeamId'].childNodes[0].data == team_id][0]
-    players = team.childNodes
+    players = [x for x in team.childNodes if x.localName == 'Player']
     player_name = [
         f'{f'{x.getElementsByTagName("FirstName")[0].firstChild.data[0:1]}. ' if x.getElementsByTagName("FirstName") and x.getElementsByTagName("FirstName")[0].firstChild else ""}{
         x.getElementsByTagName("LastName")[0].firstChild.data if x.getElementsByTagName("LastName") and x.getElementsByTagName("LastName")[0].firstChild else ""}'

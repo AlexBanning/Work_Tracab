@@ -46,6 +46,9 @@ def get_club_id_mapping(team_info_path, league):
         return get_mls_club_mapping(team_info_file)
     elif league in {'bl1', 'bl2'}:
         return get_bl_club_mapping(team_info_path)
+    elif league == 'eredivisie':
+        team_info_file = [x for x in team_info_path.iterdir()][0]
+        return get_ere_club_mapping(team_info_file)
     else:
         raise ValueError(f"Unsupported league: {league}")
 
@@ -102,3 +105,18 @@ def get_bl_club_mapping(team_info_dir):
     except Exception as e:
         print(f"Error processing Bundesliga team info files: {e}")
         return pd.DataFrame()
+
+
+def get_ere_club_mapping(team_info_file):
+    # Open team info
+    with open(team_info_file,
+              encoding='utf8') as fp:
+        team_data = BeautifulSoup(fp, 'xml')
+
+    club_data = team_data.find_all('Team')
+    club_mapping = pd.DataFrame([{
+        'TeamId': int(x['uID'][1:]),
+        'TeamName': str(x.find('Name').text)
+    } for x in club_data]).sort_values(by='TeamId', ascending=True).drop_duplicates()
+
+    return club_mapping

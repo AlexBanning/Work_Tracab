@@ -4,10 +4,28 @@ from matplotlib import pyplot as plt
 from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
-from TracabModules.Internal.tracab_output import get_observed_stats
+from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
 from pathlib import Path
 import sqlite3 as sql
 import logging
+
+def check_data_exists(db_path, team_ids, matchday, season):
+    data_exists = True
+    with sql.connect(db_path) as conn:
+        for team_id in team_ids:
+            query = f"""
+                    SELECT 1 
+                    FROM '{team_id}' 
+                    WHERE Matchday = {matchday} 
+                    AND Season = '{season}'
+                    """
+            result = pd.read_sql_query(query, conn)
+            if result.empty:
+                data_exists = False  # If any team_id does not have the record, return False
+            else:
+                print(f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
+    return data_exists
+
 
 
 def create_team_stats_table(league, match_folder):
@@ -18,58 +36,120 @@ def create_team_stats_table(league, match_folder):
     """
     logging.basicConfig(filename='stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
-    observed_path = Path(f'{match_folder}\\Observed')
+    db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
+
+    if league == 'eredivisie':
+        observed_path = match_folder / 'Validated'
+    else:
+        observed_path = match_folder / 'Observed'
     if not observed_path.exists():
-        logging.error(f'No observed folder exists for {match_folder}!')
+        print(f'No observed folder exists for {match_folder}!')
         return
 
     try:
         gamelog = next(observed_path.glob('*Gamelog*'))
     except StopIteration:
-        logging.error(f'The observed folder of {match_folder} does not contain a gamelog!')
+        print(f'The observed folder of {match_folder} does not contain a gamelog!')
         gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
 
-    gamelog_info = get_gamelog_info(gamelog)
+    gamelog_info = get_gamelog_info(str(gamelog))
+    gamelog_info['Gamelog'] = str(gamelog)
 
-    # Get report statistics
-    stats = f'{observed_path}\\Stats\\ReportData.xml'
-    if Path(stats).exists():
-        home_stats, away_stats = get_observed_stats(stats)
-
-        home_stats['Matchday'] = int(gamelog_info['Matchday'])
-        home_stats['Season'] = str(gamelog_info['SeasonId'])
-        away_stats['Matchday'] = int(gamelog_info['Matchday'])
-        away_stats['Season'] = str(gamelog_info['SeasonId'])
-        home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
-        away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
-
-        with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
-            for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
-                # Check if the record already exists
-                query = f"""
-                SELECT 1 FROM '{team_id}' 
-                WHERE Matchday = {team_stats['Matchday'].iloc[0]} 
-                AND Season = '{team_stats['Season'].iloc[0]}'
-                """
-                result = pd.read_sql_query(query, conn)
-
-                if result.empty:
-                    team_stats.to_sql(team_id, conn, if_exists='append', index=False)
-                    logging.info(
-                        f'Tables have been successfully updated for IDs: {gamelog_info["HomeId"]} and {gamelog_info["AwayId"]}')
-                else:
-                    logging.info(
-                        f"Record for team {team_id} on Matchday {team_stats['Matchday'].iloc[0]} already exists, "
-                        f"skipping.")
-
-                return
-    elif not Path(stats).exists():
-        logging.error(f'The folder {stats} does not exist!')
+    team_ids = [gamelog_info['HomeId'], gamelog_info['AwayId']]
+    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
         return
+
+    if not (league == 'eredivisie' or league == 'ekstraklasa'):
+        # Get report statistics
+        stats = f'{observed_path}\\Stats\\ReportData.xml'
+        if Path(stats).exists():
+            home_stats, away_stats = get_observed_stats(stats)
+
+            home_stats['Matchday'] = int(gamelog_info['Matchday'])
+            home_stats['Season'] = str(gamelog_info['SeasonId'])
+            away_stats['Matchday'] = int(gamelog_info['Matchday'])
+            away_stats['Season'] = str(gamelog_info['SeasonId'])
+            print(home_stats)
+            print(away_stats)
+            home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+            away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+
+            with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+                for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
+                    # Check if the record already exists
+                    query = f"""
+                    SELECT 1 FROM '{team_id}' 
+                    WHERE Matchday = {team_stats['Matchday'].iloc[0]} 
+                    AND Season = '{team_stats['Season'].iloc[0]}'
+                    """
+                    result = pd.read_sql_query(query, conn)
+
+                    if result.empty:
+                        team_stats.to_sql(team_id, conn, if_exists='append', index=False)
+                        logging.info(
+                            f'Tables have been successfully updated for IDs: {gamelog_info["HomeId"]} and {gamelog_info["AwayId"]}')
+                    else:
+                        logging.info(
+                            f"Record for team {team_id} on Matchday {team_stats['Matchday'].iloc[0]} already exists, "
+                            f"skipping.")
+
+                    return
+        elif not Path(stats).exists():
+            logging.error(f'The folder {stats} does not exist!')
+            return
+
+    elif league == 'eredivisie' or league == 'ekstraklasa':
+        if league == 'ekstraklasa':
+            stats = observed_path / f'Webmonitor/Game_{gamelog_info["MatchId"]}_4/Observed/Team/Player'
+        else:
+            stats = observed_path / f'Observed/Webmonitor/Game_{gamelog_info["MatchId"]}_4/Observed/Team/Player'
+        if Path(stats).exists():
+            home_stats, away_stats = get_validated_stats(filepath=stats, gamelog_info=gamelog_info)
+            if home_stats.empty and away_stats.empty:
+                logging.error(f"No valid player data found for {match_folder}")
+                return
+            home_stats['Matchday'] = int(gamelog_info['Matchday'])
+            home_stats['Season'] = str(gamelog_info['SeasonId'])
+            away_stats['Matchday'] = int(gamelog_info['Matchday'])
+            away_stats['Season'] = str(gamelog_info['SeasonId'])
+            home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+            away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+
+            with sql.connect(db_path) as conn:
+                for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
+                    if team_stats.empty:
+                        print(f'Stats of {team_id} are empty.')
+                        continue
+
+                    # # Check if the table exists
+                    table_exists_query = f"""
+                            SELECT name
+                            FROM sqlite_master
+                            WHERE type='table' AND name='{team_id}'
+                            """
+                    table_exists = pd.read_sql_query(table_exists_query, conn)
+#
+                    if table_exists.empty:
+                        # If table does not exist, create it and insert the data
+                        team_stats.to_sql(team_id, conn, if_exists='replace', index=False)
+                        print(
+                            f"Table '{team_id}' created and data inserted for Matchday {team_stats['Matchday'].iloc[0]} and Season {team_stats['Season'].iloc[0]}"
+                        )
+                        continue
+
+                    team_stats.to_sql(team_id, conn, if_exists='append', index=False)
+                    print(
+                        f'Tables have been successfully updated for team {team_id} on Matchday {team_stats["Matchday"].iloc[0]} and Season {team_stats["Season"].iloc[0]}'
+                    )
+                    return
+
+        elif not Path(stats).exists():
+            logging.error(f'The folder {stats} does not exist!')
+            return
 
 
 def create_avg_stats_table(club_mapping, league, season, db_update=True, data=False):
-    valid_leagues = {'bl1', 'bl2', 'mls'}
+    valid_leagues = {'bl1', 'bl2', 'mls', 'eredivisie'}
 
     def calculate_avg_stats(team_id, league, season):
         if league not in valid_leagues:

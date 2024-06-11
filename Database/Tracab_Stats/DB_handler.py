@@ -4,8 +4,6 @@ from pathlib import Path
 from TracabModules.Internal.database import create_team_stats_table, print_stats_table, create_avg_stats_table
 from TracabModules.Internal.tools import get_club_id_mapping
 import logging
-import sqlite3 as sql
-import pandas as pd
 
 
 class StatsApp(tk.Tk):
@@ -38,7 +36,7 @@ class StatsApp(tk.Tk):
         # League selection
         tk.Label(self, text="Select League:").pack(pady=5)
         self.league = tk.StringVar()
-        ttk.Combobox(self, textvariable=self.league, values=["mls", 'bl1', 'bl2']).pack(pady=5)
+        ttk.Combobox(self, textvariable=self.league, values=["mls", 'bl1', 'bl2', 'eredivisie']).pack(pady=5)
 
         # Matchday selection
         tk.Label(self, text="Select Matchday:").pack(pady=5)
@@ -68,7 +66,6 @@ class StatsApp(tk.Tk):
         # Toggle Logging Window button
         tk.Button(self, text="Toggle Logging Window", command=self.toggle_logging_window).pack(pady=5)
 
-
     def load_matchdays(self, league):
         if league == 'mls':
             data_path = Path(r'N:\01_Tracking-Data\Season_23-24\1 - MLS')
@@ -76,6 +73,11 @@ class StatsApp(tk.Tk):
             data_path = Path(r'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
         elif league == 'bl2':
             data_path = Path(r'N:\01_Tracking-Data\Season_23-24\52 - 2.Bundesliga 2_BL')
+        elif league == 'eredivisie':
+            data_path = Path(r'N:\01_Tracking-Data\Season_23-24\9 - Eredivisie')
+        elif league == 'ekstraklasa':
+            data_path = Path(r'N:\01_Tracking-Data\Season_23-24\55 - Ekstraklasa')
+
         existing_md_list = [p.name for p in data_path.iterdir() if p.is_dir() and 'MD' in p.name]
 
         # Define a custom sorting key function
@@ -98,6 +100,10 @@ class StatsApp(tk.Tk):
                 league = '52 - 2.Bundesliga 2_BL'
             elif league_choice == 'mls':
                 league = '1 - MLS'
+            elif league_choice == 'eredivisie':
+                league = '9 - Eredivisie'
+            elif league_choice == 'eredivisie':
+                league = '55 - Ekstraklasa'
             if choice == '-':
                 data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\{league}')
                 for md in data_path.iterdir():
@@ -119,7 +125,7 @@ class StatsApp(tk.Tk):
         league = self.league.get()
         season = self.season.get()
         if league:
-            team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\MLS')
+            team_info_path = Path(fr'N:\07_QC\Alex\Databases\Team_Infos\{league.upper()}')
             club_mapping = get_club_id_mapping(team_info_path, league=league)
             create_avg_stats_table(club_mapping, league=league, season=season, db_update=True, data=True)
             messagebox.showinfo("Success", "League stats generated successfully!")
