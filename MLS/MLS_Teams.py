@@ -20,7 +20,11 @@ LeaguesCup = {'New York Red Bulls': 'RBNY', 'Charlotte FC': 'CLT', 'Sporting Kan
               'LA Galaxy': 'LA', 'D.C. United': 'DC', 'CF Montréal': 'MTL', 'Toronto FC': 'TOR',
               'Chicago Fire FC': 'CHI',
               'Minnesota United': 'MIN', 'Austin FC': 'ATX', 'Colorado Rapids': 'COL', 'Portland Timbers': 'POR',
-              'Mexican Dummy': 'MDU'}
+              'Club América': 'CFA', 'Atlas FC': 'ATS', 'Atlético de San Luis': 'ASL', 'CF Monterrey': 'MTY',
+              'Chivas de Guadalajara': 'CDG', 'Cruz Azul': 'CAZ', 'FC Juárez': 'FCJ', 'Club León': 'LEO',
+              'Mazatlán FC': 'MZT', 'Club Necaxa': 'NCX', 'Club Pachuca': 'PAC', 'Club Puebla': 'PUE',
+              'Club Querétaro': 'QRO', 'Club Santos Laguna': 'CSL', 'Club Tigres': 'TIG', 'Club Tijuana': 'CTJ',
+              'Toluca FC': 'TOL', 'Pumas': 'PUM'}
 
 competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehearsals', '6': 'LeaguesCup',
                 '7': 'CampeonesCup'}

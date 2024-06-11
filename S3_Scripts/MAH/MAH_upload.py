@@ -65,9 +65,9 @@ if comp == str(1):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
                + folder_new + '" --recursive')
-elif comp == str(100):
+elif comp == str(6):
     command = ('aws s3 cp "' + filepath_new +
-               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/LeaguesCup/' + md + '/'
                + folder_new + '" --recursive')
 
 print(f'\nExecuting S3 Command: {command}\n')
