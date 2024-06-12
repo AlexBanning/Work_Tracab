@@ -56,15 +56,15 @@ else:
         print(match)
         create_team_stats_table(league='mls', match_folder=match)
 """
-Test for Eredivisie
+Single league update
 """
-data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\9 - Eredivisie')
+data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
         for match in md.iterdir():
             start_time = time.time()
-            create_team_stats_table(league='eredivisie', match_folder=match)
+            create_team_stats_table(league='bl1', match_folder=match)
             print(f"Processed {match} in {time.time() - start_time:.2f} seconds\n")
 
 """
@@ -75,8 +75,8 @@ avg_stats = create_avg_stats_table(club_mapping, league='ekstraklasa', season=20
 """
 Get League Stats to create printable tables
 """
-print_stats_table(league='eredivisie', kpi='Total Distance', season=2023,
-                  logo_path=r'C:\Users\a.banning\PycharmProjects\Work_Tracab\TeamLogos\EREDIVISIE_Logos')
+print_stats_table(league='ekstraklasa', kpi='Num. Sprints', season=2023,
+                  logo_path=r'C:\Users\alexa\PycharmProjects\Work_Tracab\TeamLogos\EKSTRAKLASA_Logos')
 
 """
 Get stats from a team
@@ -87,6 +87,16 @@ team_id = 215
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM '{team_id}' WHERE Season = {season}"
     team_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
+
+"""
+Get stats from a player
+"""
+league = 'bl1'
+season = 2023
+player_id = 49825
+with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+    query = f"SELECT * FROM '{player_id}' WHERE Season = {season}"
+    player_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
 
 """
 Deleting a table

@@ -94,18 +94,45 @@ def get_observed_stats(report):
         return
 
     # Helper function to extract statistics
-    def extract_stats(team_tag):
+    def extract_team_stats(team_tag):
         team_element = xml_doc_stats.getElementsByTagName(team_tag)[0]
         total_distance = float(team_element.attributes['TotalDistance'].childNodes[0].data.split(' ')[0])
         total_sprints = int(team_element.attributes['TotalSprints'].childNodes[0].data)
         total_speedruns = int(team_element.attributes['TotalSpeedRuns'].childNodes[0].data)
-        return {'TotalDistance': total_distance, 'Num. Sprints': total_sprints, 'Num. SpeedRuns': total_speedruns}
+        return {'Total Distance': total_distance, 'Num. Sprints': total_sprints, 'Num. SpeedRuns': total_speedruns}
+
+    def extract_player_stats(team_tag):
+        team_element = xml_doc_stats.getElementsByTagName(team_tag)[0]
+        player_elements = [x for x in team_element.childNodes]
+        shirt_numbers = [x.getAttribute('No') for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
+        total_distances = [float(x.getAttribute('Distance')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
+        high_speeds = [float(x.getAttribute('MaxSpeed')) for x in player_elements if float(x.getAttribute('MaxSpeed')) != 0.00]
+        num_sprints = [float(x.getAttribute('Sprints')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
+        num_speed_runs = [float(x.getAttribute('SpeedRuns')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
+
+        # Create DataFrame using extracted data
+        player_data = {
+            'ShirtNumber': shirt_numbers,
+            'Total Distance': total_distances,
+            'HighSpeed': high_speeds,
+            'Num. Sprints': num_sprints,
+            'Num. SpeedRuns': num_speed_runs
+        }
+
+        player_df = pd.DataFrame(player_data)
+
+        return player_df
 
     # Extract stats for home and away teams
-    home_stats = pd.DataFrame([extract_stats('HomeTeam')])
-    away_stats = pd.DataFrame([extract_stats('AwayTeam')])
+    home_stats = pd.DataFrame([extract_team_stats('HomeTeam')])
+    away_stats = pd.DataFrame([extract_team_stats('AwayTeam')])
 
-    return home_stats, away_stats
+    # Extract stats for home and away players
+    home_player_stats = extract_player_stats('HomeTeam')
+    away_player_stats = extract_player_stats('AwayTeam')
+
+    return ({'HomeStats': home_stats, 'AwayStats': away_stats},
+            {'HomePlayerStats': home_player_stats, 'AwayPlayerStats': away_player_stats})
 
 
 def get_validated_stats(filepath, gamelog_info):

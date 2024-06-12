@@ -110,6 +110,29 @@ def get_bl_club_mapping(team_info_dir):
         return pd.DataFrame()
 
 
+def get_bl_player_mapping(team_info_file):
+    """
+    Create a ShirtNumber-ObjectID mapping for Bundesliga teams from an XML file.
+
+    Parameters:
+    team_info_file (Path): The path to the file containing team information.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing the mapping of team IDs to team names.
+    """
+    xml_doc = parse(str(team_info_file))
+
+    player_elements = xml_doc.getElementsByTagName('player')
+    player_id = [x.childNodes[1].getAttribute('player-key') for x in player_elements]
+    shirt_number = [x.childNodes[1].getAttribute('uniform-number') for x in player_elements]
+    name = [x.childNodes[1].childNodes[1].getAttribute('nickname') for x in player_elements]
+
+    player_mapping = {shirt: {'ID': pid, 'Name': nm} for shirt, pid, nm in zip(shirt_number, player_id, name)}
+
+
+    return player_mapping
+
+
 def get_ere_club_mapping(team_info_file):
     # Open team info
     with open(team_info_file,

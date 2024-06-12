@@ -6,25 +6,30 @@ from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
+from TracabModules.Internal.tools import get_bl_player_mapping
 from pathlib import Path
 import sqlite3 as sql
 import logging
 
-def check_data_exists(db_path, team_ids, matchday, season):
+"""
+Add some logic to check if player AND team data already exists so if yes, the create_team_stats_table function 
+simply skips to next match.
+"""
+def check_data_exists(conn, team_id, matchday, season):
     data_exists = True
-    with sql.connect(db_path) as conn:
-        for team_id in team_ids:
-            query = f"""
-                    SELECT 1 
-                    FROM '{team_id}' 
-                    WHERE Matchday = {matchday} 
-                    AND Season = '{season}'
-                    """
-            result = pd.read_sql_query(query, conn)
-            if result.empty:
-                data_exists = False  # If any team_id does not have the record, return False
-            else:
-                print(f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
+    try:
+        query = f"""
+                SELECT 1 
+                FROM '{team_id}' 
+                WHERE Matchday = {matchday} 
+                AND Season = '{season}'
+                """
+        result = pd.read_sql_query(query, conn)
+    except pd.errors.DatabaseError:
+        data_exists = False  # If any team_id does not have the record, return False
+    else:
+        print(f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
+
     return data_exists
 
 
@@ -50,50 +55,45 @@ def create_team_stats_table(league, match_folder):
         gamelog = next(observed_path.glob('*Gamelog*'))
     except StopIteration:
         print(f'The observed folder of {match_folder} does not contain a gamelog!')
-        gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
+        try:
+            gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
+        except StopIteration:
+            print(f'The live folder of {match_folder} does not contain a gamelog!')
+            return
 
     gamelog_info = get_gamelog_info(str(gamelog))
     gamelog_info['Gamelog'] = str(gamelog)
-
-    team_ids = [gamelog_info['HomeId'], gamelog_info['AwayId']]
-    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
-        return
 
     if not (league == 'eredivisie' or league == 'ekstraklasa'):
         # Get report statistics
         stats = f'{observed_path}\\Stats\\ReportData.xml'
         if Path(stats).exists():
-            home_stats, away_stats = get_observed_stats(stats)
+            team_stats, player_stats = get_observed_stats(stats)
 
-            home_stats['Matchday'] = int(gamelog_info['Matchday'])
-            home_stats['Season'] = str(gamelog_info['SeasonId'])
-            away_stats['Matchday'] = int(gamelog_info['Matchday'])
-            away_stats['Season'] = str(gamelog_info['SeasonId'])
-            print(home_stats)
-            print(away_stats)
-            home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
-            away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
+            team_stats['HomeStats']['Matchday'] = int(gamelog_info['Matchday'])
+            team_stats['HomeStats']['Season'] = int(gamelog_info['SeasonId'])
+            team_stats['AwayStats']['Matchday'] = int(gamelog_info['Matchday'])
+            team_stats['AwayStats']['Season'] = int(gamelog_info['SeasonId'])
 
-            with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
-                for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
-                    # Check if the record already exists
-                    query = f"""
-                    SELECT 1 FROM '{team_id}' 
-                    WHERE Matchday = {team_stats['Matchday'].iloc[0]} 
-                    AND Season = '{team_stats['Season'].iloc[0]}'
-                    """
-                    result = pd.read_sql_query(query, conn)
+            home_stats = team_stats['HomeStats'][['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                                                          'SpeedRuns']]
+            away_stats = team_stats['AwayStats'][['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                                                          'SpeedRuns']]
+            with sql.connect(db_path) as conn:
+                update_team_stats_table(team_stats=home_stats, team_id=gamelog_info['HomeId'],
+                                        matchday=int(gamelog_info['Matchday']), season=int(gamelog_info['SeasonId']),
+                                        conn=conn)
+                update_team_stats_table(team_stats=away_stats, team_id=gamelog_info['AwayId'],
+                                        matchday=int(gamelog_info['Matchday']), season=int(gamelog_info['SeasonId']),
+                                        conn=conn)
 
-                    if result.empty:
-                        team_stats.to_sql(team_id, conn, if_exists='append', index=False)
-                        logging.info(
-                            f'Tables have been successfully updated for IDs: {gamelog_info["HomeId"]} and {gamelog_info["AwayId"]}')
-                    else:
-                        logging.info(
-                            f"Record for team {team_id} on Matchday {team_stats['Matchday'].iloc[0]} already exists, "
-                            f"skipping.")
+                update_player_stats_tables(league=league, stats_df=player_stats['HomePlayerStats'],
+                                           team_id=gamelog_info['HomeId'], matchday=int(gamelog_info['Matchday']),
+                                           season=int(gamelog_info['SeasonId']), conn=conn)
+                update_player_stats_tables(league=league, stats_df=player_stats['AwayPlayerStats'],
+                                           team_id=gamelog_info['AwayId'], matchday=int(gamelog_info['Matchday']),
+                                           season=int(gamelog_info['SeasonId']), conn=conn)
 
-                    return
         elif not Path(stats).exists():
             logging.error(f'The folder {stats} does not exist!')
             return
@@ -115,33 +115,8 @@ def create_team_stats_table(league, match_folder):
             home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
             away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
 
-            with sql.connect(db_path) as conn:
-                for team_stats, team_id in [(home_stats, gamelog_info['HomeId']), (away_stats, gamelog_info['AwayId'])]:
-                    if team_stats.empty:
-                        print(f'Stats of {team_id} are empty.')
-                        continue
-
-                    # # Check if the table exists
-                    table_exists_query = f"""
-                            SELECT name
-                            FROM sqlite_master
-                            WHERE type='table' AND name='{team_id}'
-                            """
-                    table_exists = pd.read_sql_query(table_exists_query, conn)
-#
-                    if table_exists.empty:
-                        # If table does not exist, create it and insert the data
-                        team_stats.to_sql(team_id, conn, if_exists='replace', index=False)
-                        print(
-                            f"Table '{team_id}' created and data inserted for Matchday {team_stats['Matchday'].iloc[0]} and Season {team_stats['Season'].iloc[0]}"
-                        )
-                        continue
-
-                    team_stats.to_sql(team_id, conn, if_exists='append', index=False)
-                    print(
-                        f'Tables have been successfully updated for team {team_id} on Matchday {team_stats["Matchday"].iloc[0]} and Season {team_stats["Season"].iloc[0]}'
-                    )
-                    return
+            update_team_stats_table(league=league, team_stats=home_stats, team_id=team_ids[0])
+            update_team_stats_table(league=league, team_stats=away_stats, team_id=team_ids[1])
 
         elif not Path(stats).exists():
             logging.error(f'The folder {stats} does not exist!')
@@ -212,7 +187,8 @@ def print_stats_table(league, season, kpi, logo_path):
 
     # Select relevant columns and sort by the specified KPI in descending order
     df_sorted = team_stats[['TeamName', kpi]].sort_values(by=kpi, ascending=False)
-    df_sorted['Rank'] = df_sorted[kpi].rank(method='min', ascending=False).astype(int)
+    df_sorted['Rank'] = df_sorted[kpi].rank(method='min', ascending=False)
+    df_sorted['Rank'] = df_sorted['Rank'].apply(lambda x: int(x) if not pd.isna(x) else x)
 
     # Add paths to team logos
     df_sorted['Logo'] = df_sorted['TeamName'].apply(lambda x: Path(logo_path) / f'{x}.png')
@@ -264,3 +240,73 @@ def print_stats_table(league, season, kpi, logo_path):
     print(f'The table for {kpi} in the {league} has been created and saved here: {output_path}')
 
 
+def update_team_stats_table(team_stats, team_id, matchday, season, conn):
+    """
+    Update the team statistics table in the database for a specific team.
+
+    Args:
+        league (str): The name of the league.
+        team_stats (pd.DataFrame): DataFrame containing team statistics.
+        team_id (str): The ID of the team.
+        gamelog_info (dict): Dictionary containing game log information.
+
+    Returns:
+        None
+    """
+
+    # if check_data_exists(conn, team_id, matchday, season):
+    #     logging.info(
+    #         f"Record for team {team_id} on Matchday {team_stats['Matchday'].iloc[0]} already exists, "
+    #         f"skipping."
+    #     )
+    #     return
+    # else:
+    team_stats.to_sql(team_id, conn, if_exists='append', index=False)
+    logging.info(
+        f'Table has been successfully updated for ID: {team_id}'
+    )
+    return print(f'Table of team {team_id} has been updated for Matchday {team_stats['Matchday'].iloc[0]}.')
+
+
+def update_player_stats_tables(league, stats_df, team_id, matchday, season, conn):
+    """
+
+    :param league:
+    :param stats_df:
+    :param team_id:
+    :param matchday:
+    :param season:
+    :return:
+    """
+    logging.basicConfig(filename='stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+
+    league_id = {'bl1': '51', 'bl2': '52'}.get(league)
+    if not league_id:
+        logging.error(f"Invalid league: {league}")
+        return
+
+    info_path = Path(fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\2023\team_players\team_players_{team_id}.xml')
+    player_mapping = get_bl_player_mapping(info_path)
+
+    for _, row in stats_df.iterrows():
+        try:
+            player_id = player_mapping[row['ShirtNumber']]['ID']
+        except KeyError:
+            print(
+                f'Number {row['ShirtNumber']} is not part of the team (ID: {team_id}) anymore. Please check to '
+                f'update manually.')
+            continue
+        player_stats = pd.DataFrame({
+            'Matchday': matchday,
+            'Season': season,
+            'Total Distance': row['Total Distance'],
+            'High Speed': row['HighSpeed'],
+            'Num. Sprints': row['Num. Sprints'],
+            'Num. SpeedRuns': row['Num. SpeedRuns']
+        }, index=[0])
+
+        # Insert player data
+        player_stats.to_sql(player_id, conn, if_exists='append', index=False)
+        print(f'Data update for player {player_id}')
+    print(
+        f"Players for team {team_id} have been updated for Matchday {matchday} in Season {season}.")
