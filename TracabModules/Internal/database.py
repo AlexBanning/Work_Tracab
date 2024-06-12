@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from pandas.errors import DatabaseError
 from matplotlib import pyplot as plt
 from plottable import ColumnDefinition, Table
 from plottable.plots import image
@@ -25,7 +26,6 @@ def check_data_exists(db_path, team_ids, matchday, season):
             else:
                 print(f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
     return data_exists
-
 
 
 def create_team_stats_table(league, match_folder):
@@ -149,7 +149,7 @@ def create_team_stats_table(league, match_folder):
 
 
 def create_avg_stats_table(club_mapping, league, season, db_update=True, data=False):
-    valid_leagues = {'bl1', 'bl2', 'mls', 'eredivisie'}
+    valid_leagues = {'bl1', 'bl2', 'mls', 'eredivisie', 'ekstraklasa'}
 
     def calculate_avg_stats(team_id, league, season):
         if league not in valid_leagues:
@@ -161,9 +161,12 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
                 avg_distance = team_stats['Total Distance'].mean().round(2)
                 avg_num_sprints = team_stats['Num. Sprints'].mean().round(2)
                 avg_num_speedruns = team_stats['Num. SpeedRuns'].mean().round(2)
-            except sql.DatabaseError as e:
-                print(f"Error accessing stats for team {team_id}: {e}")
-                return None
+            except DatabaseError as e:
+                print(f"No stats available for team {team_id}: {e}")
+                return {'TeamId': team_id,
+                        'Total Distance': np.nan,
+                        'Num. Sprints': np.nan,
+                        'Num. SpeedRuns': np.nan}
 
             return {'TeamId': team_id,
                     'Total Distance': np.round(avg_distance, 2),

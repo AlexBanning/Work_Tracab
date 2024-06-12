@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 from bs4 import BeautifulSoup
 from xml.dom.minidom import parse
-from pathlib import Path
+
 
 
 def is_date_in_current_week(date_str, mls=False):
@@ -49,6 +49,9 @@ def get_club_id_mapping(team_info_path, league):
     elif league == 'eredivisie':
         team_info_file = [x for x in team_info_path.iterdir()][0]
         return get_ere_club_mapping(team_info_file)
+    elif league == 'ekstraklasa':
+        team_info_file =[x for x in team_info_path.iterdir()][0]
+        return get_ekstra_club_mapping(team_info_file)
     else:
         raise ValueError(f"Unsupported league: {league}")
 
@@ -118,5 +121,18 @@ def get_ere_club_mapping(team_info_file):
         'TeamId': int(x['uID'][1:]),
         'TeamName': str(x.find('Name').text)
     } for x in club_data]).sort_values(by='TeamId', ascending=True).drop_duplicates()
+
+    return club_mapping
+
+
+def get_ekstra_club_mapping(team_info_file):
+    with open(team_info_file,
+              encoding='utf8') as fp:
+        team_data = BeautifulSoup(fp, 'xml')
+    club_data = team_data.find_all('team')
+    club_mapping = pd.DataFrame([{
+        'TeamId': int(x['id']),
+        'TeamName': str(x['name'])
+    } for x in club_data]).sort_values(by='TeamId', ascending=True)
 
     return club_mapping

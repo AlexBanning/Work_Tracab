@@ -20,8 +20,8 @@ import time
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\EREDIVISIE')
-club_mapping = get_club_id_mapping(team_info_path, league='eredivisie')
+team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\EKSTRAKLASA')
+club_mapping = get_club_id_mapping(team_info_path, league='ekstraklasa')
 
 """
 Database cunstruction
@@ -70,7 +70,7 @@ for md in data_path.iterdir():
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='eredivisie', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='ekstraklasa', season=2023, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
