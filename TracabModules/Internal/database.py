@@ -6,7 +6,7 @@ from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
-from TracabModules.Internal.tools import get_bl_player_mapping
+from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping
 from pathlib import Path
 import sqlite3 as sql
 import logging
@@ -85,10 +85,12 @@ def create_team_stats_table(league, match_folder):
             team_stats['AwayStats']['Matchday'] = int(gamelog_info['Matchday'])
             team_stats['AwayStats']['Season'] = int(gamelog_info['SeasonId'])
 
-            team_stats['HomeStats'] = team_stats['HomeStats'][['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
-                                                                                                          'SpeedRuns']]
-            team_stats['AwayStats'] = team_stats['AwayStats'][['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
-                                                                                                          'SpeedRuns']]
+            team_stats['HomeStats'] = team_stats['HomeStats'][
+                ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                         'SpeedRuns']]
+            team_stats['AwayStats'] = team_stats['AwayStats'][
+                ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                         'SpeedRuns']]
             with sql.connect(db_path) as conn:
                 update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
                                         conn=conn)
@@ -111,15 +113,21 @@ def create_team_stats_table(league, match_folder):
             if home_stats.empty and away_stats.empty:
                 logging.error(f"No valid player data found for {match_folder}")
                 return
-            home_stats['Matchday'] = int(gamelog_info['Matchday'])
-            home_stats['Season'] = str(gamelog_info['SeasonId'])
-            away_stats['Matchday'] = int(gamelog_info['Matchday'])
-            away_stats['Season'] = str(gamelog_info['SeasonId'])
-            home_stats = home_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
-            away_stats = away_stats[['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. SpeedRuns']]
 
-            update_team_stats_table(league=league, team_stats=home_stats, team_id=team_ids[0])
-            update_team_stats_table(league=league, team_stats=away_stats, team_id=team_ids[1])
+            team_stats['HomeStats']['Matchday'] = int(gamelog_info['Matchday'])
+            team_stats['HomeStats']['Season'] = int(gamelog_info['SeasonId'])
+            team_stats['AwayStats']['Matchday'] = int(gamelog_info['Matchday'])
+            team_stats['AwayStats']['Season'] = int(gamelog_info['SeasonId'])
+
+            team_stats['HomeStats'] = team_stats['HomeStats'][
+                ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                         'SpeedRuns']]
+            team_stats['AwayStats'] = team_stats['AwayStats'][
+                ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
+                                                                         'SpeedRuns']]
+
+            update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
+                                    conn=conn)
 
         elif not Path(stats).exists():
             logging.error(f'The folder {stats} does not exist!')
@@ -306,9 +314,10 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     :param season: Season identifier.
     :param conn: SQLite database connection.
     """
-    logging.basicConfig(filename='stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+    logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
+                        format='%(asctime)s - %(message)s')
 
-    league_id = {'bl1': '51', 'bl2': '52'}.get(league)
+    league_id = {'bl1': '51', 'bl2': '52', 'mls': '8'}.get(league)
     if not league_id:
         logging.error(f"Invalid league: {league}")
         return
@@ -319,14 +328,16 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
         for _, row in stats_df.iterrows():
             try:
-                player_id = player_mapping[row['ShirtNumber']]['ID']
+                object_id = player_mapping[row['ShirtNumber']]['ObjectId']
+                provider_id = player_mapping[row['ShirtNumber']]['DlProviderId']
             except KeyError:
                 logging.info(
                     f"Number {row['ShirtNumber']} is not part of the team anymore. Please check to update manually.")
                 continue
 
             player_stats_list.append({
-                'PlayerID': player_id,
+                'ObjectID': object_id,
+                'DlProviderID': provider_id,
                 'Matchday': matchday,
                 'Season': season,
                 'Total Distance': row['Total Distance'],
@@ -341,10 +352,12 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     away_stats = player_stats['AwayPlayerStats']
 
     # Get player mappings for both teams
-    home_info = Path(fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\2023\team_players\team_players_{team_ids[0]}.xml')
-    home_player_mapping = get_bl_player_mapping(home_info)
-    away_info = Path(fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\2023\team_players\team_players_{team_ids[1]}.xml')
-    away_player_mapping = get_bl_player_mapping(away_info)
+    if league == 'bl1' or league == 'bl2':
+        home_player_mapping = get_bl_player_mapping(league_id, team_ids[0])
+        away_player_mapping = get_bl_player_mapping(league_id, team_ids[1])
+    elif league == 'mls':
+        home_player_mapping = get_mls_player_mapping(league_id, team_ids[0])
+        away_player_mapping = get_mls_player_mapping(league_id, team_ids[1])
 
     # Process player stats for both teams
     home_player_stats_df = process_player_stats(home_stats, home_player_mapping)
@@ -357,4 +370,5 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     with conn:
         combined_player_stats_df.to_sql('player_stats', conn, if_exists='append', index=False)
 
-    logging.info(f"Player statistics updated for both teams {team_ids[0]} and {team_ids[1]} for Matchday {matchday} in Season {season}.")
+    logging.info(
+        f"Player statistics updated for both teams {team_ids[0]} and {team_ids[1]} for Matchday {matchday} in Season {season}.")

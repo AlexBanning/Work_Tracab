@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 from bs4 import BeautifulSoup
 from xml.dom.minidom import parse
+from pathlib import Path
+from lxml import etree
 
 
 
@@ -110,7 +112,7 @@ def get_bl_club_mapping(team_info_dir):
         return pd.DataFrame()
 
 
-def get_bl_player_mapping(team_info_file):
+def get_bl_player_mapping(league_id, team_id):
     """
     Create a ShirtNumber-ObjectID mapping for Bundesliga teams from an XML file.
 
@@ -120,7 +122,8 @@ def get_bl_player_mapping(team_info_file):
     Returns:
     pd.DataFrame: A DataFrame containing the mapping of team IDs to team names.
     """
-    xml_doc = parse(str(team_info_file))
+    team_info_file = fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\2023\team_players\team_players_{team_id}.xml'
+    xml_doc = parse(team_info_file)
 
     player_elements = xml_doc.getElementsByTagName('player')
     player_id = [x.childNodes[1].getAttribute('player-key') for x in player_elements]
@@ -129,6 +132,38 @@ def get_bl_player_mapping(team_info_file):
 
     player_mapping = {shirt: {'ID': pid, 'Name': nm} for shirt, pid, nm in zip(shirt_number, player_id, name)}
 
+
+    return player_mapping
+
+
+def get_mls_player_mapping(season_id, team_id):
+    info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo')
+    clubs_file = info_path / f'Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
+
+    with clubs_file.open('r', encoding='utf-8') as fp:
+        data = BeautifulSoup(fp, 'xml')
+
+    # Extract club data
+    club_data = [x for x in data.find_all('Clubs')[0].contents[1::2]]
+    id_mapping = {x['DlProviderId']: x['ClubId'] for x in club_data}
+
+    # Identify the correct player file
+    player_files = [x for x in info_path.iterdir() if 'MLS-SEA-0001K8_player.xml' in x.name]
+    club_file = next(x for x in player_files if id_mapping[team_id] in x.name)
+
+    # Parse the player file
+    tree = etree.parse(str(club_file))
+    root = tree.getroot()
+
+    # Extract player data
+    player_mapping = {
+        obj.get("ShirtNumber"): {
+            'ObjectId': obj.get("ObjectId"),
+            'DlProviderId': obj.get("DlProviderId"),
+            'Name': obj.get("ShortName"),
+        }
+        for obj in root.findall(".//Object")
+    }
 
     return player_mapping
 

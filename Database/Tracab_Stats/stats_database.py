@@ -22,8 +22,8 @@ import pstats
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\EKSTRAKLASA')
-club_mapping = get_club_id_mapping(team_info_path, league='ekstraklasa')
+team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\MLS')
+club_mapping = get_club_id_mapping(team_info_path, league='mls')
 
 """
 Database cunstruction
@@ -60,8 +60,8 @@ else:
 """
 Single league update
 """
-data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
-league = 'bl1'
+data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\1 - MLS')
+league = 'mls'
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
@@ -70,21 +70,21 @@ for md in data_path.iterdir():
         create_team_stats_table(league, match)
         # # Construct the profile output file path
         # profile_file = f"Stats_Logs\profile_output_MD1_{match.name}.prof"
-    #
-        # # Create a Profile object
+    ##
+        # # # Create a Profile object
         # profiler = cProfile.Profile()
-    #
-        # # Run the function within the profiler
+    ##
+        # # # Run the function within the profiler
         # profiler.enable()
         # create_team_stats_table(league, match)
         # profiler.disable()
-    #
-        # # Dump the profiling results to a file
+    ##
+        # # # Dump the profiling results to a file
         # profiler.dump_stats(profile_file)
-
+    #
         print(f"Processed {match} in {time.time() - start_time:.2f} seconds\n")
 
-        # # Optionally, print or analyze the profile immediately
+        # # # Optionally, print or analyze the profile immediately
         # with open(f"Stats_Logs\profile_stats_MD1_{match.name}_new.txt", 'w') as f:
         #     p = pstats.Stats(profile_file, stream=f)
         #     p.sort_stats('cumulative').print_stats(50)
@@ -103,9 +103,9 @@ print_stats_table(league='ekstraklasa', kpi='Num. Sprints', season=2023,
 """
 Get stats from a team
 """
-league = 'bl1'
-season = 2023
-team_id = 10
+league = 'mls'
+season = 2024
+team_id = 1
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
     team_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
@@ -113,12 +113,12 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 """
 Get stats from a player
 """
-league = 'bl1'
-season = 2023
+league = 'mls'
+season = 2024
 player_id = 17
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM 'player_stats' WHERE Season = {season}"
-    player_stats = pd.read_sql_query(query, conn).sort_values(by=['PlayerID', 'Matchday'], ascending=True)
+    player_stats = pd.read_sql_query(query, conn).sort_values(by=['ObjectID', 'Matchday'], ascending=True)
 
 """
 Deleting a table
