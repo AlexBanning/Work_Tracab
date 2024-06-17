@@ -6,7 +6,7 @@ from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
-from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping
+from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping, get_opta_player_mapping
 from pathlib import Path
 import sqlite3 as sql
 import logging
@@ -47,7 +47,6 @@ def create_team_stats_table(league, match_folder):
     logging.basicConfig(filename='team_stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
     db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
-    print(Path(match_folder))
     if league == 'eredivisie':
         observed_path = Path(match_folder) / 'Validated'
     else:
@@ -109,11 +108,11 @@ def create_team_stats_table(league, match_folder):
         else:
             stats = observed_path / f'Observed/Webmonitor/Game_{gamelog_info["MatchId"]}_4/Observed/Team/Player'
         if Path(stats).exists():
-            home_stats, away_stats = get_validated_stats(filepath=stats, gamelog_info=gamelog_info)
-            if home_stats.empty and away_stats.empty:
-                logging.error(f"No valid player data found for {match_folder}")
-                return
+            home_stats, away_stats, home_player_stats, away_player_stats = get_validated_stats(
+                filepath=stats, gamelog_info=gamelog_info)
 
+            team_stats = {'HomeStats': home_stats, 'AwayStats': away_stats}
+            player_stats = {'HomePlayerStats': home_player_stats, 'AwayPlayerStats': away_player_stats}
             team_stats['HomeStats']['Matchday'] = int(gamelog_info['Matchday'])
             team_stats['HomeStats']['Season'] = int(gamelog_info['SeasonId'])
             team_stats['AwayStats']['Matchday'] = int(gamelog_info['Matchday'])
@@ -126,8 +125,13 @@ def create_team_stats_table(league, match_folder):
                 ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
                                                                          'SpeedRuns']]
 
-            update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
-                                    conn=conn)
+            with sql.connect(db_path) as conn:
+                update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
+                                        conn=conn)
+
+                update_player_stats_tables(league=league, player_stats=player_stats,
+                                           team_ids=team_ids, matchday=int(gamelog_info['Matchday']),
+                                           season=int(gamelog_info['SeasonId']), conn=conn)
 
         elif not Path(stats).exists():
             logging.error(f'The folder {stats} does not exist!')
@@ -317,7 +321,7 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
                         format='%(asctime)s - %(message)s')
 
-    league_id = {'bl1': '51', 'bl2': '52', 'mls': '8'}.get(league)
+    league_id = {'bl1': '51', 'bl2': '52', 'mls': '8', 'eredivisie': '9'}.get(league)
     if not league_id:
         logging.error(f"Invalid league: {league}")
         return
@@ -328,23 +332,36 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
         for _, row in stats_df.iterrows():
             try:
-                object_id = player_mapping[row['ShirtNumber']]['ObjectId']
-                provider_id = player_mapping[row['ShirtNumber']]['DlProviderId']
+                if league == 'mls':
+                    object_id = player_mapping[row['ShirtNumber']]['ObjectId']
+                    provider_id = player_mapping[row['ShirtNumber']]['DlProviderId']
+                else:
+                    provider_id = player_mapping[row['ShirtNumber']]['ID']
             except KeyError:
                 logging.info(
                     f"Number {row['ShirtNumber']} is not part of the team anymore. Please check to update manually.")
                 continue
-
-            player_stats_list.append({
-                'ObjectID': object_id,
-                'DlProviderID': provider_id,
-                'Matchday': matchday,
-                'Season': season,
-                'Total Distance': row['Total Distance'],
-                'HighSpeed': row['HighSpeed'],
-                'Num. Sprints': row['Num. Sprints'],
-                'Num. SpeedRuns': row['Num. SpeedRuns']
-            })
+            if league == 'mls':
+                player_stats_list.append({
+                    'ObjectID': object_id,
+                    'DlProviderID': provider_id,
+                    'Matchday': matchday,
+                    'Season': season,
+                    'Total Distance': row['Total Distance'],
+                    'HighSpeed': row['HighSpeed'],
+                    'Num. Sprints': row['Num. Sprints'],
+                    'Num. SpeedRuns': row['Num. SpeedRuns']
+                })
+            else:
+                player_stats_list.append({
+                    'DlProviderID': provider_id,
+                    'Matchday': matchday,
+                    'Season': season,
+                    'Total Distance': row['Total Distance'],
+                    'HighSpeed': row['HighSpeed'],
+                    'Num. Sprints': row['Num. Sprints'],
+                    'Num. SpeedRuns': row['Num. SpeedRuns']
+                })
 
         return pd.DataFrame(player_stats_list)
 
@@ -358,6 +375,9 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     elif league == 'mls':
         home_player_mapping = get_mls_player_mapping(league_id, team_ids[0])
         away_player_mapping = get_mls_player_mapping(league_id, team_ids[1])
+    elif league == 'eredivisie':
+        home_player_mapping = get_opta_player_mapping(season, league_id, team_ids[0])
+        away_player_mapping = get_opta_player_mapping(season, league_id, team_ids[1])
 
     # Process player stats for both teams
     home_player_stats_df = process_player_stats(home_stats, home_player_mapping)
