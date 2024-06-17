@@ -168,6 +168,24 @@ def get_mls_player_mapping(season_id, team_id):
     return player_mapping
 
 
+def get_opta_player_mapping(season_id, league_id, team_id):
+    info_path = Path(fr'//10.49.0.250/Opta/MatchInfo/srml-{league_id}-{season_id}-squads.xml')
+    tree = etree.parse(str(info_path))
+    root = tree.getroot()
+
+    team = [team for team in root.find('SoccerDocument').findall('Team') if team.get('uID') == f't{team_id}'][0].findall('Player')
+
+    player_mapping = {
+        obj.find('.//Stat[@Type="jersey_num"]').text: {
+            'ID': obj.get('uID')[1:],
+            'Name': obj.find('.//Name').text,
+        }
+        for obj in team
+    }
+
+    return player_mapping
+
+
 def get_ere_club_mapping(team_info_file):
     # Open team info
     with open(team_info_file,

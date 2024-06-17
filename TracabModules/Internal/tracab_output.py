@@ -1,6 +1,8 @@
 import pandas as pd
 from xml.dom.minidom import parse
+from lxml import etree
 import logging
+import numpy as np
 from TracabModules.Internal.gamelog_functions import get_player_name
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
@@ -16,7 +18,8 @@ bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "Distance IBC", "Sprints IBC", "SpeedRuns IBC",
                        "AvgTime IBC"]
 
-stats_report_kpis = ['Distance', 'Sprints', 'SpeedRuns']
+stats_report_kpis = ['Distance', 'TopSpeed', 'Sprints', 'SpeedRuns']
+
 
 def write_excel(dfl_df, epl_df, match_info, obs):
     """
@@ -105,10 +108,14 @@ def get_observed_stats(report):
         team_element = xml_doc_stats.getElementsByTagName(team_tag)[0]
         player_elements = [x for x in team_element.childNodes]
         shirt_numbers = [x.getAttribute('No') for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
-        total_distances = [float(x.getAttribute('Distance')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
-        high_speeds = [float(x.getAttribute('MaxSpeed')) for x in player_elements if float(x.getAttribute('MaxSpeed')) != 0.00]
-        num_sprints = [float(x.getAttribute('Sprints')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
-        num_speed_runs = [float(x.getAttribute('SpeedRuns')) for x in player_elements if float(x.getAttribute('Distance')) != 0.00]
+        total_distances = [float(x.getAttribute('Distance')) for x in player_elements if
+                           float(x.getAttribute('Distance')) != 0.00]
+        high_speeds = [float(x.getAttribute('MaxSpeed')) for x in player_elements if
+                       float(x.getAttribute('MaxSpeed')) != 0.00]
+        num_sprints = [float(x.getAttribute('Sprints')) for x in player_elements if
+                       float(x.getAttribute('Distance')) != 0.00]
+        num_speed_runs = [float(x.getAttribute('SpeedRuns')) for x in player_elements if
+                          float(x.getAttribute('Distance')) != 0.00]
 
         # Create DataFrame using extracted data
         player_data = {
@@ -140,65 +147,72 @@ def get_validated_stats(filepath, gamelog_info):
 
     files = [p for p in filepath.iterdir() if p.is_file() and 'Resolution.xml' in p.name]
 
-    players_data_home = []
-    players_data_away = []
+    home_stats = pd.DataFrame()
+    home_player_stats = pd.DataFrame()
+    away_stats = pd.DataFrame()
+    away_player_stats = pd.DataFrame()
 
     # Loop through all PlayerID_Resolution.xml files to fetch KPI-scores for each player
     for file in files:
-        try:
-            xml_doc = parse(str(file))
-            player_data_elements = xml_doc.getElementsByTagName('PlayerData')
-            if not player_data_elements:
-                logging.error(f'PlayerData not found in {file}')
-                continue
-            player_data = player_data_elements[0]
-            team_id = player_data.getAttribute('TeamID')
-            player_id = player_data.getAttribute('PlayerID')
-            player_name = get_player_name(str(gamelog_info['Gamelog']), team_id, player_id)
+        #try:
+            # Parse the XML file
+            tree = etree.parse(str(file))
+            root = tree.getroot()
 
-            stats_elements = xml_doc.getElementsByTagName('Stats')
+            team_id = root.get('TeamID')
+            player_id = root.get('PlayerID')
+            shirt_num = root.get('PlayerNumber')
+
+            # Get Stats element
+            stats_elements = root.findall(".//Stats")
             if not stats_elements:
                 logging.error(f'Stats not found in {file}')
                 continue
-            stats_element = stats_elements[-1]
+                # return None
 
-            player_og_stats = []
-            for kpi in stats_report_kpis:
-                kpi_elements = stats_element.getElementsByTagName(kpi)
-                if kpi_elements:
-                    player_og_stats.append(float(kpi_elements[0].childNodes[0].data))
-                else:
-                    player_og_stats.append(0.0)  # Default to 0 if KPI not found
+            top_speed = max([float(x.find(f'.//TopSpeed').text)
+                             for x in root.findall(".//Stats")])
 
-            if player_og_stats[0] == 0.0:
+            stats_data = {}
+            for stat_elem in stats_elements:
+                for kpi in stats_report_kpis:
+                    kpi_value = float(stat_elem.findtext(f".//{kpi}", np.nan))
+                    stats_data.setdefault(kpi, []).append(kpi_value)
+
+            # Check if any key performance indicator is missing
+            if stats_data['Distance'][-1] == 0.0:
                 continue
 
+            top_speed = max(stats_data.get('TopSpeed', [np.nan]))
+
             player = {
-                "TeamID": team_id,
                 "PlayerID": player_id,
-                "PlayerName": player_name,
-                "Total Distance": player_og_stats[0],
-                "Num. Sprints": player_og_stats[1],
-                "Num. SpeedRuns": player_og_stats[2]
+                "ShirtNumber": shirt_num,
+                "Total Distance": stats_data['Distance'][-1],
+                "HighSpeed": top_speed,
+                "Num. Sprints": stats_data['Sprints'][-1],
+                "Num. SpeedRuns": stats_data['SpeedRuns'][-1]
             }
 
-            if team_id == gamelog_info['HomeId']:
-                players_data_home.append(player)
-            else:
-                players_data_away.append(player)
+        # except etree.XMLSyntaxError as e:
+        #     logging.error(f'XML syntax error in {file}: {e}')
+        #     # return None
+        # except Exception as e:
+        #     logging.error(f'Unexpected error in {file}: {e}')
+        #   # return None
 
-        except Exception as e:
-            print(f"Error processing file {file}: {e}")
-            continue
+            if team_id == gamelog_info['HomeId']:
+                home_player_stats = pd.concat([home_player_stats, pd.DataFrame([player])])
+            else:
+                away_player_stats = pd.concat([away_player_stats, pd.DataFrame([player])])
 
     def aggregate_stats(players_data):
-        if not players_data:
+        if players_data.empty:
             return pd.DataFrame()
-        df = pd.DataFrame(players_data)
-        totals = df[['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']].sum().round(2)
+        totals = players_data[['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']].sum().round(2)
         return pd.DataFrame([totals])
 
-    home_stats = aggregate_stats(players_data_home)
-    away_stats = aggregate_stats(players_data_away)
+    home_stats = aggregate_stats(home_player_stats)
+    away_stats = aggregate_stats(away_player_stats)
 
-    return home_stats, away_stats
+    return home_stats, away_stats, home_player_stats, away_player_stats
