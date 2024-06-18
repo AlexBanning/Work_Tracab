@@ -202,6 +202,8 @@ def get_d3_mls_schedule(comp_id, filename):
         fixtures = [x for x in fixtures if x['Season'] == '2024']
     elif comp_id == 2:
         league = 'MLS PlayOffs'
+    elif comp_id == 6:
+        league = 'MLS Leagues Cup'
 
     # Create empty DF
     schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium", "STS-ID"])
