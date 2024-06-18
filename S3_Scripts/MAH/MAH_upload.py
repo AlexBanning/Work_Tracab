@@ -9,7 +9,7 @@ v2.0 2024/03/14 09:40
 """
 import shutil
 import sys
-from MLS.MLS_Teams import MLS
+from MLS.MLS_Teams import MLS, LeaguesCup
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -21,7 +21,10 @@ match_folder = newest_folder(r'\\192.168.7.72\Rec')
 print(f'Matchfolder: {match_folder} \n')
 home, away, md, comp = get_match_info(match_folder)
 # Define team-dictionary
-teams = MLS
+if comp == '1':
+    teams = MLS
+elif comp == '6':
+    teams = LeaguesCup
 
 # Get 3LCs of both teams
 try:
@@ -46,9 +49,9 @@ except KeyError:
 # Add both team substrings to get the match string
 match = str(ht) + '-' + str(at)
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(comp, home, away)
+sts_id, date = get_STSID(comp, home, away, season_id='8')
 # create the path of the to-be-created folder for the upload command
-filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
+filepath_new = fr'{os.getcwd()}\MD{str(md)}_{match}_{comp}'
 # Create a folder with the correct naming in the current directory
 try:
     os.mkdir(filepath_new)
@@ -56,7 +59,7 @@ except FileExistsError:
     shutil.rmtree(filepath_new)
     os.mkdir(filepath_new)
 # create the name for the folder as it should be named on the S3 bucket for the upload command
-folder_new = str(sts_id) + '_' + match
+folder_new = f'{str(sts_id)}_{match}'
 
 move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date=date)
 

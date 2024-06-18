@@ -34,7 +34,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
         squads_filename = 'srml-' + str(comp_id) + '-' + str(season_id) + '-squads.xml'
         ftp_dir = 'Opta/MatchInfo'
     if vendor == 'd3_mls':
-        filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(comp_id) + '.xml'
+        filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
         # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
         ftp_dir = 'D3_MLS/MatchInfo/'
     if vendor == 'keytoq':
@@ -347,7 +347,7 @@ def push_to_google(schedule, league):
     return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "23/24 Schedule"')
 
 
-def get_STSID(comp_id, home_team, away_team):
+def get_STSID(comp_id, home_team, away_team, season_id):
     """
 
     :param away_team:
@@ -363,7 +363,7 @@ def get_STSID(comp_id, home_team, away_team):
     correct_date = 0
 
     try:
-        filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False)
+        filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False, season_id=season_id)
     except UnboundLocalError:
         print('schedule-file not found, check the competition in the gamestats')
         input('Enter to exit')
@@ -380,12 +380,18 @@ def get_STSID(comp_id, home_team, away_team):
     # MatchIds of all matches of the home_team
     matches_schedule = data.find_all('Fixture')
 
+    # Assuming home_team and away_team are provided as input or variables
+    home_team_input = home_team.strip().lower()
+    away_team_input = away_team.strip().lower()
+
     while True:
         try:
             match_ids = [x['MatchId'] for x in matches_schedule if
-                        str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team]
+                        str(x['HomeTeamName'].strip().lower()) == home_team_input and
+                         str(x['GuestTeamName'].strip().lower()) == away_team_input][0]
             dates = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
-                    str(x['HomeTeamName']) == home_team and str(x['GuestTeamName']) == away_team]
+                     str(x['HomeTeamName'].strip().lower()) == home_team_input and
+                     str(x['GuestTeamName'].strip().lower()) == away_team_input][0]
             for n, date in enumerate(dates):
                 if is_date_in_current_week(date, mls=True):
                     correct_date = date.replace('-', '_')
@@ -395,14 +401,13 @@ def get_STSID(comp_id, home_team, away_team):
 
         except IndexError:
             print('The home/away team cannot be found in the competition. Please give the correct (full) names: \n')
-            home_team = str(input('Home Team: '))
-            away_team = str(input('Away Team: '))
+            home_team_input = str(input('Home Team: ')).strip().lower()
+            away_team_input = str(input('Away Team: ')).strip().lower()
             continue
         else:
             break
 
     return match_id, correct_date
-
 
 def get_tracabID(home_team):
     """
