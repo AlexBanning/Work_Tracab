@@ -6,7 +6,7 @@ from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
-from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping, get_opta_player_mapping
+from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping, get_opta_player_mapping, get_ekstra_player_mapping
 from pathlib import Path
 import sqlite3 as sql
 import logging
@@ -44,7 +44,7 @@ def create_team_stats_table(league, match_folder):
     :param league:
     :return:
     """
-    logging.basicConfig(filename='team_stats_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+    logging.basicConfig(filename=f'team_stats_log_{league}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
     db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
     if league == 'eredivisie':
@@ -69,9 +69,9 @@ def create_team_stats_table(league, match_folder):
     gamelog_info['Gamelog'] = str(gamelog)
     team_ids = [gamelog_info['HomeId'], gamelog_info['AwayId']]
 
-    if int(gamelog_info['Matchday']) == 1:
-        if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
-            return
+
+    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
+        return
 
     if not (league == 'eredivisie' or league == 'ekstraklasa'):
         # Get report statistics
@@ -321,9 +321,9 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
                         format='%(asctime)s - %(message)s')
 
-    league_id = {'bl1': '51', 'bl2': '52', 'mls': '8', 'eredivisie': '9'}.get(league)
+    league_id = {'bl1': '51', 'bl2': '52', 'mls': '8', 'eredivisie': '9', 'ekstraklasa': '55'}.get(league)
     if not league_id:
-        logging.error(f"Invalid league: {league}")
+        logging.error(f"Update Player Stats: Invalid league - {league}")
         return
 
     # Function to process player statistics
@@ -378,13 +378,26 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     elif league == 'eredivisie':
         home_player_mapping = get_opta_player_mapping(season, league_id, team_ids[0])
         away_player_mapping = get_opta_player_mapping(season, league_id, team_ids[1])
+    elif league == 'ekstraklasa':
+        home_player_mapping = get_ekstra_player_mapping(team_ids[0], league)
+        away_player_mapping = get_ekstra_player_mapping(team_ids[1], league)
 
     # Process player stats for both teams
-    home_player_stats_df = process_player_stats(home_stats, home_player_mapping)
-    away_player_stats_df = process_player_stats(away_stats, away_player_mapping)
+    if not home_player_mapping is None:
+        home_player_stats_df = process_player_stats(home_stats, home_player_mapping)
+    if not away_player_mapping is None:
+        away_player_stats_df = process_player_stats(away_stats, away_player_mapping)
 
     # Combine home and away player stats into one DataFrame
-    combined_player_stats_df = pd.concat([home_player_stats_df, away_player_stats_df], ignore_index=True)
+    if home_player_mapping is not None and away_player_mapping is not None:
+        combined_player_stats_df = pd.concat([home_player_stats_df, away_player_stats_df], ignore_index=True)
+    elif home_player_mapping is not None:
+        combined_player_stats_df = home_player_stats_df
+    elif away_player_mapping is not None:
+        combined_player_stats_df = away_player_stats_df
+    else:
+        logging.info(f'No table-update for the match between {team_ids[0]} vs. {team_ids[1]}.')
+        return
 
     # Insert all player data in a single transaction
     with conn:

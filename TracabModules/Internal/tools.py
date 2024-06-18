@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from xml.dom.minidom import parse
 from pathlib import Path
 from lxml import etree
-
+import logging
 
 
 def is_date_in_current_week(date_str, mls=False):
@@ -212,3 +212,25 @@ def get_ekstra_club_mapping(team_info_file):
     } for x in club_data]).sort_values(by='TeamId', ascending=True)
 
     return club_mapping
+
+
+def get_ekstra_player_mapping(team_id, league):
+    logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
+                        format='%(asctime)s - %(message)s')
+    tree = etree.parse(str(r'\\10.49.0.250\\Keytoq\\MatchInfo\\main.xml'))
+    root = tree.getroot()
+    try:
+        team = [x for x in root.findall('.//team') if x.get('id') == team_id][0]
+    except IndexError:
+        logging.info(f'Team {team_id} is not found inside the active club list of this league.')
+        return
+
+    player_mapping = {
+        obj.get('nr'): {
+            'ID': obj.get('id'),
+            'Name': f'{obj.get('fname')} {obj.get('sname')}'
+        }
+        for obj in team.find('players').findall('player')
+    }
+
+    return player_mapping

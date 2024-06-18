@@ -22,8 +22,8 @@ import pstats
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\BL2')
-club_mapping = get_club_id_mapping(team_info_path, league='bl2')
+team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\EREDIVISIE')
+club_mapping = get_club_id_mapping(team_info_path, league='eredivisie')
 
 """
 Database cunstruction
@@ -66,39 +66,40 @@ for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
     for match in md.iterdir():
-        start_time = time.time()
-        create_team_stats_table(league, match)
-        # # Construct the profile output file path
-        # profile_file = f"Stats_Logs\profile_output_MD1_{match.name}.prof"
-    ###
-        # # # # Create a Profile object
-        # profiler = cProfile.Profile()
-    ###
-        # # # # Run the function within the profiler
-        # profiler.enable()
-        # create_team_stats_table(league, match)
-        # profiler.disable()
-    ###
-        # # # # Dump the profiling results to a file
-        # profiler.dump_stats(profile_file)
-    ##
-        print(f"Processed {match} in {time.time() - start_time:.2f} seconds\n")
+        if match.is_dir():
+            start_time = time.time()
+            create_team_stats_table(league, match)
+            # # Construct the profile output file path
+            # profile_file = f"Stats_Logs\profile_output_MD1_{match.name}.prof"
+        ###
+            # # # # Create a Profile object
+            # profiler = cProfile.Profile()
+        ###
+            # # # # Run the function within the profiler
+            # profiler.enable()
+            # create_team_stats_table(league, match)
+            # profiler.disable()
+        ###
+            # # # # Dump the profiling results to a file
+            # profiler.dump_stats(profile_file)
+        ##
+            print(f"Processed {match} in {time.time() - start_time:.2f} seconds\n")
 
-        # # # Optionally, print or analyze the profile immediately
-        # with open(f"Stats_Logs\profile_stats_MD1_{match.name}_new.txt", 'w') as f:
-        #     p = pstats.Stats(profile_file, stream=f)
-        #     p.sort_stats('cumulative').print_stats(50)
+            # # # Optionally, print or analyze the profile immediately
+            # with open(f"Stats_Logs\profile_stats_MD1_{match.name}_new.txt", 'w') as f:
+            #     p = pstats.Stats(profile_file, stream=f)
+            #     p.sort_stats('cumulative').print_stats(50)
 
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='ekstraklasa', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='eredivisie', season=2023, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
 """
-print_stats_table(league='ekstraklasa', kpi='Num. Sprints', season=2023,
-                  logo_path=r'C:\Users\alexa\PycharmProjects\Work_Tracab\TeamLogos\EKSTRAKLASA_Logos')
+print_stats_table(league='eredivisie', kpi='Total Distance', season=2023,
+                  logo_path=r'C:\Users\a.banning\PycharmProjects\Work_Tracab\TeamLogos\EREDIVISIE_Logos')
 
 """
 Get stats from a team
@@ -113,11 +114,11 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 """
 Get stats from a player
 """
-league = 'eredivisie'
+league = 'ekstraklasa'
 season = 2023
-player_id = 17
+player_id = 13526
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
-    query = f"SELECT * FROM 'player_stats' WHERE Season = {season}"
+    query = f"SELECT * FROM 'player_stats' WHERE DlProviderID = {player_id}"
     player_stats = pd.read_sql_query(query, conn).sort_values(by=['DlProviderID', 'Matchday'], ascending=True)
 
 """
