@@ -22,8 +22,8 @@ import pstats
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\EREDIVISIE')
-club_mapping = get_club_id_mapping(team_info_path, league='eredivisie')
+team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\MLS')
+club_mapping = get_club_id_mapping(team_info_path, league='mls')
 
 """
 Database cunstruction
@@ -60,8 +60,8 @@ else:
 """
 Single league update
 """
-data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\9 - Eredivisie')
-league = 'eredivisie'
+data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\1 - MLS')
+league = 'mls'
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
@@ -93,20 +93,20 @@ for md in data_path.iterdir():
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='eredivisie', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='mls', season=2024, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
 """
-print_stats_table(league='eredivisie', kpi='Total Distance', season=2023,
-                  logo_path=r'C:\Users\a.banning\PycharmProjects\Work_Tracab\TeamLogos\EREDIVISIE_Logos')
+print_stats_table(league='mls', kpi='Num. SpeedRuns', season=2024,
+                  logo_path=r'C:\Users\alexa\PycharmProjects\Work_Tracab\TeamLogos\MLS_Logos')
 
 """
 Get stats from a team
 """
-league = 'bl2'
-season = 2023
-team_id = 9
+league = 'mls'
+season = 2024
+team_id = 1
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
     team_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
