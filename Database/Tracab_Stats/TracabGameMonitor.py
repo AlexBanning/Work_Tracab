@@ -15,7 +15,11 @@ Design should be relying on existing DFL_Highspeed_Monitor.
 """
 import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
-import sys, os
+import pandas as pd
+import sqlite3 as sql
+import os
+import sys
+
 
 class TracabGameMonitor:
     def __init__(self):
@@ -23,9 +27,11 @@ class TracabGameMonitor:
 
         self.root = tk.Tk()
         self.root.title("TracabGameMonitor")
+
         # Load Tracab Icon
         exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
         self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+
         # Set Background colour
         self.root.configure(bg='#2F4F4F')
 
@@ -38,17 +44,19 @@ class TracabGameMonitor:
         self.center_frame.configure(bg='#2F4F4F')
 
         # Dropdown list for selecting the league
-        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
-                                                                                        sticky="nw")
+        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5,
+                                                                                            pady=2, sticky="nw")
         self.league_var = tk.StringVar(self.root)
-        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues, state='readonly')
+        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues,
+                                            state='readonly')
         self.league_dropdown.grid(row=0, column=1, padx=5, pady=2, sticky="nw")
 
         # Input field for entering the GameID
-        tk.Label(self.center_frame, text="Enter GameID:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5, pady=2, sticky="nw")
-        self.gameid_var = tk.StringVar(self.root)
-        self.gameid_entry = tk.Entry(self.center_frame, textvariable=self.gameid_var)
-        self.gameid_entry.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+        tk.Label(self.center_frame, text="Enter GameID:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5,
+                                                                                           pady=2, sticky="nw")
+        self.teamid_var = tk.StringVar(self.root)
+        self.teamid_entry = tk.Entry(self.center_frame, textvariable=self.teamid_var)
+        self.teamid_entry.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
 
         # Button to confirm input
         self.confirm_button = tk.Button(self.center_frame, text="Confirm", command=self.show_match_data)
@@ -67,23 +75,56 @@ class TracabGameMonitor:
 
     def show_match_data(self):
         selected_league = self.league_var.get()
-        game_id = self.gameid_var.get()
+        team_id = self.teamid_var.get()
         # Close the current window
         self.root.destroy()
 
         # Open a new window with match data
         self.match_data_window = tk.Tk()
-        self.match_data_window.title(f"Match Data for GameID {game_id}")
+        self.match_data_window.title(f"Data for Team {team_id}")
         self.match_data_window.configure(bg='#2F4F4F')
 
-        # Display match data (this is a placeholder, you should replace it with actual match data)
-        tk.Label(self.match_data_window, text=f"League: {selected_league}", fg="#98FB98", bg="#2F4F4F").pack(padx=10,
-                                                                                                             pady=10)
-        tk.Label(self.match_data_window, text=f"GameID: {game_id}", fg="#98FB98", bg="#2F4F4F").pack(padx=10, pady=10)
+        # Create a frame for the treeview
+        frame = tk.Frame(self.match_data_window)
+        frame.pack(fill='both', expand=True)
 
-        # Add actual match data here
-        # ...
+        # Create the treeview
+        treeview = ttk.Treeview(frame)
+        treeview.pack(fill='both', expand=True)
+
+        # Fetch and display match data
+        with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{selected_league}_stats.db') as conn:
+            query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = 2024"
+            team_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
+        self.display_dataframe(team_stats, treeview)
 
         self.match_data_window.mainloop()
+
+    def display_dataframe(self, dataframe, treeview):
+        # Clear previous data
+        treeview.delete(*treeview.get_children())
+
+        # Display dataframe columns as headers
+        treeview["columns"] = list(dataframe.columns)
+        for col in dataframe.columns:
+            treeview.heading(col, text=col)
+
+        # Adjust column widths based on content
+        for col in dataframe.columns:
+            if col == '#':
+                treeview.column(col, width=20)
+            elif col == 'Goals' or col == 'Assists':
+                treeview.column(col, width=40)
+            else:
+                treeview.column(col, width=120)
+
+        for index, row in dataframe.iterrows():
+            values = [int(val) if isinstance(val, float) and val.is_integer() else val for val in row]
+            # Display dataframe rows
+            treeview.insert('', 'end', text='', values=values)
+
+        # Remove the first column completely
+        treeview["show"] = "headings"
+
 
 apptest = TracabGameMonitor()

@@ -10,10 +10,15 @@ LeagueX.db
 | - team3_stats
 | - ...
 | - league_stats
+    - Table that contains avg values for all KPIs of each team of the league
+| - player_stats
+    - Table that contains matchday values for all player KPIs for each player of the league
 
 
 team1_stats --Columns: Matchday, Season, Total Distance, Num. Sprints, Num. SpeedRuns
 league_stats --Columns: TeamId, Total Distance, Num. Sprints, Num. SpeedRuns
+player_stats --Columns: (MLS: ObjectID), DlProviderID, Matchday, Season, Total Distance, HighSpeed, Num. Sprints, Num. SpeedRuns
+
 
 To update the team stats tables and league_stats table the user should always put in the matchday/matchdays that they want
 to update the tables with. A function that checks whether they are already in the tables and/or if the data is already
