@@ -390,10 +390,10 @@ def get_STSID(comp_id, home_team, away_team, season_id):
         try:
             match_ids = [x['MatchId'] for x in matches_schedule if
                         str(x['HomeTeamName'].strip().lower()) == home_team_input and
-                         str(x['GuestTeamName'].strip().lower()) == away_team_input][0]
+                         str(x['GuestTeamName'].strip().lower()) == away_team_input]
             dates = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
                      str(x['HomeTeamName'].strip().lower()) == home_team_input and
-                     str(x['GuestTeamName'].strip().lower()) == away_team_input][0]
+                     str(x['GuestTeamName'].strip().lower()) == away_team_input]
             for n, date in enumerate(dates):
                 if is_date_in_current_week(date, mls=True):
                     correct_date = date.replace('-', '_')
