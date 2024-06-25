@@ -1,5 +1,5 @@
 from TracabModules.External.DataHub import HighSpeedGUI, HighSpeedGUItest
 
 
-app = HighSpeedGUI()
+# app = HighSpeedGUI()
 apptest = HighSpeedGUItest()

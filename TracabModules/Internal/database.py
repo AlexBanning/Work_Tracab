@@ -145,7 +145,7 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
         if league not in valid_leagues:
             raise ValueError("results: league must be one of %r." % valid_leagues)
         with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
-            query = f"SELECT * FROM '{team_id}' WHERE Season = {season}"
+            query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
             try:
                 team_stats = pd.read_sql_query(query, conn)
                 avg_distance = team_stats['Total Distance'].mean().round(2)
@@ -242,7 +242,7 @@ def print_stats_table(league, season, kpi, logo_path):
     )
 
     # Save the figure
-    output_path = Path(f'N:\\07_QC\\Alex\\StatsReports\\{league.upper()}') / f'{league}_{kpi}_{season}_table.png'
+    output_path = Path(f'N:\\07_QC\\Alex\\StatsReports\\{league.upper()}') / f'{league}_{kpi.lower()}_{season}_table.png'
     fig.savefig(
         output_path,
         facecolor=ax.get_facecolor(),
