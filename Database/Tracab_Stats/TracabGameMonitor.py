@@ -201,7 +201,7 @@ class TracabGameMonitor:
         # Adjust the size of the GUI window
         self.root.geometry("700x250")
 
-        # Create a frame to contain the labels and buttons
+        # Create a frame to contain the labels and button
         self.center_frame = tk.Frame(self.root)
         self.center_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.center_frame.configure(bg='#2F4F4F')
@@ -218,9 +218,16 @@ class TracabGameMonitor:
         # Input field for entering the GameID
         tk.Label(self.center_frame, text="Enter GameID:", fg="#98FB98", bg="#2F4F4F").grid(row=1, column=0, padx=5,
                                                                                            pady=2, sticky="nw")
-        self.teamid_var = tk.StringVar(self.root)
-        self.teamid_entry = tk.Entry(self.center_frame, textvariable=self.teamid_var)
-        self.teamid_entry.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+        self.game_id_var = tk.StringVar(self.root)
+        self.game_id_entry = tk.Entry(self.center_frame, textvariable=self.game_id_var)
+        self.game_id_entry.grid(row=1, column=1, padx=5, pady=2, sticky="nw")
+
+        # Input field for entering the SeasonID
+        tk.Label(self.center_frame, text="Enter SeasonID:", fg="#98FB98", bg="#2F4F4F").grid(row=2, column=0, padx=5,
+                                                                                           pady=2, sticky="nw")
+        self.season_id_var = tk.StringVar(self.root)
+        self.season_id_entry = tk.Entry(self.center_frame, textvariable=self.season_id_var)
+        self.season_id_entry.grid(row=2, column=1, padx=5, pady=2, sticky="nw")
 
         # Button to fetch team and player data
         self.fetch_button = tk.Button(self.center_frame, text="Get Data", command=self.fetch_data)
@@ -238,11 +245,12 @@ class TracabGameMonitor:
 
     def fetch_data(self):
         league = self.league_var.get()
-        game_id = self.teamid_var.get()
+        game_id = self.game_id_var.get()
+        season = self.season_id_var.get()
 
         # Replace with your function to fetch highspeed dataframes based on home_team and away_team
         try:
-            fetcher = DataFetcher(game_id=game_id, league=league, season="2023")
+            fetcher = DataFetcher(game_id=game_id, league=league, season=season)
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = fetcher.fetch_data()
 
             # Check if Treeview widgets already exist, if not, create new ones
@@ -287,8 +295,8 @@ class TracabGameMonitor:
             self.away_treeview.pack(side="right", padx=5, pady=5)
 
             # Display dataframes in TreeView
-            self.display_dataframe(home_highspeeds, self.home_treeview)
-            self.display_dataframe(away_highspeeds, self.away_treeview)
+            self.display_dataframe(home_highspeeds, self.home_treeview, team_indicator='Home')
+            self.display_dataframe(away_highspeeds, self.away_treeview, team_indicator='Away')
 
             # Adjust the window geometry
             self.adjust_window_size()
@@ -308,18 +316,26 @@ class TracabGameMonitor:
         height = self.root.winfo_reqheight()  # Get the required height of the GUI
         self.root.geometry(f"{width}x{height}")  # Set the GUI window size
 
-    def display_dataframe(self, dataframe, treeview):
+    def display_dataframe(self, dataframe, treeview, team_indicator):
         # Clear previous data
         treeview.delete(*treeview.get_children())
-
+        new_names = {'ShirtNumber': '#', 'HighSpeed': 'Speed'}
+        dataframe = dataframe.rename(columns=new_names)
         # Display dataframe columns as headers
         treeview["columns"] = list(dataframe.columns)
         for col in dataframe.columns:
-            treeview.heading(col, text=col)
+            if col == 'Name':
+                treeview.heading(col, text=team_indicator)
+            else:
+                treeview.heading(col, text=col)
 
         # Adjust column widths based on content
         for col in dataframe.columns:
-            treeview.column(col, width=max(100, len(col) * 10))  # Adjust width based on column name length
+            if col == 'Name':
+                treeview.column(col, width=max(100, len(col) * 10))  # Adjust width based on column name length
+            else:
+                treeview.column(col, width=len(col) * 10) # Adjust width based on column name length
+
 
         # Insert the data
         for index, row in dataframe.iterrows():
