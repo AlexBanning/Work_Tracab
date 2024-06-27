@@ -19,7 +19,7 @@ v1.3: 2024/03/08 10:20
     - Ideas for future: Implement a warning if the TDF did not contain any clicks
 """
 import os
-from TracabModules.Internal.data_output import write_excel
+from TracabModules.Internal.tracab_output import write_excel
 from TracabModules.DataManipulation.data_manipulation import get_excel_kpis
 from TracabModules.Internal.gamelog_functions import get_match_info
 

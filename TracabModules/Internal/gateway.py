@@ -657,7 +657,7 @@ class FootballDataProcessor:
                             if not data:
                                 break
                             # Process the received data as needed
-                            print("Received data:", data.decode())
+                            print("Received data:", data.decode('utf8'))
                         except socket.timeout:
                             print("Timeout reached. Stopping receiving process.")
                             break

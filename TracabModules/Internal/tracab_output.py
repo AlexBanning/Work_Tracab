@@ -170,9 +170,6 @@ def get_validated_stats(filepath, gamelog_info):
                 continue
                 # return None
 
-            top_speed = max([float(x.find(f'.//TopSpeed').text)
-                             for x in root.findall(".//Stats")])
-
             stats_data = {}
             for stat_elem in stats_elements:
                 for kpi in stats_report_kpis:

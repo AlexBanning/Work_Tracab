@@ -6,7 +6,7 @@ Generating a PDF out of Tracab's Gateway output.
 """
 import pandas as pd
 
-from TracabModules.Internal.gateway import download_tf08_feed, download_tf09_feed
+from TracabModules.Internal.gateway import GatewayDownloader
 import numpy as np
 
 game_id = '2374222'
@@ -14,8 +14,9 @@ vendor_id = '5'
 extr_vers = '4'
 data_quality = '1'
 
-tf09_data = download_tf09_feed(game_id, vendor_id, data_quality, extr_vers)
-tf08_data = download_tf08_feed(game_id, vendor_id, data_quality, extr_vers)
+downloader = GatewayDownloader(game_id, vendor_id, data_quality, extr_vers)
+tf09_data, tf09_success = downloader.download_tf09_feed()
+tf08_data, tf08_success = downloader.download_tf08_feed()
 
 
 ft = tf08_data[0]['Periods'][0]

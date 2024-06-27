@@ -57,6 +57,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
 
             return filename, print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
     except:
+        print('error')
         pass
 
     try:

@@ -3,6 +3,7 @@ import requests
 
 import pandas as pd
 from TracabModules.DataManipulation.data_manipulation import GatewayKPIs
+from TracabModules.Internal.gateway import GatewayDownloader
 
 import socket
 import struct
@@ -16,10 +17,10 @@ headers['accept'] = 'application/json'
 headers['Authorization'] = 'Bearer ' + token
 
 # Define match parameters
-game_id = '184530'
-vendor_id = '4'
+game_id = '2374219'
+vendor_id = '5'
 extr_vers = '4'
-data_quality = '0'
+data_quality = '1'
 team_id = '215'
 
 # Call fixtures and results
@@ -88,6 +89,7 @@ with open('soccer_data_converted.dat', 'w') as dat_file:
 """
 Test End
 """
+
 frames = pd.DataFrame(json_file['FrameData'])
 player_frames = frames['PlayerPositions']
 
@@ -240,7 +242,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 json_url = (f'https://stream-api.tracab.com/api/V1/downloads/tf10?GameID={game_id}&VendorID={vendor_id}&'
             f'ExtractionVersion={extr_vers}&DataQuality={data_quality}&Phase=0')
 r_json = requests.get(json_url, headers=headers, stream=True, timeout=5)
-
 
 """
 TF08-KPIs

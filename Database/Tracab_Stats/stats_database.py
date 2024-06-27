@@ -22,8 +22,8 @@ import pstats
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\MLS')
-club_mapping = get_club_id_mapping(team_info_path, league='mls')
+team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\BL1')
+club_mapping = get_club_id_mapping(team_info_path, league='bl1')
 
 """
 Database cunstruction
@@ -60,8 +60,8 @@ else:
 """
 Single league update
 """
-data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\1 - MLS')
-league = 'mls'
+data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
+league = 'bl1'
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
@@ -93,7 +93,7 @@ for md in data_path.iterdir():
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='mls', season=2024, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='bl1', season=2023, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
@@ -124,7 +124,6 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 """
 Deleting a table
 """
-
 
 def delete_table(db_path, table_name):
     """
