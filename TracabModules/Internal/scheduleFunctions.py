@@ -34,6 +34,8 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
         squads_filename = 'srml-' + str(comp_id) + '-' + str(season_id) + '-squads.xml'
         ftp_dir = 'Opta/MatchInfo'
     if vendor == 'd3_mls':
+        if comp_id == str(102):
+            filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00002U.xml'
         filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
         # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
         ftp_dir = 'D3_MLS/MatchInfo/'
@@ -339,7 +341,8 @@ def push_to_google(schedule, league):
                        'schedule_push_authentification.json'
                        )
 
-    schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
+    # schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
+    schedule_sheet = gc.open_by_key('1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw')
     try:
         worksheet = schedule_sheet.worksheet(league)
     except gspread.WorksheetNotFound:
@@ -347,7 +350,7 @@ def push_to_google(schedule, league):
     worksheet = schedule_sheet.worksheet(league)
     worksheet.update([schedule.columns.values.tolist()] + schedule.values.tolist())
 
-    return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "23/24 Schedule"')
+    return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "24/25 Schedule"')
 
 
 def get_STSID(comp_id, home_team, away_team, season_id):
