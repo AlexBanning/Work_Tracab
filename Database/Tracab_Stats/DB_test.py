@@ -6,13 +6,16 @@ from TracabModules.Internal.tools import get_club_id_mapping
 import sqlite3 as sql
 import pandas as pd
 import time
+import threading
 
 
 def update_team_stats_table(league, matchday):
     league_paths = {
         'mls': r'N:\01_Tracking-Data\Season_23-24\1 - MLS',
         'bl1': r'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL',
-        'bl2': r'N:\01_Tracking-Data\Season_23-24\52 - Bundesliga 2_BL'
+        'bl2': r'N:\01_Tracking-Data\Season_23-24\52 - 2.Bundesliga 2_BL',
+        'eredivisie': r'N:\01_Tracking-Data\Season_23-24\9 - Eredivisie',
+        'ekstraklasa': r'N:\01_Tracking-Data\Season_23-24\55 - Ekstraklasa'
     }
 
     if league not in league_paths:
@@ -20,22 +23,39 @@ def update_team_stats_table(league, matchday):
         return
 
     data_path = Path(league_paths[league])
-    data_path = data_path / f'MD{matchday}'
-
-    if not data_path.exists():
-        messagebox.showerror("Error", f"Matchday {matchday} data does not exist for league {league}")
-        return
-
     start_time = time.time()
 
-    for match in data_path.iterdir():
-        if match.is_dir():
-            start_time_match = time.time()
-            create_team_stats_table(league, match)
-            print(f"Processed {match} in {time.time() - start_time_match:.2f} seconds\n")
+    def update_in_background():
+        if matchday != '-':
+            data_path_matchday = data_path / f'MD{matchday}'
+            if not data_path_matchday.exists():
+                messagebox.showerror("Error", f"Matchday {matchday} data does not exist for league {league}")
+                return
 
-    print(f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
-    messagebox.showinfo("Success", f"Database updated for league {league}, matchday {matchday}")
+            for match in data_path_matchday.iterdir():
+                if match.is_dir():
+                    start_time_match = time.time()
+                    create_team_stats_table(league, match)
+                    print(f"Processed {match} in {time.time() - start_time_match:.2f} seconds")
+
+            messagebox.showinfo("Success", f"Database updated for league {league}, matchday {matchday}")
+        else:
+            for md in data_path.glob('MD*'):
+                if md.is_dir() and 'MD' in md.name:
+                    print(md)
+                    for match in md.iterdir():
+                        if match.is_dir():
+                            start_time_match = time.time()
+                            create_team_stats_table(league, match)
+                            print(f"Processed {match} in {time.time() - start_time_match:.2f} seconds")
+
+            messagebox.showinfo("Success", f"Database updated for the complete season of {league}")
+
+        print(f"DB has been updated in {time.time() - start_time:.2f} seconds")
+
+    # Create a thread for the background task
+    thread = threading.Thread(target=update_in_background)
+    thread.start()
 
 
 def show_data_in_popup(data):
@@ -92,10 +112,15 @@ def main():
             advanced_frame.grid()
             toggle_button.config(text="Hide Advanced Functions")
 
-    def on_update_click():
+    def on_matchday_update_click():
         league = league_var.get()
         matchday = matchday_entry.get()
         update_team_stats_table(league, matchday)
+
+    def on_season_update_click():
+        league = league_var.get()
+        matchday = matchday_entry.get()
+        update_team_stats_table(league, matchday='-')
 
     def on_fetch_team_click():
         league = league_var.get()
@@ -121,7 +146,7 @@ def main():
 
     ttk.Label(root, text="League").grid(column=0, row=0, padx=10, pady=5)
     league_menu = ttk.Combobox(root, textvariable=league_var)
-    league_menu['values'] = ('mls', 'bl1', 'bl2')
+    league_menu['values'] = ('mls', 'bl1', 'bl2', 'eredivisie', 'ekstraklasa')
     league_menu.grid(column=1, row=0, padx=10, pady=5)
     league_menu.current(0)
 
@@ -129,8 +154,11 @@ def main():
     matchday_entry = ttk.Entry(root)
     matchday_entry.grid(column=1, row=1, padx=10, pady=5)
 
-    ttk.Button(root, text="Update Team Stats", command=on_update_click).grid(column=0, row=2, padx=10, pady=5,
-                                                                             columnspan=2)
+    ttk.Button(root, text="Update Matchday", command=on_matchday_update_click).grid(column=0, row=2, padx=10, pady=5,
+                                                                             columnspan=1)
+
+    ttk.Button(root, text="Update Season", command=on_season_update_click).grid(column=1, row=2, padx=10, pady=5,
+                                                                             columnspan=1)
 
     toggle_button = ttk.Button(root, text="Show Advanced Functions", command=toggle_advanced)
     toggle_button.grid(column=0, row=3, padx=10, pady=5, columnspan=2)
