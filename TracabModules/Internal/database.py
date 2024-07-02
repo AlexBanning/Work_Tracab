@@ -10,6 +10,7 @@ from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_m
 from pathlib import Path
 import sqlite3 as sql
 import logging
+import tkinter as tk
 
 """
 Add some logic to check if player AND team data already exists so if yes, the create_team_stats_table function 
@@ -17,7 +18,7 @@ simply skips to next match.
 """
 
 
-def check_data_exists(db_path, team_ids, matchday, season):
+def check_data_exists(db_path, team_ids, matchday, season, log):
     data_exists = True
     with sql.connect(db_path) as conn:
         try:
@@ -32,13 +33,13 @@ def check_data_exists(db_path, team_ids, matchday, season):
                 if result.empty:
                     data_exists = False  # If any team_id does not have the record, return False
                 else:
-                    print(f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
+                    log.insert(tk.END, f"\nRecord for team {team_id} on Matchday {matchday} and Season {season} already exists.")
         except pd.errors.DatabaseError:
             data_exists = False  # If any team_id does not have the record, return False
     return data_exists
 
 
-def create_team_stats_table(league, match_folder):
+def create_team_stats_table(league, match_folder, log):
     """
     :param match_folder:
     :param league:
@@ -52,25 +53,24 @@ def create_team_stats_table(league, match_folder):
     else:
         observed_path = Path(match_folder) / 'Observed'
     if not observed_path.exists():
-        print(f'No observed folder exists for {match_folder}!')
+        log.insert(tk.END, f'\nNo observed folder exists for {match_folder}!')
         return
 
     try:
         gamelog = next(observed_path.glob('*Gamelog*'))
     except StopIteration:
-        logging.info(f'The observed folder of {match_folder} does not contain a gamelog!')
+        log.insert(tk.END, f'\nThe observed folder of {match_folder} does not contain a gamelog!')
         try:
             gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
         except StopIteration:
-            logging.info(f'The live folder of {match_folder} does not contain a gamelog!')
+            log.insert(tk.END, f'\nThe live folder of {match_folder} does not contain a gamelog!')
             return
 
     gamelog_info = get_gamelog_info(str(gamelog))
     gamelog_info['Gamelog'] = str(gamelog)
     team_ids = [gamelog_info['HomeId'], gamelog_info['AwayId']]
 
-
-    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
+    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId'], log):
         return
 
     if not (league == 'eredivisie' or league == 'ekstraklasa'):
@@ -99,7 +99,7 @@ def create_team_stats_table(league, match_folder):
                                            season=int(gamelog_info['SeasonId']), conn=conn)
 
         elif not Path(stats).exists():
-            logging.error(f'The folder {stats} does not exist!')
+            log.insert(tk.END, f'\nThe folder {stats} does not exist!')
             return
 
     elif league == 'eredivisie' or league == 'ekstraklasa':
@@ -134,7 +134,7 @@ def create_team_stats_table(league, match_folder):
                                            season=int(gamelog_info['SeasonId']), conn=conn)
 
         elif not Path(stats).exists():
-            logging.error(f'The folder {stats} does not exist!')
+            log.insert(tk.END, f'\nThe folder {stats} does not exist!')
             return
 
 
@@ -178,7 +178,7 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
         return league_stats
 
 
-def print_stats_table(league, season, kpi, logo_path):
+def print_stats_table(league, season, kpi, logo_path, log):
     """
     Generate and save a statistics table for a given league and KPI.
 
@@ -194,7 +194,7 @@ def print_stats_table(league, season, kpi, logo_path):
             query = f"SELECT * FROM 'league_overview_{season}'"
             team_stats = pd.read_sql_query(query, conn)
     except sql.Error as e:
-        print(f"Error connecting to database: {e}")
+        log.insert(tk.END, f"Error connecting to database: {e}")
         return
 
     # Adjust 'Total Distance' to kilometers and round to two decimal places
@@ -252,7 +252,7 @@ def print_stats_table(league, season, kpi, logo_path):
 
     plt.close(fig)
 
-    print(f'The table for {kpi} in the {league} has been created and saved here: {output_path}')
+    log.insert(tk.END, f'\nThe table for {kpi} in the {league} has been created and saved here: {output_path}')
 
 
 def update_team_stats_table(teams_stats, team_ids, conn):
