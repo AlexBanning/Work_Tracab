@@ -103,6 +103,15 @@ def create_avg_stats(league, season):
     messagebox.showinfo("Success", f"Average stats table created for league {league}, season {season}")
 
 
+LEAGUE_MAPPING = {
+        'MLS': 'mls',
+        '1.Bundesliga': 'bl1',
+        '2.Bundesliga': 'bl2',
+        'Eredivisie': 'eredivisie',
+        'Ekstraklasa': 'ekstraklasa'
+    }
+
+
 def main():
     def toggle_advanced():
         if advanced_frame.winfo_viewable():
@@ -113,29 +122,28 @@ def main():
             toggle_button.config(text="Hide Advanced Functions")
 
     def on_matchday_update_click():
-        league = league_var.get()
+        league = LEAGUE_MAPPING[league_var.get()]
         matchday = matchday_entry.get()
         update_team_stats_table(league, matchday)
 
     def on_season_update_click():
-        league = league_var.get()
-        matchday = matchday_entry.get()
+        league = LEAGUE_MAPPING[league_var.get()]
         update_team_stats_table(league, matchday='-')
 
     def on_fetch_team_click():
-        league = league_var.get()
+        league = LEAGUE_MAPPING[league_var.get()]
         season = season_entry.get()
         team_id = team_id_entry.get()
         fetch_team_stats(league, season, team_id)
 
     def on_fetch_player_click():
-        league = league_var.get()
+        league = LEAGUE_MAPPING[league_var.get()]
         season = season_entry.get()
         player_id = player_id_entry.get()
         fetch_player_stats(league, season, player_id)
 
     def on_create_avg_stats_click():
-        league = league_var.get()
+        league = LEAGUE_MAPPING[league_var.get()]
         season = season_entry.get()
         create_avg_stats(league, season)
 
@@ -146,7 +154,7 @@ def main():
 
     ttk.Label(root, text="League").grid(column=0, row=0, padx=10, pady=5)
     league_menu = ttk.Combobox(root, textvariable=league_var)
-    league_menu['values'] = ('mls', 'bl1', 'bl2', 'eredivisie', 'ekstraklasa')
+    league_menu['values'] = ('MLS', '1.Bundesliga', '2.Bundesliga', 'Eredivisie', 'Ekstraklasa')
     league_menu.grid(column=1, row=0, padx=10, pady=5)
     league_menu.current(0)
 
