@@ -17,8 +17,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 import pandas as pd
 import sqlite3 as sql
-from TracabModules.Internal.scheduleFunctions import get_schedule_xml
-from TracabModules.Internal.tools import get_club_id_mapping
+# from TracabModules.Internal.scheduleFunctions import get_schedule_xml
+# from TracabModules.Internal.tools import get_club_id_mapping
 from lxml import etree
 from pathlib import Path
 import os
