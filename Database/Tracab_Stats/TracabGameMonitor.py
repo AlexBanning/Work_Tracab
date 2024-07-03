@@ -336,7 +336,6 @@ class TracabGameMonitor:
             else:
                 treeview.column(col, width=len(col) * 10) # Adjust width based on column name length
 
-
         # Insert the data
         for index, row in dataframe.iterrows():
             values = list(row)

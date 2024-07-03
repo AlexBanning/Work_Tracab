@@ -22,8 +22,7 @@ import pstats
 Club Mappings
 """
 
-team_info_path = Path(r'N:\07_QC\Alex\Databases\Team_Infos\BL1')
-club_mapping = get_club_id_mapping(team_info_path, league='bl1')
+club_mapping = get_club_id_mapping(league='mls')
 
 """
 Database cunstruction
@@ -57,17 +56,19 @@ else:
     for match in data_path.iterdir():
         print(match)
         create_team_stats_table(league='mls', match_folder=match)
+
 """
 Single league update
 """
 data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
 league = 'bl1'
+start_time = time.time()
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
     for match in md.iterdir():
         if match.is_dir():
-            start_time = time.time()
+            start_time_match = time.time()
             create_team_stats_table(league, match)
             # # Construct the profile output file path
             # profile_file = f"Stats_Logs\profile_output_MD1_{match.name}.prof"
@@ -83,17 +84,17 @@ for md in data_path.iterdir():
             # # # # Dump the profiling results to a file
             # profiler.dump_stats(profile_file)
         ##
-            print(f"Processed {match} in {time.time() - start_time:.2f} seconds\n")
-
+            print(f"Processed {match} in {time.time() - start_time_match:.2f} seconds\n")
             # # # Optionally, print or analyze the profile immediately
             # with open(f"Stats_Logs\profile_stats_MD1_{match.name}_new.txt", 'w') as f:
             #     p = pstats.Stats(profile_file, stream=f)
             #     p.sort_stats('cumulative').print_stats(50)
+print(f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
 
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='bl1', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='bl2', season=2023, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
@@ -114,11 +115,11 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 """
 Get stats from a player
 """
-league = 'ekstraklasa'
+league = 'bl2'
 season = 2023
 player_id = 13526
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
-    query = f"SELECT * FROM 'player_stats' WHERE DlProviderID = {player_id}"
+    query = f"SELECT * FROM 'player_stats'"
     player_stats = pd.read_sql_query(query, conn).sort_values(by=['DlProviderID', 'Matchday'], ascending=True)
 
 """

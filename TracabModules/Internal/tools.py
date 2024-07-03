@@ -31,7 +31,7 @@ def is_date_in_current_week(date_str, mls=False):
         return start_of_last_week <= date_to_check <= end_of_week
 
 
-def get_club_id_mapping(team_info_path, league):
+def get_club_id_mapping(league):
     """
     Create a mapping between club id and club name and return it as a DataFrame.
 
@@ -44,15 +44,19 @@ def get_club_id_mapping(team_info_path, league):
     """
 
     if league == 'mls':
-        team_info_file = [x for x in team_info_path.iterdir()][0]
+        team_info_file = r'\\10.49.0.250\d3_mls\MatchInfo\Feed_01_04_basedata_clubs_MLS-SEA-0001K8_MLS-COM-000001.xml'
         return get_mls_club_mapping(team_info_file)
-    elif league in {'bl1', 'bl2'}:
-        return get_bl_club_mapping(team_info_path)
+    elif league == 'bl1':
+        team_info_path = r'\\10.49.0.250\deltatre\MatchInfo\51\2023\team_players'
+        return get_bl_club_mapping(Path(team_info_path))
+    elif league == 'bl2':
+        team_info_path = r'\\10.49.0.250\deltatre\MatchInfo\52\2023\team_players'
+        return get_bl_club_mapping(Path(team_info_path))
     elif league == 'eredivisie':
-        team_info_file = [x for x in team_info_path.iterdir()][0]
+        team_info_file = r'\\10.49.0.250\Opta\MatchInfo\srml-9-2023-squads.xml'
         return get_ere_club_mapping(team_info_file)
     elif league == 'ekstraklasa':
-        team_info_file =[x for x in team_info_path.iterdir()][0]
+        team_info_file = r'\\10.49.0.250\Keytoq\MatchInfo\main.xml'
         return get_ekstra_club_mapping(team_info_file)
     else:
         raise ValueError(f"Unsupported league: {league}")
@@ -69,7 +73,7 @@ def get_mls_club_mapping(team_info_file):
     pd.DataFrame: A DataFrame containing the mapping of team IDs to team names.
     """
     try:
-        with team_info_file.open('r', encoding='utf-8') as fp:
+        with Path(team_info_file).open('r', encoding='utf-8') as fp:
             data = BeautifulSoup(fp, 'xml')
 
         club_data = data.find_all('Clubs')[0].contents[1::2]

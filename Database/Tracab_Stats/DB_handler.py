@@ -125,8 +125,7 @@ class StatsApp(tk.Tk):
         league = self.league.get()
         season = self.season.get()
         if league:
-            team_info_path = Path(fr'N:\07_QC\Alex\Databases\Team_Infos\{league.upper()}')
-            club_mapping = get_club_id_mapping(team_info_path, league=league)
+            club_mapping = get_club_id_mapping(league=league)
             create_avg_stats_table(club_mapping, league=league, season=season, db_update=True, data=True)
             messagebox.showinfo("Success", "League stats generated successfully!")
         else:

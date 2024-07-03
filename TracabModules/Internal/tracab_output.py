@@ -3,7 +3,6 @@ from xml.dom.minidom import parse
 from lxml import etree
 import logging
 import numpy as np
-from TracabModules.Internal.gamelog_functions import get_player_name
 
 bvb_validation_kpis = ["TeamID", "PlayerID", "PlayerNumber", "PlayerName",
                        "PlayTime (min)", "Distance (m)", "Distance/min",

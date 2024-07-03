@@ -252,7 +252,7 @@ def print_stats_table(league, season, kpi, logo_path, log):
 
     plt.close(fig)
 
-    log.insert(tk.END, f'\nThe table for {kpi} in the {league} has been created and saved here: {output_path}')
+    log.insert(tk.END, f'\nThe table for "{kpi}" in the {league.upper()} has been created and saved here: {output_path}')
 
 
 def update_team_stats_table(teams_stats, team_ids, conn):

@@ -9,28 +9,27 @@ import pandas as pd
 import time
 import threading
 import numpy as np
+import os, sys
+
+LEAGUE_MAPPING = {
+    'MLS': 'mls',
+    'Bundesliga': 'bl1',
+    '2.Bundesliga': 'bl2',
+    'Eredivisie': 'eredivisie',
+    'Ekstraklasa': 'ekstraklasa'
+}
 
 
 # Function to update team stats table
-def update_team_stats_table(data_path, log_text_widget):
+def update_team_stats_table(data_path, league, log_text_widget):
     start_time = time.time()
 
-    if data_path.parts[3] == '1 - MLS':
-        league = 'mls'
-    elif data_path.parts[3] == '51 - Bundesliga 1_BL':
-        league = 'bl1'
-    elif data_path.parts[3] == '52 - 2.Bundesliga 2_BL':
-        league = 'bl2'
-    elif data_path.parts[3] == '9 - Eredivisie':
-        league = 'eredivisie'
-    elif data_path.parts[3] == '55 - Ekstraklasa':
-        league = 'ekstraklasa'
-
+    # Process based on whether it's a single matchday or league folder
     if "MD" in data_path.name:  # Single matchday folder selected
         for match in data_path.iterdir():
             if match.is_dir():
                 start_time_match = time.time()
-                create_team_stats_table(league, match, log_text_widget)  # Assuming league is two levels up
+                create_team_stats_table(league, match, log_text_widget)
                 log_text_widget.insert(tk.END, f"\nProcessed {match} in {time.time() - start_time_match:.2f} seconds\n")
                 log_text_widget.yview(tk.END)  # Scroll to the end of the text widget
 
@@ -41,9 +40,8 @@ def update_team_stats_table(data_path, log_text_widget):
                 for match in md.iterdir():
                     if match.is_dir():
                         start_time_match = time.time()
-                        create_team_stats_table(league, match, log_text_widget)  # Assuming league is the folder name
-                        log_text_widget.insert(tk.END,
-                                               f"\nProcessed {match} in {time.time() - start_time_match:.2f} seconds\n")
+                        create_team_stats_table(league, match, log_text_widget)
+                        log_text_widget.insert(tk.END, f"\nProcessed {match} in {time.time() - start_time_match:.2f} seconds\n")
                         log_text_widget.yview(tk.END)  # Scroll to the end of the text widget
 
         messagebox.showinfo("Success", f"Database updated for the complete season of {data_path.parts[-1]}")
@@ -51,6 +49,7 @@ def update_team_stats_table(data_path, log_text_widget):
     log_text_widget.insert(tk.END, f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
 
 
+# Function to display the database data in a table
 def show_data_in_popup(data):
     # Create a new pop-up window
     popup = tk.Toplevel()
@@ -69,6 +68,7 @@ def show_data_in_popup(data):
     text.configure(yscrollcommand=scrollbar.set)
 
 
+# Function to fetch and display the data for a team
 def fetch_team_stats(league, season, team_id):
     db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
     with sql.connect(db_path) as conn:
@@ -78,6 +78,7 @@ def fetch_team_stats(league, season, team_id):
         show_data_in_popup(team_stats)
 
 
+# Function to fetch and display the data for a player
 def fetch_player_stats(league, season, player_id):
     db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
     with sql.connect(db_path) as conn:
@@ -91,50 +92,30 @@ def fetch_player_stats(league, season, player_id):
         show_data_in_popup(player_stats)
 
 
+# Function to create the avg stats table for a league
 def create_avg_stats(league, season):
-    team_info_path = Path(f'N:\\07_QC\\Alex\\Databases\\Team_Infos\\{league.upper()}')
-    club_mapping = get_club_id_mapping(team_info_path, league=league)
+    club_mapping = get_club_id_mapping(league=league)
     create_avg_stats_table(club_mapping, league=league, season=season, db_update=True, data=True)
-    messagebox.showinfo("Success", f"Average stats table created for league {league}, season {season}")
+    messagebox.showinfo("Success", f"Average stats table created for {league.upper()}, season {season}")
 
 
+# Function to create the stats reports
 def create_stats_report(league, season, log_text_widget):
     for kpi in ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']:
         print_stats_table(league=league, kpi=kpi, season=season,
-                          logo_path=fr'N:\07_QC\Alex\Databases\TeamLogos\{league.upper()}_Logos\{season}', log=log_text_widget)
-    messagebox.showinfo("Success", f"Stats-Reports created for league {league}, season {season}")
+                          logo_path=fr'N:\07_QC\Alex\Databases\TeamLogos\{league.upper()}_Logos\{season}',
+                          log=log_text_widget)
+    messagebox.showinfo("Success", f"Stats-Reports created for {league.upper()}, season {season}")
 
 
-def update_in_background(data_path, log_text_widget):
-    threading.Thread(target=update_team_stats_table, args=(data_path, log_text_widget)).start()
+# Implement threading so the GUI remains responsive while the code is exeucted
+def update_in_background(data_path, league, log_text_widget):
+    threading.Thread(target=update_team_stats_table, args=(data_path, league, log_text_widget)).start()
 
 
+# Implement threading so the GUI remains responsive while the code is exeucted
 def report_in_background(league, season, log_text_widget):
     threading.Thread(target=create_stats_report, args=(league, season, log_text_widget)).start()
-
-
-class TextRedirector:
-    def __init__(self, widget, tag="stdout"):
-        self.widget = widget
-        self.tag = tag
-
-    def write(self, msg):
-        self.widget.configure(state='normal')
-        self.widget.insert(tk.END, msg, (self.tag,))
-        self.widget.configure(state='disabled')
-        self.widget.yview(tk.END)
-
-    def flush(self):
-        pass
-
-
-LEAGUE_MAPPING = {
-    'MLS': 'mls',
-    '1.Bundesliga': 'bl1',
-    '2.Bundesliga': 'bl2',
-    'Eredivisie': 'eredivisie',
-    'Ekstraklasa': 'ekstraklasa'
-}
 
 
 def main():
@@ -156,8 +137,19 @@ def main():
 
     def on_update_click():
         data_path = Path(data_path_var.get())
+        # Determine league based on data_path
+        league = LEAGUE_MAPPING.get(data_path.parts[3].split()[2], None)
+        if league is None:
+            log_text_widget.insert(tk.END, "Invalid league selected.\n")
+            return
+        # # Determine the season based on data_path
+        # if league == 'mls':
+        #     season = f'20{data_path.parts[2].split('_')[1][-2:]}'
+        # else:
+        #     season = f'20{data_path.parts[2].split('_')[1][:2]}'
         if data_path:
-            update_in_background(data_path, log_text_widget)
+            update_in_background(data_path, league, log_text_widget)
+            # create_avg_stats(league, season)
 
     def on_fetch_team_click():
         league = LEAGUE_MAPPING[league_var.get()]
@@ -191,6 +183,11 @@ def main():
 
     root = tk.Tk()
     root.title("Database Manager")
+    # Load Tracab Icon
+    exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
+    root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+    # Set Background colour
+    root.configure(bg='#2F4F4F')
 
     league_var = tk.StringVar()
     data_path_var = tk.StringVar()
