@@ -18,7 +18,10 @@ season_id = input('Which season do you want to update? \n')
 sf.get_schedule_xml(comp_id, vendor='d3_mls', season_id=season_id)
 
 # Define filename so the schedule function can open it
-filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str(comp_id) + '.xml'
+if comp_id == str(102):
+    filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00002U.xml'
+else:
+    filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
 schedule = sf.get_d3_mls_schedule(int(comp_id), filename)

@@ -8,6 +8,7 @@ import os
 import xml.etree.ElementTree as ET
 import sys
 
+
 def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     """
     Download all required xml-files for the schedule of specified competition
@@ -36,9 +37,11 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     if vendor == 'd3_mls':
         if comp_id == str(102):
             filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00002U.xml'
-        filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
-        # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
-        ftp_dir = 'D3_MLS/MatchInfo/'
+            ftp_dir = r'D3_MLS/MatchInfo/STS-DataFetch'
+        else:
+            filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
+            # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
+            ftp_dir = 'D3_MLS/MatchInfo/'
     if vendor == 'keytoq':
         comp_id = '55'
         filename = 'main.xml'
@@ -59,7 +62,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
 
             return filename, print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
     except:
-        print('error')
+        print(f'The schedule fur competition {str(comp_id)} of {str(vendor)} is not available!')
         pass
 
     try:
@@ -207,6 +210,9 @@ def get_d3_mls_schedule(comp_id, filename):
         league = 'MLS PlayOffs'
     elif comp_id == 6:
         league = 'MLS Leagues Cup'
+    elif comp_id == 102:
+        league = 'U.S. Open Cup'
+
 
     # Create empty DF
     schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium", "STS-ID"])

@@ -7,7 +7,7 @@ Schedule-Script for all main competitions we are covering in the 23/24 season
 """
 Create MLS Schedule
 """
-sf.get_schedule_xml(1, vendor='d3_mls', season_id=2024)
+sf.get_schedule_xml(1, vendor='d3_mls', season_id=8)
 
 
 # Define filename so the schedule function can open it
@@ -21,7 +21,7 @@ mls_schedule = sf.get_d3_mls_schedule(comp_id=1,filename=mls_filename)
 Create BL1 Schedule
 """
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(51, vendor='deltatre', season_id=2023)
+sf.get_schedule_xml(51, vendor='deltatre', season_id=2024)
 
 # Define filename so the schedule function can open it
 bl_filename = 'schedule.xml'
@@ -34,7 +34,7 @@ Create BL2 Schedule
 """
 
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(52, vendor='deltatre', season_id=2023)
+sf.get_schedule_xml(52, vendor='deltatre', season_id=2024)
 
 # Define filename so the schedule function can open it
 blt_filename = 'schedule.xml'
@@ -47,10 +47,10 @@ blt_schedule = sf.get_d3_schedule(comp_id=52, filename=blt_filename)
 Create Eredivisie Schedule
 """
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(9, vendor='opta', season_id=2023)
+sf.get_schedule_xml(9, vendor='opta', season_id=2024)
 
-schedule_filename = 'srml-' + str(9) + '-' + str(2023) + '-results.xml'
-squads_filename = 'srml-' + str(9) + '-' + str(2023) + '-squads.xml'
+schedule_filename = 'srml-' + str(9) + '-' + str(2024) + '-results.xml'
+squads_filename = 'srml-' + str(9) + '-' + str(2024) + '-squads.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
 opta_schedule = sf.get_opta_schedule(comp_id=9, schedule_filename=schedule_filename, squad_filename=squads_filename)
