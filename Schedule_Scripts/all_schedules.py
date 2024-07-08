@@ -1,13 +1,17 @@
 import TracabModules.Internal.scheduleFunctions as sf
 
 """
-Schedule-Script for all main competitions we are covering in the 23/24 season 
+Schedule-Script for all main competitions we are covering in the 24/25 season 
+
+To Edit:
+- season_id Relevant to fetch the most up to date schedule
+- season_dir Relevant for Schedule-Script folder on NAS
 """
 
 """
 Create MLS Schedule
 """
-sf.get_schedule_xml(1, vendor='d3_mls', season_id=8)
+sf.get_schedule_xml(1, vendor='d3_mls', season_id=8, season_dir='Season24-25')
 
 
 # Define filename so the schedule function can open it
@@ -15,45 +19,45 @@ mls_filename = 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K8_MLS-COM-00000' + str
 
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-mls_schedule = sf.get_d3_mls_schedule(comp_id=1,filename=mls_filename)
+mls_schedule = sf.get_d3_mls_schedule(comp_id=1,filename=mls_filename, season_dir='Season24-25')
 
 """
 Create BL1 Schedule
 """
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(51, vendor='deltatre', season_id=2024)
+sf.get_schedule_xml(51, vendor='deltatre', season_id=2024, season_dir='Season24-25')
 
 # Define filename so the schedule function can open it
 bl_filename = 'schedule.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-bl_schedule = sf.get_d3_schedule(comp_id=51, filename=bl_filename)
+bl_schedule = sf.get_d3_schedule(comp_id=51, filename=bl_filename, season_dir='Season24-25')
 
 """
 Create BL2 Schedule
 """
 
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(52, vendor='deltatre', season_id=2024)
+sf.get_schedule_xml(52, vendor='deltatre', season_id=2024, season_dir='Season24-25')
 
 # Define filename so the schedule function can open it
 blt_filename = 'schedule.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-blt_schedule = sf.get_d3_schedule(comp_id=52, filename=blt_filename)
+blt_schedule = sf.get_d3_schedule(comp_id=52, filename=blt_filename, season_dir='Season24-25')
 
 
 """ 
 Create Eredivisie Schedule
 """
 # Download the xml-file based on comp and season id
-sf.get_schedule_xml(9, vendor='opta', season_id=2024)
+sf.get_schedule_xml(9, vendor='opta', season_id=2024, season_dir='Season24-25')
 
 schedule_filename = 'srml-' + str(9) + '-' + str(2024) + '-results.xml'
 squads_filename = 'srml-' + str(9) + '-' + str(2024) + '-squads.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-opta_schedule = sf.get_opta_schedule(comp_id=9, schedule_filename=schedule_filename, squad_filename=squads_filename)
+opta_schedule = sf.get_opta_schedule(comp_id=9, schedule_filename=schedule_filename, squad_filename=squads_filename, season_dir='Season24-25')
 
 """
 Create Ekstraklasa Schedule
@@ -61,35 +65,35 @@ Create Ekstraklasa Schedule
 
 comp_id = int(51)
 
-sf.get_schedule_xml(comp_id, vendor='keytoq')
+sf.get_schedule_xml(comp_id, vendor='keytoq', season_dir='Season24-25')
 
 filename = 'main.xml'
 
 # Parse the schedule from xml-file to a pandas.Dataframe
-ktq_schedule = sf.get_keytoq_schedule(filename)
+ktq_schedule = sf.get_keytoq_schedule(filename, season_dir='Season24-25')
 
 """
 Push MLS Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(mls_schedule, league=mls_schedule['League'].iloc[0])
+sf.push_to_google(mls_schedule, league=mls_schedule['League'].iloc[0], season_dir='Season24-25')
 """
 Push BL1 Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(bl_schedule, league=bl_schedule['League'].iloc[0])
+sf.push_to_google(bl_schedule, league=bl_schedule['League'].iloc[0], season_dir='Season24-25')
 """
 Push BL2 Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(blt_schedule, league=blt_schedule['League'].iloc[0])
+sf.push_to_google(blt_schedule, league=blt_schedule['League'].iloc[0], season_dir='Season24-25')
 """
 Push Eredivisie Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(opta_schedule, league=opta_schedule['League'].iloc[0])
+sf.push_to_google(opta_schedule, league=opta_schedule['League'].iloc[0], season_dir='Season24-25')
 """
 Push Ekstraklasa Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(ktq_schedule, league=ktq_schedule['League'].iloc[0])
+sf.push_to_google(ktq_schedule, league=ktq_schedule['League'].iloc[0], season_dir='Season24-25')

@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 import sys
 
 
-def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
+def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
     """
     Download all required xml-files for the schedule of specified competition
     :param chdr:
@@ -50,7 +50,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
     # Try statement as workaround due to raised (unknown) error when downloading files from ftp
     # Change directory so the schedules are downloaded into the MatchInfo folder
     if chdr is True:
-        os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+        os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
 
     try:
         if vendor != 'opta':
@@ -82,7 +82,7 @@ def get_schedule_xml(comp_id, vendor, chdr=True, **kwargs):
         pass
 
 
-def get_fifa_schedule(comp_id, filename):
+def get_fifa_schedule(comp_id, filename, season_dir):
     """
     Parse the schedule.xml of the fifa tournament into a pd.DataFrame that can be pushed to the Google Sheet.
     :param comp_id:
@@ -93,7 +93,7 @@ def get_fifa_schedule(comp_id, filename):
     """
 
     global league
-    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
     with open(filename) as fp:
         data = BeautifulSoup(fp, features='html.parser')
 
@@ -128,7 +128,7 @@ def get_fifa_schedule(comp_id, filename):
     return schedule
 
 
-def get_d3_schedule(comp_id, filename, chdr=True):
+def get_d3_schedule(comp_id, filename, season_dir):
     """
     Parse the schedule.xml of the deltatre tournament into a pd.DataFrame that can be pushed to the Google Sheet.
     :param chdr:
@@ -139,11 +139,8 @@ def get_d3_schedule(comp_id, filename, chdr=True):
         Dataframe containing the whole available schedule for the competition
     """
 
-    # Parse in the schedule
-    if chdr == True:
-        tree = ET.parse("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo\\" + filename)
-    else:
-        tree = ET.parse(filename)
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
+    tree = ET.parse(filename)
     root = tree.getroot()
     # Get (if available) both halfs (all rounds) of a tournament, e.g. 'Hinrunde', 'Rückrunde'
     division = [x for x in root[1][1:]]
@@ -182,7 +179,7 @@ def get_d3_schedule(comp_id, filename, chdr=True):
     return schedule
 
 
-def get_d3_mls_schedule(comp_id, filename):
+def get_d3_mls_schedule(comp_id, filename, season_dir):
     """
     Parse the schedule.xml of the mls tournament into a pd.DataFrame that can be pushed to the Google Sheet.
     :param comp_id:
@@ -192,7 +189,7 @@ def get_d3_mls_schedule(comp_id, filename):
         Dataframe containing the whole available schedule for the competition
     """
 
-    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
     with open(filename) as fp:
         data = BeautifulSoup(fp, 'xml')
 
@@ -243,7 +240,7 @@ def get_d3_mls_schedule(comp_id, filename):
     return schedule
 
 
-def get_opta_schedule(comp_id, schedule_filename, squad_filename):
+def get_opta_schedule(comp_id, schedule_filename, squad_filename, season_dir):
     """
     Parse the schedule.xml of the opta tournament into a pd.DataFrame that can be pushed to the Google Sheet.
     :param comp_id: Int
@@ -258,7 +255,7 @@ def get_opta_schedule(comp_id, schedule_filename, squad_filename):
 
     """
 
-    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
     with open(schedule_filename,
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
@@ -301,14 +298,14 @@ def get_opta_schedule(comp_id, schedule_filename, squad_filename):
     return schedule
 
 
-def get_keytoq_schedule(filename):
+def get_keytoq_schedule(filename, season_dir):
     """
     Parse the schedule.xml of the Ekstraklasa into a pd.DataFrame that can be pushed to the Google Sheet.
     :param filename:
     :return:
     """
 
-    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24\\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
     with open(filename,
               encoding='utf8') as fp:
         schedule_data = BeautifulSoup(fp, 'xml')
@@ -332,7 +329,7 @@ def get_keytoq_schedule(filename):
     return schedule
 
 
-def push_to_google(schedule, league):
+def push_to_google(schedule, league, season_dir):
     """
     Takes in a pd.DataFrame and pushes it into the Google Sheet '23/24 Schedule'.
     :param schedule: pd.DataFrame
@@ -342,7 +339,7 @@ def push_to_google(schedule, league):
     :return:
     """
 
-    os.chdir("N:\\07_QC\\Scripts\\Schedule_script\\Season23-24")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
     gc = gspread.oauth(credentials_filename=
                        'schedule_push_authentification.json'
                        )
