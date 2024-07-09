@@ -101,6 +101,8 @@ def create_avg_stats(league, season):
 
 # Function to create the stats reports
 def create_stats_report(league, season, log_text_widget):
+    if not league or not season:
+        messagebox.showwarning("Error", f"Please enter the league and season!")
     for kpi in ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']:
         print_stats_table(league=league, kpi=kpi, season=season,
                           logo_path=fr'N:\07_QC\Alex\Databases\TeamLogos\{league.upper()}_Logos\{season}',

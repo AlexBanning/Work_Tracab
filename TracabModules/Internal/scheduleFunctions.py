@@ -37,11 +37,10 @@ def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
     if vendor == 'd3_mls':
         if comp_id == str(102):
             filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00002U.xml'
-            ftp_dir = r'D3_MLS/MatchInfo/STS-DataFetch'
         else:
             filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000' + str(comp_id) + '.xml'
             # correct file: 'Feed_01_06_basedata_fixtures_MLS-SEA-0001K7_MLS-COM-000001.xml'
-            ftp_dir = 'D3_MLS/MatchInfo/'
+        ftp_dir = r'D3_MLS/MatchInfo/STS-DataFetch'
     if vendor == 'keytoq':
         comp_id = '55'
         filename = 'main.xml'
@@ -356,7 +355,7 @@ def push_to_google(schedule, league, season_dir):
     return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "24/25 Schedule"')
 
 
-def get_STSID(comp_id, home_team, away_team, season_id):
+def get_STSID(comp_id, home_team, away_team, season_id, season_dir):
     """
 
     :param away_team:
@@ -372,7 +371,7 @@ def get_STSID(comp_id, home_team, away_team, season_id):
     correct_date = 0
 
     try:
-        filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False, season_id=season_id)
+        filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False, season_id=season_id, season_dir=season_dir)
     except UnboundLocalError:
         print('schedule-file not found, check the competition in the gamestats')
         input('Enter to exit')

@@ -44,7 +44,8 @@ def get_club_id_mapping(league):
     """
 
     if league == 'mls':
-        team_info_file = r'\\10.49.0.250\d3_mls\MatchInfo\Feed_01_04_basedata_clubs_MLS-SEA-0001K8_MLS-COM-000001.xml'
+        team_info_file = (r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_04_basedata_clubs_MLS-SEA-0001K8_MLS'
+                          r'-COM-000001.xml')
         return get_mls_club_mapping(team_info_file)
     elif league == 'bl1':
         team_info_path = r'\\10.49.0.250\deltatre\MatchInfo\51\2023\team_players'
@@ -136,12 +137,11 @@ def get_bl_player_mapping(league_id, team_id):
 
     player_mapping = {shirt: {'ID': pid, 'Name': nm} for shirt, pid, nm in zip(shirt_number, player_id, name)}
 
-
     return player_mapping
 
 
 def get_mls_player_mapping(season_id, team_id):
-    info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo')
+    info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch')
     clubs_file = info_path / f'Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
 
     with clubs_file.open('r', encoding='utf-8') as fp:
@@ -177,7 +177,8 @@ def get_opta_player_mapping(season_id, league_id, team_id):
     tree = etree.parse(str(info_path))
     root = tree.getroot()
 
-    team = [team for team in root.find('SoccerDocument').findall('Team') if team.get('uID') == f't{team_id}'][0].findall('Player')
+    team = [team for team in root.find('SoccerDocument').findall('Team') if team.get('uID') == f't{team_id}'][
+        0].findall('Player')
 
     player_mapping = {
         obj.find('.//Stat[@Type="jersey_num"]').text: {

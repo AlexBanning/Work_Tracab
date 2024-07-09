@@ -47,10 +47,9 @@ class DataFetcher:
             return
 
     def mls(self):
-        if self.season == '2024':
-            season_id = '8'
+        season_id = str(int(self.season + 2016))
         tree = etree.parse(
-            fr'\\10.49.0.250\d3_mls\MatchInfo\Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml')
+            fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml')
         root = tree.getroot()
 
         match = next(
@@ -68,7 +67,8 @@ class DataFetcher:
         avg_stats_table, players = self.get_stats_tables(league=self.league)
 
         # Get players from active lineup
-        lineup_file = fr'\\10.49.0.250\d3_mls\MatchInfo\Feed_02_01_matchinformation_MLS-COM-000001_{match['STS-ID']}.xml'
+        lineup_file = fr'\\10.49.0.250\d3_mls\MatchInfo\STS_DataFetch\Feed_02_01_matchinformation_MLS-COM-000001_{
+                      match['STS-ID']}.xml'
         gamestats_tree = etree.parse(lineup_file)
         gamestats_root = gamestats_tree.getroot()
 
@@ -130,7 +130,6 @@ class DataFetcher:
         home_name = root.findall('.//team')[0].find('team-metadata').find('name').get('full')
 
         away_name = root.findall('.//team')[1].find('team-metadata').find('name').get('full')
-
 
         home_players = {
             x.find('player-metadata').get('player-key'): {
