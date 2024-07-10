@@ -210,8 +210,8 @@ def print_stats_table(league, season, kpi, logo_path, log):
     df_sorted = df_sorted[['Rank', 'Logo', 'TeamName', kpi]]
 
     # Define table characteristics
-    bg_color = "#FFFFFF"
-    text_color = "#000000"
+    bg_color = "#052A2A"
+    text_color = "#127839"
     plt.rcParams["text.color"] = text_color
     plt.rcParams["font.family"] = "monospace"
 
@@ -241,6 +241,9 @@ def print_stats_table(league, season, kpi, logo_path, log):
         ax=ax,
     )
 
+    # Adjust layout to fit the table tightly
+    # plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
+
     # Save the figure
     output_path = Path(f'N:\\07_QC\\Alex\\StatsReports\\{league.upper()}') / f'{league}_{kpi.lower()}_{season}_table.png'
     fig.savefig(
@@ -248,6 +251,8 @@ def print_stats_table(league, season, kpi, logo_path, log):
         facecolor=ax.get_facecolor(),
         dpi=200,
         bbox_inches="tight",
+        pad_inches=0.1,  # Adjust padding as needed
+
     )
 
     plt.close(fig)

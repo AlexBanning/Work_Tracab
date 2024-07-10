@@ -17,8 +17,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 import pandas as pd
 import sqlite3 as sql
-# from TracabModules.Internal.scheduleFunctions import get_schedule_xml
-# from TracabModules.Internal.tools import get_club_id_mapping
+import numpy as np
 from lxml import etree
 from pathlib import Path
 import os
@@ -47,7 +46,8 @@ class DataFetcher:
             return
 
     def mls(self):
-        season_id = str(int(self.season + 2016))
+        season_id = str((int(self.season) - 2016))
+        # season_id = '8'
         tree = etree.parse(
             fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml')
         root = tree.getroot()
@@ -67,7 +67,7 @@ class DataFetcher:
         avg_stats_table, players = self.get_stats_tables(league=self.league)
 
         # Get players from active lineup
-        lineup_file = fr'\\10.49.0.250\d3_mls\MatchInfo\STS_DataFetch\Feed_02_01_matchinformation_MLS-COM-000001_{
+        lineup_file = fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_02_01_matchinformation_MLS-COM-000001_{
                       match['STS-ID']}.xml'
         gamestats_tree = etree.parse(lineup_file)
         gamestats_root = gamestats_tree.getroot()
@@ -105,7 +105,9 @@ class DataFetcher:
 
         columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
         home_row = avg_stats_table[avg_stats_table['TeamName'] == match['Home']][columns_to_keep]
+        home_row['Total Distance'] = np.round(home_row['Total Distance'] / 1000, 2)
         away_row = avg_stats_table[avg_stats_table['TeamName'] == match['Away']][columns_to_keep]
+        away_row['Total Distance'] = np.round(away_row['Total Distance'] / 1000, 2)
 
         return home_row, away_row, match['Home'], match['Away'], home_highspeeds, away_highspeeds
 
@@ -164,7 +166,9 @@ class DataFetcher:
 
         columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
         home_row = avg_stats_table[avg_stats_table['TeamName'] == home_name][columns_to_keep]
+        home_row['Total Distance'] = np.round(home_row['Total Distance'] / 1000, 2)
         away_row = avg_stats_table[avg_stats_table['TeamName'] == away_name][columns_to_keep]
+        away_row['Total Distance'] = np.round(away_row['Total Distance'] / 1000, 2)
 
         return home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds
 
@@ -192,8 +196,8 @@ class TracabGameMonitor:
         self.root = tk.Tk()
         self.root.title("Tracab GameMonitor")
         # Load Tracab Icon
-        exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
-        self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+        # exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
+        # self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
         # Set Background colour
         self.root.configure(bg='#2F4F4F')
 
@@ -230,7 +234,7 @@ class TracabGameMonitor:
 
         # Button to fetch team and player data
         self.fetch_button = tk.Button(self.center_frame, text="Get Data", command=self.fetch_data)
-        self.fetch_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="nw")
+        self.fetch_button.grid(row=3, column=0, columnspan=2, pady=5, sticky="nw")
 
         # Create a frame to contain the TreeView for displaying dataframes
         self.dataframe_frame = tk.Frame(self.root)
@@ -251,6 +255,22 @@ class TracabGameMonitor:
         try:
             fetcher = DataFetcher(game_id=game_id, league=league, season=season)
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = fetcher.fetch_data()
+
+            # Test labels for team values
+            tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
+                     ).grid(row=4, column=0, padx=5, pady=2, sticky="nw")
+            tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
+                     ).grid(row=4, column=1, padx=5, pady=2, sticky="nw")
+
+            # Center the label horizontally
+            self.center_frame.grid_columnconfigure(0, weight=1)
+            self.center_frame.grid_columnconfigure(1, weight=1)
+
+            # Display total distance
+            tk.Label(self.center_frame, text=f'Avg. Distance: {home_row['Total Distance'].iloc[0]}km',
+                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=0, padx=5, pady=2, sticky="nw")
+            tk.Label(self.center_frame, text=f'Avg. Distance: {away_row['Total Distance'].iloc[0]}km',
+                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=1, padx=5, pady=2, sticky="nw")
 
             # Check if Treeview widgets already exist, if not, create new ones
             if not hasattr(self, 'home_treeview') or not hasattr(self, 'away_treeview'):
@@ -331,7 +351,9 @@ class TracabGameMonitor:
         # Adjust column widths based on content
         for col in dataframe.columns:
             if col == 'Name':
-                treeview.column(col, width=max(100, len(col) * 10))  # Adjust width based on column name length
+                treeview.column(col, width=max(120, len(col) * 20))  # Adjust width based on column name length
+            elif col == '#':
+                treeview.column(col, width=25) # Adjust width based on column name length
             else:
                 treeview.column(col, width=len(col) * 10) # Adjust width based on column name length
 

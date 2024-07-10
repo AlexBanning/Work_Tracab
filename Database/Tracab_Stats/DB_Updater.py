@@ -14,6 +14,7 @@ import os, sys
 LEAGUE_MAPPING = {
     'MLS': 'mls',
     'Bundesliga': 'bl1',
+    '1.Bundesliga': 'bl1',
     '2.Bundesliga': 'bl2',
     'Eredivisie': 'eredivisie',
     'Ekstraklasa': 'ekstraklasa'
