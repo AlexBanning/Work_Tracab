@@ -16,6 +16,7 @@ Design should be relying on existing DFL_Highspeed_Monitor.
 import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 from TracabModules.Internal.database import DataFetcher
+import logging
 
 
 class TracabGameMonitor:
