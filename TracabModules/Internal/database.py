@@ -11,6 +11,7 @@ from pathlib import Path
 import sqlite3 as sql
 import logging
 import tkinter as tk
+from lxml import etree
 
 """
 Add some logic to check if player AND team data already exists so if yes, the create_team_stats_table function 
@@ -410,3 +411,194 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
     logging.info(
         f"Player statistics updated for both teams {team_ids[0]} and {team_ids[1]} for Matchday {matchday} in Season {season}.")
+
+
+class DataFetcher:
+    def __init__(self, game_id, league, season):
+        self.game_id = game_id
+        self.league = league.lower()
+        self.season = season
+
+    def get_stats_tables(self, league, matchday):
+        db_path = Path(f'N:/07_QC/Alex/Databases/{league}_stats.db')
+        try:
+            with sql.connect(db_path) as conn:
+                team_query = (
+                    f"SELECT * FROM 'league_overview_{int(self.season) - 1}'"
+                    if matchday == '1' else
+                    f"SELECT * FROM 'league_overview_{self.season}'"
+                )
+                avg_stats_table = pd.read_sql_query(team_query, conn)
+                player_query = f"SELECT * FROM 'player_stats'"
+                players = pd.read_sql_query(player_query, conn)
+                return avg_stats_table, players
+        except sql.Error as e:
+            print(f"Error connecting to database: {e}")
+            return None, None
+
+    def get_match_path(self):
+        league_code = '51' if self.league == 'bl1' else '52'
+        base_path = Path(fr'\\10.49.0.250\deltatre\MatchInfo') / league_code / str(self.season) / 'match_facts'
+        return next(x for x in base_path.iterdir() if self.game_id in x.name)
+
+    def parse_match_file(self, match_file):
+        tree = etree.parse(str(match_file))
+        root = tree.getroot()
+        matchday = root.findall('.//tournament-round')[0].get('round-number')
+        home_team = root.findall('.//team')[0]
+        away_team = root.findall('.//team')[1]
+        home_name = home_team.find('team-metadata').find('name').get('full')
+        away_name = away_team.find('team-metadata').find('name').get('full')
+        home_players = self.extract_players(home_team)
+        away_players = self.extract_players(away_team)
+        return matchday, home_name, away_name, home_players, away_players
+
+    def extract_players(self, team):
+        return {
+            player.find('player-metadata').get('player-key'): {
+                'ShirtNumber': int(player.find('player-metadata').get('uniform-number')),
+                'Name': player.find('player-metadata').find('name').get('nickname')
+            }
+            for player in team.findall('.//player')
+        }
+
+    def fill_missing_players_mls(self, filtered_df, players_dict):
+        missing_players = set(players_dict.keys()) - set(filtered_df['ObjectID'])
+        missing_df = pd.DataFrame({
+            'ObjectID': list(missing_players),
+            'HighSpeed': [np.nan] * len(missing_players)
+        })
+        return pd.concat([filtered_df, missing_df], ignore_index=True)
+
+    def fill_missing_players_dfl(self, filtered_df, players_dict):
+        missing_players = set(players_dict.keys()) - set(filtered_df['DlProviderID'])
+        missing_df = pd.DataFrame({
+            'DlProviderID': list(missing_players),
+            'HighSpeed': [np.nan] * len(missing_players)
+        })
+        return pd.concat([filtered_df, missing_df], ignore_index=True)
+
+    def calculate_highspeeds_mls(self, filtered_df, players_dict):
+        highspeeds = filtered_df.groupby('ObjectID')['HighSpeed'].max().reset_index()
+        highspeeds['Name'] = highspeeds['ObjectID'].map(lambda x: players_dict[x]['Name'])
+        highspeeds['ShirtNumber'] = highspeeds['ObjectID'].map(lambda x: players_dict[x]['ShirtNumber'])
+        return highspeeds[['Name', 'ShirtNumber', 'HighSpeed']].sort_values(by='ShirtNumber')
+
+    def calculate_highspeeds_dfl(self, filtered_df, players_dict):
+        highspeeds = filtered_df.groupby('DlProviderID')['HighSpeed'].max().reset_index()
+        highspeeds['Name'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['Name'])
+        highspeeds['ShirtNumber'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['ShirtNumber'])
+        return highspeeds[['Name', 'ShirtNumber', 'HighSpeed']].sort_values(by='ShirtNumber')
+
+    def handle_team_row(self, avg_stats_table, team_name, columns_to_keep):
+        try:
+            team_row = avg_stats_table[avg_stats_table['TeamName'] == team_name][columns_to_keep]
+            if not team_row.empty:
+                team_row['Total Distance'] = np.round(team_row['Total Distance'] / 1000, 2)
+            else:
+                team_row = pd.DataFrame([[np.nan] * len(columns_to_keep)], columns=columns_to_keep)
+        except KeyError:
+            team_row = pd.DataFrame([[np.nan] * len(columns_to_keep)], columns=columns_to_keep)
+        return team_row
+
+    def bundesliga(self):
+        match_file = self.get_match_path()
+        matchday, home_name, away_name, home_players, away_players = self.parse_match_file(match_file)
+        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday)
+
+        if avg_stats_table is None or players is None:
+            return None
+
+        home_filtered_df = players[players['DlProviderID'].isin(home_players.keys())]
+        away_filtered_df = players[players['DlProviderID'].isin(away_players.keys())]
+
+        home_filtered_df = self.fill_missing_players_dfl(home_filtered_df, home_players)
+        away_filtered_df = self.fill_missing_players_dfl(away_filtered_df, away_players)
+
+        home_highspeeds = self.calculate_highspeeds_dfl(home_filtered_df, home_players)
+        away_highspeeds = self.calculate_highspeeds_dfl(away_filtered_df, away_players)
+
+        columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
+        home_row = self.handle_team_row(avg_stats_table, home_name, columns_to_keep)
+        away_row = self.handle_team_row(avg_stats_table, away_name, columns_to_keep)
+
+        return home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds
+
+    def mls(self):
+        season_id = str((int(self.season) - 2016))
+        base_path = Path(fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch')
+        fixture_file = base_path / f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
+        tree = etree.parse(str(fixture_file))
+        root = tree.getroot()
+
+        match = next(
+            (
+                {
+                    'STS-ID': obj.get("MatchId"),
+                    'Home': obj.get("HomeTeamName"),
+                    'Home-ID': obj.get("HomeTeamName"),
+                    'Away': obj.get("GuestTeamName"),
+                    'Away-ID': obj.get("HomeTeamName"),
+                }
+                for obj in root.findall('.//Fixture') if obj.get('DlProviderId') == self.game_id
+            ),
+            None
+        )
+
+        if match is None:
+            print(f"No match found for game_id: {self.game_id}")
+            return None
+
+        lineup_file = base_path / f'Feed_02_01_matchinformation_MLS-COM-000001_{match["STS-ID"]}.xml'
+        gamestats_tree = etree.parse(lineup_file)
+        gamestats_root = gamestats_tree.getroot()
+
+        home_players = {
+            obj.get('PersonId'): {
+                'ShirtNumber': int(obj.get('ShirtNumber')),
+                'Name': f'{obj.get('Shortname')}'
+            }
+            for obj in gamestats_root.findall('.//Team')[0].findall('.//Player')
+        }
+
+        away_players = {
+            obj.get('PersonId'): {
+                'ShirtNumber': int(obj.get('ShirtNumber')),
+                'Name': f'{obj.get('Shortname')}'
+            }
+            for obj in gamestats_root.findall('.//Team')[1].findall('.//Player')
+        }
+
+        matchday = gamestats_root.findall('.//General')[0].get('MatchDay')
+        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday)
+        if avg_stats_table is None or players is None:
+            return None
+
+        home_filtered_df = players[players['ObjectID'].isin(home_players.keys())]
+        away_filtered_df = players[players['ObjectID'].isin(away_players.keys())]
+
+        home_filtered_df = self.fill_missing_players_mls(home_filtered_df, home_players)
+        away_filtered_df = self.fill_missing_players_mls(away_filtered_df, away_players)
+
+        home_highspeeds = self.calculate_highspeeds_mls(home_filtered_df, home_players)
+        away_highspeeds = self.calculate_highspeeds_mls(away_filtered_df, away_players)
+
+        columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
+        home_row = self.handle_team_row(avg_stats_table, match['Home'], columns_to_keep)
+        away_row = self.handle_team_row(avg_stats_table, match['Away'], columns_to_keep)
+
+        return home_row, away_row, match['Home'], match['Away'], home_highspeeds, away_highspeeds
+
+    def fetch_data(self):
+        league_method_map = {
+            'mls': self.mls,
+            'bl1': self.bundesliga,
+            'bl2': self.bundesliga
+        }
+
+        fetch_method = league_method_map.get(self.league)
+        if fetch_method:
+            return fetch_method()
+        else:
+            print(f"No method defined for league: {self.league}")
+            return None
