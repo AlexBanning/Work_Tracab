@@ -9,6 +9,9 @@ MLS = {'New York Red Bulls': 'RBNY', 'Charlotte FC': 'CLT', 'Sporting Kansas Cit
        'LA Galaxy': 'LA', 'D.C. United': 'DC', 'CF Montréal': 'MTL', 'Toronto FC': 'TOR', 'Chicago Fire FC': 'CHI',
        'Minnesota United': 'MIN', 'Austin FC': 'ATX', 'Colorado Rapids': 'COL', 'Portland Timbers': 'POR'}
 
+OpenCup = {'Los Angeles Football Club': 'LAFC', 'Sporting Kansas City': 'SKC', 'FC Dallas': 'DAL',
+           'New Mexico United': 'NM', 'Sacramento Republic FC': 'SRC'}
+
 LeaguesCup = {'New York Red Bulls': 'RBNY', 'Charlotte FC': 'CLT', 'Sporting Kansas City': 'SKC',
               'San Jose Earthquakes': 'SJ',
               'Orlando City': 'ORL', 'FC Cincinnati': 'CIN', 'Nashville SC': 'NSH', 'Columbus Crew': 'CLB',

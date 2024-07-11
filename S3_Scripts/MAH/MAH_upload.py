@@ -9,7 +9,7 @@ v2.0 2024/03/14 09:40
 """
 import shutil
 import sys
-from MLS.MLS_Teams import MLS, LeaguesCup
+from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -25,6 +25,8 @@ if comp == '1':
     teams = MLS
 elif comp == '6':
     teams = LeaguesCup
+elif comp == '102':
+    teams = OpenCup
 
 # Get 3LCs of both teams
 try:
