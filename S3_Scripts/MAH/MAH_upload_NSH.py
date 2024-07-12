@@ -8,7 +8,7 @@ v2.0: 2024/03/14 09:40
 """
 import shutil
 import sys
-from MLS.MLS_Teams import MLS
+from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -18,9 +18,14 @@ import os
 match_folder = newest_folder(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
 print(f'Matchfolder: {match_folder} \n')
-home, away, md, comp = get_match_info(match_folder)
+home, away, md, comp, match_id = get_match_info(match_folder)
 # Define team-dictionary
-teams = MLS
+if comp == '1':
+    teams = MLS
+elif comp == '6':
+    teams = LeaguesCup
+elif comp == '102':
+    teams = OpenCup
 
 # Get 3LCs of both teams
 try:
@@ -45,9 +50,9 @@ except KeyError:
 # Add both team substrings to get the match string
 match = str(ht) + '-' + str(at)
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(comp, home, away)
+sts_id, date = get_STSID(comp, match_id, season_id='8', season_dir='Season24-25')
 # create the path of the to-be-created folder for the upload command
-filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
+filepath_new = fr'{os.getcwd()}\MD{str(md)}_{match}_{comp}'
 # Create a folder with the correct naming in the current directory
 try:
     os.mkdir(filepath_new)
@@ -64,9 +69,13 @@ if comp == str(1):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
                + folder_new + '" --recursive')
-elif comp == str(100):
+elif comp == str(6):
     command = ('aws s3 cp "' + filepath_new +
-               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/LeaguesCup/' + md + '/'
+               + folder_new + '" --recursive')
+elif comp == str(102):
+    command = ('aws s3 cp "' + filepath_new +
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/USOpenCup/' + md + '/'
                + folder_new + '" --recursive')
 
 print(command)

@@ -132,6 +132,7 @@ def get_match_info(match_folder):
         away_team_name = str(dict(away_team_element.attributes.items())['sTeamDesc'])
         matchday = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iRoundId'])
         comp_id = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iCompetitionId'])
+        match_id = str(dict(xml_doc.getElementsByTagName('Hego')[0].attributes.items())['iGameNumber'])
 
     except FileNotFoundError:
         messagebox.showwarning('MAH Upload',
@@ -139,4 +140,4 @@ def get_match_info(match_folder):
                                f'restart.')
         sys.exit()
 
-    return home_team_name, away_team_name, matchday, comp_id
+    return home_team_name, away_team_name, matchday, comp_id, match_id

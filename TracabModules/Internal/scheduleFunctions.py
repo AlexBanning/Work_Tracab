@@ -355,7 +355,7 @@ def push_to_google(schedule, league, season_dir):
     return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "24/25 Schedule"')
 
 
-def get_STSID(comp_id, home_team, away_team, season_id, season_dir):
+def get_STSID(comp_id, match_id, season_id, season_dir):
     """
 
     :param away_team:
@@ -363,12 +363,6 @@ def get_STSID(comp_id, home_team, away_team, season_id, season_dir):
     :param home_team:
     :return:
     """
-    # Create a function that can download the gamestats of a single match based on the home team's name
-    # Download squad xml and schedule xml to be able to map team name and team ID and get the MatchID of their match
-    # Define matchID and date in case of undefined values
-
-    match_id = 0
-    correct_date = 0
 
     try:
         filename = get_schedule_xml(comp_id, vendor='d3_mls', chdr=False, season_id=season_id, season_dir=season_dir)
@@ -388,34 +382,11 @@ def get_STSID(comp_id, home_team, away_team, season_id, season_dir):
     # MatchIds of all matches of the home_team
     matches_schedule = data.find_all('Fixture')
 
-    # Assuming home_team and away_team are provided as input or variables
-    home_team_input = home_team.strip().lower()
-    away_team_input = away_team.strip().lower()
+    sts_id = next(x['MatchId'] for x in matches_schedule if x['DlProviderId'] == match_id)
+    date = next(x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if x['DlProviderId'] == match_id).replace('-', '_')
 
-    while True:
-        try:
-            match_ids = [x['MatchId'] for x in matches_schedule if
-                        str(x['HomeTeamName'].strip().lower()) == home_team_input and
-                         str(x['GuestTeamName'].strip().lower()) == away_team_input]
-            dates = [x['PlannedKickoffTimeCustom'][0:10] for x in matches_schedule if
-                     str(x['HomeTeamName'].strip().lower()) == home_team_input and
-                     str(x['GuestTeamName'].strip().lower()) == away_team_input]
-            for n, date in enumerate(dates):
-                if is_date_in_current_week(date, mls=True):
-                    correct_date = date.replace('-', '_')
-                    match_id = match_ids[n]
-                    print(f'Match-ID: {match_id} \n')
-            break
+    return sts_id, date
 
-        except IndexError:
-            print('The home/away team cannot be found in the competition. Please give the correct (full) names: \n')
-            home_team_input = str(input('Home Team: ')).strip().lower()
-            away_team_input = str(input('Away Team: ')).strip().lower()
-            continue
-        else:
-            break
-
-    return match_id, correct_date
 
 def get_tracabID(home_team):
     """

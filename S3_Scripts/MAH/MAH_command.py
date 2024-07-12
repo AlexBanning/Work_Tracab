@@ -13,7 +13,7 @@ import sys
 import os
 import tkinter as tk
 from tkinter import ttk
-from MLS.MLS_Teams import MLS
+from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, get_feed_names
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -42,8 +42,14 @@ def display_feed_names(sts_id, match):
 
 def generate_command():
     match_folder = newest_folder(r'\\192.168.7.72\Rec')
-    home, away, md, comp = get_match_info(match_folder)
-    teams = MLS
+    home, away, md, comp, match_id = get_match_info(match_folder)
+    # Define team-dictionary
+    if comp == '1':
+        teams = MLS
+    elif comp == '6':
+        teams = LeaguesCup
+    elif comp == '102':
+        teams = OpenCup
 
     try:
         ht = teams[home]
@@ -64,19 +70,24 @@ def generate_command():
         sys.exit()
 
     match = str(ht) + '-' + str(at)
-    sts_id, date = get_STSID(comp, home, away)
+    sts_id, date = get_STSID(comp, match_id, season_id='8', season_dir='Season24-25')
     filepath_new = os.getcwd() + '\\MD' + str(md) + '_' + match
     folder_new = str(sts_id) + '_' + match
 
     get_feed_names(sts_id, match)
 
+    # Upload folder after all videos have been moved and renamed
     if comp == str(1):
         command = ('aws s3 cp "' + filepath_new +
                    '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
                    + folder_new + '" --recursive')
-    elif comp == str(100):
+    elif comp == str(6):
         command = ('aws s3 cp "' + filepath_new +
-                   '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRehearsals/' + md + '/'
+                   '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/LeaguesCup/' + md + '/'
+                   + folder_new + '" --recursive')
+    elif comp == str(102):
+        command = ('aws s3 cp "' + filepath_new +
+                   '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/USOpenCup/' + md + '/'
                    + folder_new + '" --recursive')
 
     command_text.delete("1.0", "end")  # Clear previous text

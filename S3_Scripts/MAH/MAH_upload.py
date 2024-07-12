@@ -19,7 +19,7 @@ import os
 match_folder = newest_folder(r'\\192.168.7.72\Rec')
 # newest(r'\\192.168.7.72\Rec ')
 print(f'Matchfolder: {match_folder} \n')
-home, away, md, comp = get_match_info(match_folder)
+home, away, md, comp, match_id = get_match_info(match_folder)
 # Define team-dictionary
 if comp == '1':
     teams = MLS
@@ -51,7 +51,7 @@ except KeyError:
 # Add both team substrings to get the match string
 match = str(ht) + '-' + str(at)
 # Get the STS-ID out of the schedule.xml using home and away team names
-sts_id, date = get_STSID(comp, home, away, season_id='8', season_dir='Season24-25')
+sts_id, date = get_STSID(comp, match_id, season_id='8', season_dir='Season24-25')
 # create the path of the to-be-created folder for the upload command
 filepath_new = fr'{os.getcwd()}\MD{str(md)}_{match}_{comp}'
 # Create a folder with the correct naming in the current directory
