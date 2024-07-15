@@ -9,17 +9,13 @@ from TracabModules.Internal.tracab_output import get_observed_stats, get_validat
 from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping, get_opta_player_mapping, get_ekstra_player_mapping
 from pathlib import Path
 import sqlite3 as sql
-import logging
-import tkinter as tk
 from lxml import etree
 
-"""
-Add some logic to check if player AND team data already exists so if yes, the create_team_stats_table function 
-simply skips to next match.
-"""
+import logging
+logger = logging.getLogger('update_logger')
 
 
-def check_data_exists(db_path, team_ids, matchday, season, log):
+def check_data_exists(db_path, team_ids, matchday, season):
     data_exists = True
     with sql.connect(db_path) as conn:
         try:
@@ -34,19 +30,20 @@ def check_data_exists(db_path, team_ids, matchday, season, log):
                 if result.empty:
                     data_exists = False  # If any team_id does not have the record, return False
                 else:
-                    log.insert(tk.END, f"\nRecord for team {team_id} on Matchday {matchday} and Season {season} already exists.")
+                    logger.info(
+                        f"Record for team {team_id} on Matchday {matchday} and Season {season} already exists.")
         except pd.errors.DatabaseError:
             data_exists = False  # If any team_id does not have the record, return False
     return data_exists
 
 
-def create_team_stats_table(league, match_folder, log):
+def create_team_stats_table(league, match_folder):
     """
     :param match_folder:
     :param league:
     :return:
     """
-    logging.basicConfig(filename=f'team_stats_log_{league}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+    # logging.basicConfig(filename=f'team_stats_log_{league}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
     db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
     if league == 'eredivisie':
@@ -54,24 +51,24 @@ def create_team_stats_table(league, match_folder, log):
     else:
         observed_path = Path(match_folder) / 'Observed'
     if not observed_path.exists():
-        log.insert(tk.END, f'\nNo observed folder exists for {match_folder}!')
+        logger.error(f'No observed folder exists for {match_folder}!')
         return
 
     try:
         gamelog = next(observed_path.glob('*Gamelog*'))
     except StopIteration:
-        log.insert(tk.END, f'\nThe observed folder of {match_folder} does not contain a gamelog!')
+        logging.error(f'The observed folder of {match_folder} does not contain a gamelog!')
         try:
             gamelog = next(Path(f'{match_folder}\\Live').glob('*Gamelog*'))
         except StopIteration:
-            log.insert(tk.END, f'\nThe live folder of {match_folder} does not contain a gamelog!')
+            logger.error(f'The live folder of {match_folder} does not contain a gamelog!')
             return
 
     gamelog_info = get_gamelog_info(str(gamelog))
     gamelog_info['Gamelog'] = str(gamelog)
     team_ids = [gamelog_info['HomeId'], gamelog_info['AwayId']]
 
-    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId'], log):
+    if check_data_exists(db_path, team_ids, gamelog_info['Matchday'], gamelog_info['SeasonId']):
         return
 
     if not (league == 'eredivisie' or league == 'ekstraklasa'):
@@ -100,7 +97,7 @@ def create_team_stats_table(league, match_folder, log):
                                            season=int(gamelog_info['SeasonId']), conn=conn)
 
         elif not Path(stats).exists():
-            log.insert(tk.END, f'\nThe folder {stats} does not exist!')
+            logger.error(f'The folder {stats} does not exist!')
             return
 
     elif league == 'eredivisie' or league == 'ekstraklasa':
@@ -135,7 +132,7 @@ def create_team_stats_table(league, match_folder, log):
                                            season=int(gamelog_info['SeasonId']), conn=conn)
 
         elif not Path(stats).exists():
-            log.insert(tk.END, f'\nThe folder {stats} does not exist!')
+            logger.error(f'The folder {stats} does not exist!')
             return
 
 
@@ -149,11 +146,11 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
             query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
             try:
                 team_stats = pd.read_sql_query(query, conn)
-                avg_distance = team_stats['Total Distance'].mean().round(2)
-                avg_num_sprints = team_stats['Num. Sprints'].mean().round(2)
-                avg_num_speedruns = team_stats['Num. SpeedRuns'].mean().round(2)
+                avg_distance = np.round(team_stats['Total Distance'].mean(),2)
+                avg_num_sprints = np.round(team_stats['Num. Sprints'].mean(),2)
+                avg_num_speedruns = np.round(team_stats['Num. SpeedRuns'].mean(),2)
             except DatabaseError as e:
-                print(f"No stats available for team {team_id}: {e}")
+                logger.error(f"No stats available for team {team_id}: {e}")
                 return {'TeamId': team_id,
                         'Total Distance': np.nan,
                         'Num. Sprints': np.nan,
@@ -179,7 +176,7 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
         return league_stats
 
 
-def print_stats_table(league, season, kpi, logo_path, log):
+def print_stats_table(league, season, kpi, logo_path):
     """
     Generate and save a statistics table for a given league and KPI.
 
@@ -195,7 +192,7 @@ def print_stats_table(league, season, kpi, logo_path, log):
             query = f"SELECT * FROM 'league_overview_{season}'"
             team_stats = pd.read_sql_query(query, conn)
     except sql.Error as e:
-        log.insert(tk.END, f"Error connecting to database: {e}")
+        logger.error(f"Error connecting to database: {e}")
         return
 
     # Adjust 'Total Distance' to kilometers and round to two decimal places
@@ -258,7 +255,7 @@ def print_stats_table(league, season, kpi, logo_path, log):
 
     plt.close(fig)
 
-    log.insert(tk.END, f'\nThe table for "{kpi}" in the {league.upper()} has been created and saved here: {output_path}')
+    logger.info(f'The table for "{kpi}" in the {league.upper()} has been created and saved here: {output_path}')
 
 
 def update_team_stats_table(teams_stats, team_ids, conn):
@@ -310,7 +307,7 @@ def update_team_stats_table(teams_stats, team_ids, conn):
         # Insert away team stats
         cursor.executemany(sql_insert.format(team_id=team_ids[1]), away_stats_tuples)
 
-    logging.info(f'Team statistics updated for teams {team_ids[0]} and {team_ids[1]}.')
+    logger.info(f'Team statistics updated for teams {team_ids[0]} and {team_ids[1]}.')
 
 
 def update_player_stats_tables(league, player_stats, team_ids, matchday, season, conn):
@@ -324,12 +321,10 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     :param season: Season identifier.
     :param conn: SQLite database connection.
     """
-    logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
-                        format='%(asctime)s - %(message)s')
 
     league_id = {'bl1': '51', 'bl2': '52', 'mls': '8', 'eredivisie': '9', 'ekstraklasa': '55'}.get(league)
     if not league_id:
-        logging.error(f"Update Player Stats: Invalid league - {league}")
+        logger.error(f"Update Player Stats: Invalid league - {league}")
         return
 
     # Function to process player statistics
@@ -344,7 +339,7 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
                 else:
                     provider_id = player_mapping[row['ShirtNumber']]['ID']
             except KeyError:
-                logging.info(
+                logger.error(
                     f"Number {row['ShirtNumber']} is not part of the team anymore. Please check to update manually.")
                 continue
             if league == 'mls':
@@ -402,14 +397,14 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
     elif away_player_mapping is not None:
         combined_player_stats_df = away_player_stats_df
     else:
-        logging.info(f'No table-update for the match between {team_ids[0]} vs. {team_ids[1]}.')
+        logger.error(f'No table-update for the match between {team_ids[0]} vs. {team_ids[1]}.')
         return
 
     # Insert all player data in a single transaction
     with conn:
         combined_player_stats_df.to_sql('player_stats', conn, if_exists='append', index=False)
 
-    logging.info(
+    logger.info(
         f"Player statistics updated for both teams {team_ids[0]} and {team_ids[1]} for Matchday {matchday} in Season {season}.")
 
 

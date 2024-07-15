@@ -85,6 +85,7 @@ class GatewayDownloader:
 
         while response.status_code == 202:
             logging.info(f"Received status code 202. Retrying in 10 seconds...")
+            print(f"Received status code 202. Retrying in 10 seconds...")
             time.sleep(10)  # Wait for 10 seconds before retrying
             response, success = self._make_request(url)
 

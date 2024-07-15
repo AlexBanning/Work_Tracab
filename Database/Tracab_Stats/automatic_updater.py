@@ -1,49 +1,71 @@
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-from tkinter.scrolledtext import ScrolledText
-from pathlib import Path
-from TracabModules.Internal.database import create_team_stats_table, print_stats_table, create_avg_stats_table
+from TracabModules.Internal.database import create_team_stats_table, create_avg_stats_table
 from TracabModules.Internal.tools import get_club_id_mapping
-import sqlite3 as sql
-import pandas as pd
 import time
-import threading
-import numpy as np
-import os, sys
-
+import logging
+import atexit
+import json
+import logging.config
+import logging.handlers
+from pathlib import Path
 
 LEAGUE_MAPPING = {
-
     'mls': r'N:\01_Tracking-Data\Season_23-24\1 - MLS',
     'bl1': r'N:\01_Tracking-Data\Season_24-25\51 - Bundesliga 1_BL',
     'bl2': r'N:\01_Tracking-Data\Season_24-25\52 - 2.Bundesliga 2_BL',
     'eredivisie': r'N:\01_Tracking-Data\Season_24-25\9 - Eredivisie',
-    'ekstraklasa': r'N:\01_Tracking-Data\Season_24-25\55 - Ekstraklasa'}
+    'ekstraklasa': r'N:\01_Tracking-Data\Season_24-25\55 - Ekstraklasa'
+}
 
-# Function to update team stats table
-def update_team_stats_table(data_path, league, log_text_widget):
+logger = logging.getLogger("update_logger")  # __name__ is a common choice
+
+
+def setup_logging():
+    config_file = Path(r"N:/07_QC/Scripts/Database/logging_configs/1-stderr-file.json")
+    with open(config_file) as f_in:
+        config = json.load(f_in)
+
+    logging.config.dictConfig(config)
+    queue_handler = logging.getHandlerByName("queue_handler")
+    if queue_handler is not None:
+        queue_handler.listener.start()
+        atexit.register(queue_handler.listener.stop)
+
+
+def update_team_stats_table(data_path: Path, league: str):
+    setup_logging()
+    logging.basicConfig(level="ERROR")
+
     start_time = time.time()
+    for md in data_path.glob('MD*'):
+        if md.is_dir():
+            for match in md.iterdir():
+                if match.is_dir():
+                    start_time_match = time.time()
+                    create_team_stats_table(league, match)
+                    elapsed_time = time.time() - start_time_match
+                    message = f"Processed {match} in {elapsed_time:.2f} seconds"
+                    # print(f'Processed {match} in {elapsed_time:.2f} seconds')
+                    logger.info(message)
 
-    # Process based on whether it's a single matchday or league folder
-    if "MD" in data_path.name:  # Single matchday folder selected
-        for match in data_path.iterdir():
-            if match.is_dir():
-                start_time_match = time.time()
-                create_team_stats_table(league, match, log_text_widget)
-                log_text_widget.insert(tk.END, f"\nProcessed {match} in {time.time() - start_time_match:.2f} seconds\n")
-                log_text_widget.yview(tk.END)  # Scroll to the end of the text widget
+    total_elapsed_time = time.time() - start_time
+    final_message = f"DB of {league} has been updated in {total_elapsed_time:.2f} seconds"
+    logger.critical(final_message)
 
-        messagebox.showinfo("Success", f"Database updated for {data_path.parts[-3]}, matchday {data_path.name}")
-    else:  # League folder selected
-        for md in data_path.glob('MD*'):
-            if md.is_dir():
-                for match in md.iterdir():
-                    if match.is_dir():
-                        start_time_match = time.time()
-                        create_team_stats_table(league, match, log_text_widget)
-                        log_text_widget.insert(tk.END, f"\nProcessed {match} in {time.time() - start_time_match:.2f} seconds\n")
-                        log_text_widget.yview(tk.END)  # Scroll to the end of the text widget
 
-        messagebox.showinfo("Success", f"Database updated for the complete season of {data_path.parts[-1]}")
+def create_avg_stats(league: str, season: int) -> None:
+    club_mapping = get_club_id_mapping(league=league, season=season)
+    create_avg_stats_table(club_mapping, league=league, season=season, db_update=True, data=True)
+    logger.critical(f"Average stats table created for {league.upper()}, season {season}")
 
-    log_text_widget.insert(tk.END, f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
+
+def main() -> None:
+    for league in LEAGUE_MAPPING:
+        update_team_stats_table(data_path=Path(LEAGUE_MAPPING[league]), league=league)
+        create_avg_stats(league, season=2024)
+
+    message = f"All databases have been updated."
+    logger.critical(message)
+
+
+if __name__ == '__main__':
+    main()

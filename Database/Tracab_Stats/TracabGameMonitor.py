@@ -196,4 +196,9 @@ class TracabGameMonitor:
         treeview["show"] = "headings"
 
 
-test = TracabGameMonitor()
+def main() -> None:
+    TracabGameMonitor()
+
+
+if __name__ == '__main__':
+    main()

@@ -31,7 +31,7 @@ def is_date_in_current_week(date_str, mls=False):
         return start_of_last_week <= date_to_check <= end_of_week
 
 
-def get_club_id_mapping(league):
+def get_club_id_mapping(league: str, season: int):
     """
     Create a mapping between club id and club name and return it as a DataFrame.
 
@@ -44,17 +44,18 @@ def get_club_id_mapping(league):
     """
 
     if league == 'mls':
-        team_info_file = (r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_04_basedata_clubs_MLS-SEA-0001K8_MLS'
+        season_id = season - 2016
+        team_info_file = (fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS'
                           r'-COM-000001.xml')
         return get_mls_club_mapping(team_info_file)
     elif league == 'bl1':
-        team_info_path = r'\\10.49.0.250\deltatre\MatchInfo\51\2023\team_players'
+        team_info_path = fr'\\10.49.0.250\deltatre\MatchInfo\51\{season}\team_players'
         return get_bl_club_mapping(Path(team_info_path))
     elif league == 'bl2':
-        team_info_path = r'\\10.49.0.250\deltatre\MatchInfo\52\2023\team_players'
+        team_info_path = fr'\\10.49.0.250\deltatre\MatchInfo\52\{season}\team_players'
         return get_bl_club_mapping(Path(team_info_path))
     elif league == 'eredivisie':
-        team_info_file = r'\\10.49.0.250\Opta\MatchInfo\srml-9-2023-squads.xml'
+        team_info_file = fr'\\10.49.0.250\Opta\MatchInfo\srml-9-{season}-squads.xml'
         return get_ere_club_mapping(team_info_file)
     elif league == 'ekstraklasa':
         team_info_file = r'\\10.49.0.250\Keytoq\MatchInfo\main.xml'
