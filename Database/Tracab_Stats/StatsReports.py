@@ -63,8 +63,9 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
         df_top_players = df_sorted.drop_duplicates(subset='DlProviderID', keep='first')
 
     if kpi == 'Total Distance':
-        df_sorted['Total Distance'] = np.round(players[kpi] / 1000, 2)
+        # df_sorted['Total Distance'] = np.round(players[kpi] / 1000, 2)
         avg_distance = players.groupby('DlProviderID')[kpi].mean().round(2).reset_index()
+        avg_distance['Total Distance'] = np.round(avg_distance[kpi] / 1000, 2)
         avg_distance.columns = ['DlProviderID', 'Avg Distance']
 
         # 2. Merge the average distance back into the original DataFrame
@@ -126,8 +127,7 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
 
 # top_ten_players_to_google(league='bl2', season=2023, kpi='Num. Sprints')
 
-# leagues = ['mls', 'bl1', 'bl2', 'eredivisie', 'ekstraklasa']
-leagues = ['ekstraklasa']
+leagues = ['mls', 'bl1', 'bl2', 'eredivisie', 'ekstraklasa']
 kpis = ['Total Distance', 'Num. Sprints', 'HighSpeed']
 
 
