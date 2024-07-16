@@ -354,9 +354,15 @@ def push_df_to_google(df: pd.DataFrame, spreadsheet_id: str, worksheet: str) -> 
         # If worksheet doesn't exist, create it
         worksheet = spreadsheet.add_worksheet(title=worksheet, rows=1000, cols=15)
 
+    # Replace NaN values with empty strings to avoid serialization issues
+    df = df.fillna(0)
+
+    # Prepare data for update: convert DataFrame to list of lists
+    data_to_update = [df.columns.values.tolist()] + df.values.tolist()
+
     # Update or append data to the worksheet
     # worksheet.clear()  # Clear existing content before updating
-    worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+    worksheet.update(data_to_update)
 
     return logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
 

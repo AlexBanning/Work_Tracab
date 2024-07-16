@@ -55,12 +55,15 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
         player_query = f"SELECT * FROM 'player_stats' WHERE Season = {season}"
         players = pd.read_sql_query(player_query, conn)
 
+    # Sort DataFrame by selected kpi in descending order
+    df_sorted = players.sort_values(by=kpi, ascending=False)
+
     if kpi == 'HighSpeed':
         # Drop duplicates, keeping the first occurrence (which is the highest 'HighSpeed' due to sorting)
-        df_top_players = players.drop_duplicates(subset='DlProviderID', keep='first')
+        df_top_players = df_sorted.drop_duplicates(subset='DlProviderID', keep='first')
 
     if kpi == 'Total Distance':
-        players['Total Distance'] = np.round(players[kpi] / 1000, 2)
+        df_sorted['Total Distance'] = np.round(players[kpi] / 1000, 2)
         avg_distance = players.groupby('DlProviderID')[kpi].mean().round(2).reset_index()
         avg_distance.columns = ['DlProviderID', 'Avg Distance']
 
@@ -102,10 +105,20 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
     # Add names to top_10
     top_10_with_names = pd.merge(top_10, player_mapping, left_on='DlProviderID', right_on='DlProviderID', how='left')
 
-    # Add a 'Rank' column based on 'HighSpeed' ranking
-    top_10_with_names['Rank'] = top_10_with_names[kpi].rank(method='min', ascending=False)
+    # Add a 'Rank' column based on KPI ranking and drop remaining columns
+    if kpi == 'Total Distance':
+        top_10_with_names = top_10_with_names[['Name', 'Avg Distance']]
+        top_10_with_names['Rank'] = top_10_with_names['Avg Distance'].rank(method='min', ascending=False)
+        top_10_with_names = top_10_with_names[['Rank', 'Name', 'Avg Distance']]
+    elif kpi == 'Num. Sprints':
+        top_10_with_names = top_10_with_names[['Name', 'Avg Sprints']]
+        top_10_with_names['Rank'] = top_10_with_names['Avg Sprints'].rank(method='min', ascending=False)
+        top_10_with_names = top_10_with_names[['Rank', 'Name', 'Avg Sprints']]
+    else:
+        top_10_with_names = top_10_with_names[['Name', kpi]]
+        top_10_with_names['Rank'] = top_10_with_names[kpi].rank(method='min', ascending=False)
+        top_10_with_names = top_10_with_names[['Rank', 'Name', kpi]]
 
-    top_10_with_names = top_10_with_names[['Rank', 'Name', kpi]]
     kpi_sheet = kpi.replace(' ', '_')
     push_df_to_google(df=top_10_with_names, spreadsheet_id='1eb58QR0kt8S_zTzkc9w3f-infU_wU_Pnero4WjdEn9s',
                       worksheet=f'{league}_{kpi_sheet}_players')
