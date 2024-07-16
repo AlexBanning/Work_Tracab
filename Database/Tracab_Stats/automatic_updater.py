@@ -19,8 +19,7 @@ LEAGUE_MAPPING = {
 logger = logging.getLogger("update_logger")  # __name__ is a common choice
 
 
-def setup_logging():
-    config_file = Path(r"N:/07_QC/Scripts/Database/logging_configs/1-stderr-file.json")
+def setup_logging(config_file: Path):
     with open(config_file) as f_in:
         config = json.load(f_in)
 
@@ -32,7 +31,7 @@ def setup_logging():
 
 
 def update_team_stats_table(data_path: Path, league: str):
-    setup_logging()
+    setup_logging(Path(r"N:/07_QC/Scripts/logging_configs/automatic_updater.json"))
     logging.basicConfig(level="ERROR")
 
     start_time = time.time()

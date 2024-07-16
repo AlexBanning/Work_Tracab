@@ -95,7 +95,7 @@ def fetch_player_stats(league, season, player_id):
 
 # Function to create the avg stats table for a league
 def create_avg_stats(league, season):
-    club_mapping = get_club_id_mapping(league=league)
+    club_mapping = get_club_id_mapping(league=league, season=season)
     create_avg_stats_table(club_mapping, league=league, season=season, db_update=True, data=True)
     messagebox.showinfo("Success", f"Average stats table created for {league.upper()}, season {season}")
 

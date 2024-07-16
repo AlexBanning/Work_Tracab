@@ -2,12 +2,15 @@ import ftputil
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import timedelta, datetime, date
+from gspread.exceptions import WorksheetNotFound
 from TracabModules.Internal.tools import is_date_in_current_week
 import gspread
 import os
 import xml.etree.ElementTree as ET
 import sys
+import logging
 
+logger = logging.getLogger('reports_logger')
 
 def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
     """
@@ -328,31 +331,34 @@ def get_keytoq_schedule(filename, season_dir):
     return schedule
 
 
-def push_to_google(schedule, league, season_dir):
+def push_df_to_google(df: pd.DataFrame, spreadsheet_id: str, worksheet: str) -> None:
     """
     Takes in a pd.DataFrame and pushes it into the Google Sheet '23/24 Schedule'.
-    :param schedule: pd.DataFrame
-        pd.DataFrame that contains the relevant schedule
-    :param league: str
-        Name of the league and therefore of the worksheet that needs to be updated
+    :param df:
+    :param worksheet:
+    :param spreadsheet_id:
     :return:
     """
 
-    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\Season24-25\MatchInfo")
     gc = gspread.oauth(credentials_filename=
                        'schedule_push_authentification.json'
                        )
 
     # schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
-    schedule_sheet = gc.open_by_key('1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw')
+    spreadsheet = gc.open_by_key(spreadsheet_id)
+    # Attempt to fetch the worksheet if it exists
     try:
-        worksheet = schedule_sheet.worksheet(league)
-    except gspread.WorksheetNotFound:
-        schedule_sheet.add_worksheet(title=league, rows=1000, cols=15)
-    worksheet = schedule_sheet.worksheet(league)
-    worksheet.update([schedule.columns.values.tolist()] + schedule.values.tolist())
+        worksheet = spreadsheet.worksheet(worksheet)
+    except WorksheetNotFound:
+        # If worksheet doesn't exist, create it
+        worksheet = spreadsheet.add_worksheet(title=worksheet, rows=1000, cols=15)
 
-    return print('The schedule of ' + league + ' has been successfully pushed to the Google Sheet "24/25 Schedule"')
+    # Update or append data to the worksheet
+    # worksheet.clear()  # Clear existing content before updating
+    worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+
+    return logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
 
 
 def get_STSID(comp_id, match_id, season_id, season_dir):

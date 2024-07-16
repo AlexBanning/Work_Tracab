@@ -22,7 +22,7 @@ import pstats
 Club Mappings
 """
 
-club_mapping = get_club_id_mapping(league='mls')
+club_mapping = get_club_id_mapping(league='ekstraklasa', season=2023)
 
 """
 Database cunstruction
@@ -94,7 +94,7 @@ print(f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='bl2', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='ekstraklasa', season=2023, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
@@ -115,7 +115,7 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 """
 Get stats from a player
 """
-league = 'bl2'
+league = 'mls'
 season = 2023
 player_id = 13526
 with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:

@@ -6,6 +6,8 @@ from pathlib import Path
 from lxml import etree
 import logging
 
+logger = logging.getLogger('reports_logger')
+
 
 def is_date_in_current_week(date_str, mls=False):
     # Convert the date string to a datetime object
@@ -45,8 +47,9 @@ def get_club_id_mapping(league: str, season: int):
 
     if league == 'mls':
         season_id = season - 2016
-        team_info_file = (fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS'
-                          r'-COM-000001.xml')
+        team_info_file = (
+            fr'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch\Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS'
+            r'-COM-000001.xml')
         return get_mls_club_mapping(team_info_file)
     elif league == 'bl1':
         team_info_path = fr'\\10.49.0.250\deltatre\MatchInfo\51\{season}\team_players'
@@ -141,55 +144,91 @@ def get_bl_player_mapping(league_id, team_id):
     return player_mapping
 
 
-def get_mls_player_mapping(season_id, team_id):
+def get_dfl_player_mapping(league_id: int, season: int, team_id: int = None) -> pd.DataFrame:
+    base_dir = Path(fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\{season}\team_players')
+    data = []
+
+    if not base_dir.exists():
+        logger.error(f"The directory {base_dir} does not exist.")
+        raise FileNotFoundError(f"The directory {base_dir} does not exist.")
+
+    if team_id:
+        pattern = f'team_players_{team_id}.xml'
+    else:
+        pattern = '*.xml'
+
+    files = list(base_dir.glob(pattern))
+
+    # Iterate over all files in the directory
+    for filename in files:
+            xml_doc = etree.parse(filename)
+            player_elements = xml_doc.xpath('//player')
+            for player_element in player_elements:
+                metadata = player_element.xpath('player-metadata')[0]
+                player_key = metadata.get('player-key')
+                uniform_number = metadata.get('uniform-number')
+                nickname = metadata.xpath('name/@nickname')[0]
+
+                data.append({
+                    'uniform_number': uniform_number,
+                    'DlProviderID': player_key,
+                    'Name': nickname
+                })
+
+    # Create a DataFrame from the collected data
+    df = pd.DataFrame(data)
+    return df
+
+
+def get_mls_player_mapping(season_id: int, team_id: int = None) -> pd.DataFrame:
     info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch')
     clubs_file = info_path / f'Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
 
-    with clubs_file.open('r', encoding='utf-8') as fp:
-        data = BeautifulSoup(fp, 'xml')
+    xml_doc = etree.parse(clubs_file)
 
-    # Extract club data
-    club_data = [x for x in data.find_all('Clubs')[0].contents[1::2]]
-    id_mapping = {x['DlProviderId']: x['ClubId'] for x in club_data}
+    club_docs = xml_doc.findall('Clubs')[0].findall('Club')
+    id_mapping = {int(x.get('DlProviderId')): x.get('ClubId') for x in club_docs}
 
-    # Identify the correct player file
-    player_files = [x for x in info_path.iterdir() if 'MLS-SEA-0001K8_player.xml' in x.name]
-    club_file = next(x for x in player_files if id_mapping[team_id] in x.name)
+    if team_id:
+        player_files = [x for x in info_path.iterdir() if 'MLS-SEA-0001K8_player.xml' in x.name and
+                        x.parts[3].split('_')[4] == id_mapping[team_id]]
+    else:
+        player_files = [x for x in info_path.iterdir() if 'MLS-SEA-0001K8_player.xml' in x.name and
+                        x.parts[3].split('_')[4] in id_mapping.values()]
 
-    # Parse the player file
-    tree = etree.parse(str(club_file))
-    root = tree.getroot()
+    df = pd.DataFrame(columns=['uniform_number', 'DlProviderID', 'Name'])
+    for club in player_files:
+        xml_doc_players = etree.parse(club)
+        players = xml_doc_players.findall('.//Object')
+        club_data = pd.DataFrame([{'uniform_number': x.get('ShirtNumber'),
+                                   'DlProviderID': x.get('DlProviderId'),
+                                   'Name': x.get('ShortName')} for x in players if x.get('Type') == 'player'])
+        df = pd.concat([df, club_data])
 
-    # Extract player data
-    player_mapping = {
-        obj.get("ShirtNumber"): {
-            'ObjectId': obj.get("ObjectId"),
-            'DlProviderId': obj.get("DlProviderId"),
-            'Name': obj.get("ShortName"),
-        }
-        for obj in root.findall(".//Object")
-    }
-
-    return player_mapping
+    return df
 
 
-def get_opta_player_mapping(season_id, league_id, team_id):
+def get_opta_player_mapping(season_id: int, league_id: int, team_id: int = None) -> pd.DataFrame:
     info_path = Path(fr'//10.49.0.250/Opta/MatchInfo/srml-{league_id}-{season_id}-squads.xml')
-    tree = etree.parse(str(info_path))
-    root = tree.getroot()
+    xml_doc = etree.parse(str(info_path))
 
-    team = [team for team in root.find('SoccerDocument').findall('Team') if team.get('uID') == f't{team_id}'][
-        0].findall('Player')
+    if team_id:
+        club_docs = [team for team in xml_doc.find('SoccerDocument').findall('Team') if
+                     int(team.get('uID')[1:]) == team_id]
 
-    player_mapping = {
-        obj.find('.//Stat[@Type="jersey_num"]').text: {
-            'ID': obj.get('uID')[1:],
-            'Name': obj.find('.//Name').text,
-        }
-        for obj in team
-    }
+    else:
+        club_docs = [team for team in xml_doc.find('SoccerDocument').findall('Team')]
 
-    return player_mapping
+    df = pd.DataFrame(columns=['uniform_number', 'DlProviderID', 'Name'])
+    for club in club_docs:
+        players = club.findall('.//Player')
+        club_data = pd.DataFrame([{'uniform_number': x.findall('Stat')[-5].text,
+                                   'DlProviderID': x.get('uID')[1:],
+                                   'Name': f'{x.findall('Stat')[0].text[0]}. {x.findall('Stat')[1].text}'} for
+                                  x in players])
+        df = pd.concat([df, club_data])
+
+    return df
 
 
 def get_ere_club_mapping(team_info_file):
@@ -220,23 +259,21 @@ def get_ekstra_club_mapping(team_info_file):
     return club_mapping
 
 
-def get_ekstra_player_mapping(team_id, league):
-    logging.basicConfig(filename=fr'StatsLogs\{league}stats_log.log', level=logging.INFO,
-                        format='%(asctime)s - %(message)s')
-    tree = etree.parse(str(r'\\10.49.0.250\\Keytoq\\MatchInfo\\main.xml'))
-    root = tree.getroot()
-    try:
-        team = [x for x in root.findall('.//team') if x.get('id') == team_id][0]
-    except IndexError:
-        logging.info(f'Team {team_id} is not found inside the active club list of this league.')
-        return
+def get_ekstra_player_mapping(team_id: int = None) -> pd.DataFrame:
+    xml_doc = etree.parse(str(r'\\10.49.0.250\\Keytoq\\MatchInfo\\main.xml'))
 
-    player_mapping = {
-        obj.get('nr'): {
-            'ID': obj.get('id'),
-            'Name': f'{obj.get('fname')} {obj.get('sname')}'
-        }
-        for obj in team.find('players').findall('player')
-    }
+    if team_id:
+        club_docs = [x for x in xml_doc.findall('.//team') if int(x.get('id')) == team_id]
+    else:
+        club_docs = [x for x in xml_doc.findall('.//team')]
 
-    return player_mapping
+    df = pd.DataFrame(columns=['uniform_number', 'DlProviderID', 'Name'])
+    for club in club_docs:
+        players = club.findall('.//player')
+        club_data = pd.DataFrame([{'uniform_number': x.get('nr'),
+                                   'DlProviderID': x.get('id'),
+                                   'Name': f'{x.get('fname')[0]}. {x.get('sname')}' if x.get('fname') else x.get('sname')} for
+                                  x in players])
+        df = pd.concat([df, club_data])
+
+    return df
