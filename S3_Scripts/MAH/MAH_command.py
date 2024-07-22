@@ -13,7 +13,7 @@ import sys
 import os
 import tkinter as tk
 from tkinter import ttk
-from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup
+from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup, AllStar
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, get_feed_names
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -50,6 +50,8 @@ def generate_command():
         teams = LeaguesCup
     elif comp == '102':
         teams = OpenCup
+    elif comp == '5':
+        teams = AllStar
 
     try:
         ht = teams[home]
@@ -88,6 +90,10 @@ def generate_command():
     elif comp == str(102):
         command = ('aws s3 cp "' + filepath_new +
                    '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/USOpenCup/' + md + '/'
+                   + folder_new + '" --recursive')
+    elif comp == str(5):
+        command = ('aws s3 cp "' + filepath_new +
+                   '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/AllStarGame/' + md + '/'
                    + folder_new + '" --recursive')
 
     command_text.delete("1.0", "end")  # Clear previous text

@@ -15,6 +15,7 @@ from reportlab.lib.pagesizes import letter, A4
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Image, Spacer
 from reportlab.lib.units import inch
+from PIL import Image
 
 from Database.Tracab_Stats.automatic_updater import setup_logging
 import logging
@@ -24,6 +25,14 @@ LEAGUE_ID_MAPPING = {'mls': 1,
                      'bl2': 52,
                      'eredivisie': 9,
                      'ekstraklasa': 55}
+
+LEAGUE_MAPPING = {
+    'mls': 'MLS',
+    'bl1': '1. Bundesliga',
+    'bl2': '2. Bundesliga',
+    'eredivisie': 'Eredivisie',
+    'ekstraklasa': 'Ekstraklasa'
+}
 
 
 # logger = logging.getLogger("reports_logger")
@@ -154,7 +163,7 @@ def club_stats_to_google(league: str, season: int, kpi: str) -> None:
     df_sorted['Rank'] = df_sorted['Rank'].apply(lambda x: int(x) if not pd.isna(x) else x)
     df_sorted = df_sorted[['Rank', 'TeamName', kpi]]
     filename = fr'\\10.49.0.250/tracab_neu/07_QC/Alex/StatsReports/{league.upper()}/{league}_{kpi}_{season}.png'
-    logo_path = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\Databases\TeamLogos\{league.upper()}_Logos\{season}'
+    logo_path = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\TeamLogos\{league.upper()}_Logos\{season}'
     create_team_table(df_sorted, kpi, filename, logo_path)
 
     # kpi_sheet = kpi.replace(' ', '_')
@@ -250,7 +259,8 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
 
 
 # top_ten_players_to_google(league='bl2', season=2023, kpi='Num. Sprints')
-def images_to_2x3_page_pdf(image_paths, output_filename, top_heading, image_headings, spacing=20, lower_amount_cm=1.5):
+def images_to_2x3_page_pdf(league: str, image_paths: list[str], output_filename: str, top_heading: str,
+                           image_headings: list[str], spacing=20, lower_amount_cm=1.5):
     if len(image_paths) != 5:
         raise ValueError("Exactly 5 image paths are required for this layout.")
 
@@ -263,10 +273,40 @@ def images_to_2x3_page_pdf(image_paths, output_filename, top_heading, image_head
     c = canvas.Canvas(output_filename, pagesize=A4)
     page_width, page_height = A4
 
+    # Process the logo image with Pillow
+    logo = Image.open(r'\\10.49.0.250\tracab_neu\07_QC\Alex\tracab_logo.png')
+    logo_width = 50  # Adjust the width of the logo
+    logo_height = int((logo_width / logo.width) * logo.height)  # Maintain aspect ratio
+
+    # Save the processed logo temporarily
+    logo_temp_path = 'temp_logo.png'
+    logo.save(logo_temp_path)
+
+    # Add company logo to the top left corner
+    c.drawImage(logo_temp_path, 10, page_height - logo_height - 10, width=logo_width, height=logo_height, mask='auto')
+
+    # Process the right logo image with Pillow
+    logo_right = Image.open(fr'\\10.49.0.250\tracab_neu\07_QC\Alex\{league}_logo.png')
+    logo_right_width = 50  # Adjust the width of the logo
+    logo_right_height = int((logo_right_width / logo_right.width) * logo_right.height)  # Maintain aspect ratio
+
+    # Save the processed right logo temporarily
+    logo_right_temp_path = 'temp_logo_right.png'
+    logo_right.save(logo_right_temp_path)
+
+    # Add right company logo to the top right corner
+    c.drawImage(logo_right_temp_path, page_width - logo_right_width - 10, page_height - logo_right_height - 10,
+                width=logo_right_width, height=logo_right_height, mask='auto')
+
     # Set up fonts for headings
     heading_font = 'Helvetica-Bold'
     heading_size = 12  # Font size in points
     c.setFont(heading_font, heading_size)
+
+    # Set up fonts for subheadings
+    sub_heading_font = 'Helvetica-Bold'
+    sub_heading_size = 8  # Font size in points
+    c.setFont(sub_heading_font, sub_heading_size)
 
     # Calculate top heading position
     top_heading_width = c.stringWidth(top_heading, heading_font, heading_size)
@@ -280,7 +320,7 @@ def images_to_2x3_page_pdf(image_paths, output_filename, top_heading, image_head
     large_image_width = page_width / 1.9
     large_image_height = (page_height - spacing) / 1.9
     small_image_width = page_width / 2.9
-    small_image_height = (page_height - spacing) / 3.5
+    small_image_height = (page_height - spacing) / 3.9
 
     # Position for headings and images
     y_positions_large_images = [
@@ -304,27 +344,27 @@ def images_to_2x3_page_pdf(image_paths, output_filename, top_heading, image_head
         c.drawImage(image_paths[i], image_x, image_y, width=large_image_width, height=large_image_height)
 
     for i in range(0, 3):
-        heading = image_headings[i]
+        heading = image_headings[i + 2]
         # image_x = (i - 2) * small_image_width + (i * 30)
         image_x = i * small_image_width
         image_y = y_positions_small_images[i]
-        heading_width = c.stringWidth(heading, heading_font, heading_size)
-        heading_x = image_x + (small_image_width - heading_width) / 2
-        c.drawString(heading_x, image_y + small_image_height + heading_spacing_points, heading)
+        sub_heading_width = c.stringWidth(heading, sub_heading_font, sub_heading_size)
+        sub_heading_x = image_x + (small_image_width - sub_heading_width) / 2
+        c.drawString(sub_heading_x, image_y + small_image_height + heading_spacing_points, heading)
         c.drawImage(image_paths[i + 2], image_x, image_y, width=small_image_width, height=small_image_height)
 
     # Save the PDF
     c.save()
 
 
-# leagues = ['mls', 'bl1', 'bl2', 'eredivisie']
-leagues = ['bl1']
+leagues = ['mls', 'bl1', 'bl2', 'eredivisie', 'ekstraklasa']
+#leagues = ['bl1']
 kpis = ['Total Distance', 'Num. Sprints', 'HighSpeed']
 
 
 def main() -> None:
     for league in leagues:
-        season = 2024 if league == 'mls' else 2023
+        season = 2024 if league == 'mls' or league == 'ekstraklasa' else 2023
         for kpi in kpis:
             if kpi != 'HighSpeed':
                 club_stats_to_google(league=league, season=season, kpi=kpi)
@@ -335,21 +375,54 @@ def main() -> None:
             fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}.png",
             fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Total Distance_{season}.png",
             fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Total Distance_{season}_players.png",
-            fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}_players.png",
-            fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_HighSpeed_{season}_players.png"]
+            fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_HighSpeed_{season}_players.png",
+            fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}_players.png"]
+
         output_filename = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league}_report.pdf'
+
         image_headings = [
-            "Large Image 1",
-            "Large Image 2",
-            "Small Image 1",
-            "Small Image 2",
-            "Small Image 3"
+            "Number of Sprints",
+            "Total Distance [km]",
+            "Total Distance - Players [km]",
+            "Top 10 Highspeeds [km/h]",
+            "Number of Sprints - Players"
         ]
-        images_to_2x3_page_pdf(image_paths, output_filename, '1. Bundesliga MD34 Season 23/24', image_headings)
+
+        top_heading = f'{LEAGUE_MAPPING[league]} Season {season}'
+        images_to_2x3_page_pdf(league, image_paths, output_filename, top_heading, image_headings)
         print(f'\n {league}: DONE')
 
 
 if __name__ == '__main__':
     main()
 
+import PyPDF2
 
+
+def merge_pdfs(pdf_list, output_filename):
+    # Create a PDF writer object
+    pdf_writer = PyPDF2.PdfWriter()
+
+    # Loop through all the PDF files
+    for pdf in pdf_list:
+        # Create a PDF reader object
+        pdf_reader = PyPDF2.PdfReader(pdf)
+
+        # Add all pages of the current PDF to the writer object
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            pdf_writer.add_page(page)
+
+    # Write the merged PDF to a file
+    with open(output_filename, 'wb') as output_pdf:
+        pdf_writer.write(output_pdf)
+
+
+pdf_files = [
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\bl1_report.pdf',
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\bl2_report.pdf',
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\mls_report.pdf',
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\eredivisie_report.pdf',
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\ekstraklasa_report.pdf'
+]
+merge_pdfs(pdf_files, r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\tracab_report.pdf')

@@ -9,7 +9,7 @@ v2.0 2024/03/14 09:40
 """
 import shutil
 import sys
-from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup
+from MLS.MLS_Teams import MLS, LeaguesCup, OpenCup, AllStar
 from TracabModules.Internal.gamestats_functions import get_match_info
 from TracabModules.Internal.server_manipulations import newest_folder, move_and_rename_feed
 from TracabModules.Internal.scheduleFunctions import get_STSID
@@ -27,6 +27,8 @@ elif comp == '6':
     teams = LeaguesCup
 elif comp == '102':
     teams = OpenCup
+elif comp == '5':
+    teams = AllStar
 
 # Get 3LCs of both teams
 try:
@@ -77,6 +79,11 @@ elif comp == str(6):
 elif comp == str(102):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/USOpenCup/' + md + '/'
+               + folder_new + '" --recursive')
+
+elif comp == str(5):
+    command = ('aws s3 cp "' + filepath_new +
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/AllStarGame/' + md + '/'
                + folder_new + '" --recursive')
 
 
