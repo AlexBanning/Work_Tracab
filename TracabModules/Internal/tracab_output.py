@@ -212,3 +212,7 @@ def get_validated_stats(filepath, gamelog_info):
     away_stats = aggregate_stats(away_player_stats)
 
     return home_stats, away_stats, home_player_stats, away_player_stats
+
+
+def get_ekstraklasa_stats(filepath):
+    xml_doc = etree.parse(filepath)

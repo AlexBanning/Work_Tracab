@@ -5,6 +5,7 @@ from pathlib import Path
 import sqlite3 as sql
 import numpy as np
 import pandas as pd
+import re
 from TracabModules.Internal.scheduleFunctions import push_df_to_google
 from TracabModules.Internal.tools import (get_dfl_player_mapping, get_mls_player_mapping, get_opta_player_mapping,
                                           get_ekstra_player_mapping)
@@ -27,12 +28,42 @@ LEAGUE_ID_MAPPING = {'mls': 1,
                      'ekstraklasa': 55}
 
 LEAGUE_MAPPING = {
-    'mls': 'MLS',
+    'mls': 'Major League Soccer',
     'bl1': '1. Bundesliga',
     'bl2': '2. Bundesliga',
     'eredivisie': 'Eredivisie',
     'ekstraklasa': 'Ekstraklasa'
 }
+
+
+def shorten_name(name):
+    if pd.isna(name):
+        return name  # Handle NaN values if they exist
+
+    # Remove '(M)' suffix
+    name = re.sub(r'\s*\(M\)$', '', name)
+
+    # Split the name into parts
+    parts = name.split()
+    # Split the name into parts
+    parts = name.split()
+
+    # Check if the name has more than 2 parts
+    if len(parts) > 2:
+        # Take the first initial
+        first_initial = parts[0]
+
+        # Shorten middle names to initials
+        middle_initials = ' '.join([part[0] + '.' for part in parts[1:-1]])
+
+        # Keep the last name as is
+        last_name = parts[-1]
+
+        # Combine the parts
+        return f'{first_initial} {middle_initials} {last_name}'
+    else:
+        # Return the name as is if it doesn't have more than 2 parts
+        return name
 
 
 # logger = logging.getLogger("reports_logger")
@@ -42,8 +73,8 @@ LEAGUE_MAPPING = {
 # Create player tables
 def create_table(df: pd.DataFrame, kpi: str, filename: str) -> None:
     # Define table characteristics
-    bg_color = "#FFFFFF"  # White background color
-    text_color = "black"  # Black text color
+    bg_color = "#212121"
+    text_color = "#2F6054"
     plt.rcParams["text.color"] = text_color
     plt.rcParams["font.family"] = "monospace"
 
@@ -95,8 +126,8 @@ def create_team_table(df: pd.DataFrame, kpi: str, filename: str, logo_path) -> N
     df_sorted = df[['Rank', 'Logo', 'TeamName', kpi]]
 
     # Define table characteristics
-    bg_color = "#FFFFFF"  # White background color
-    text_color = "black"  # Black text color
+    bg_color = "#212121"  # White background color
+    text_color = "#2F6054"  # Black text color
     plt.rcParams["text.color"] = text_color
     plt.rcParams["font.family"] = "monospace"
 
@@ -240,17 +271,20 @@ def top_ten_players_to_google(league: str, season: int, kpi: str) -> None:
         top_10_with_names['Rank'] = top_10_with_names['Avg Distance'].rank(method='min', ascending=False).astype(int)
         top_10_with_names = top_10_with_names[['Rank', 'Name', 'Avg Distance']]
         top_10_with_names = top_10_with_names.rename(columns={'Avg Distance': 'Distance'})
+        top_10_with_names['Name'] = top_10_with_names['Name'].apply(shorten_name) # shorten names
         create_table(top_10_with_names, 'Distance', filename)
     elif kpi == 'Num. Sprints':
         top_10_with_names = top_10_with_names[['Name', 'Avg Sprints']]
         top_10_with_names['Rank'] = top_10_with_names['Avg Sprints'].rank(method='min', ascending=False).astype(int)
         top_10_with_names = top_10_with_names[['Rank', 'Name', 'Avg Sprints']]
         top_10_with_names = top_10_with_names.rename(columns={'Avg Sprints': 'Sprints'})
+        top_10_with_names['Name'] = top_10_with_names['Name'].apply(shorten_name) # shorten names
         create_table(top_10_with_names, 'Sprints', filename)
     else:
         top_10_with_names = top_10_with_names[['Name', kpi]]
         top_10_with_names['Rank'] = top_10_with_names[kpi].rank(method='min', ascending=False).astype(int)
         top_10_with_names = top_10_with_names[['Rank', 'Name', 'HighSpeed']].rename(columns={'HighSpeed': 'Speed'})
+        top_10_with_names['Name'] = top_10_with_names['Name'].apply(shorten_name) # shorten names
         create_table(top_10_with_names, 'Speed', filename)
 
     # kpi_sheet = kpi.replace(' ', '_')
@@ -419,6 +453,7 @@ def merge_pdfs(pdf_list, output_filename):
 
 
 pdf_files = [
+    r'\\10.49.0.250\tracab_neu\07_QC\Alex\PDF_templates\deckblatt.pdf',
     r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\bl1_report.pdf',
     r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\bl2_report.pdf',
     r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\mls_report.pdf',
@@ -426,3 +461,162 @@ pdf_files = [
     r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\ekstraklasa_report.pdf'
 ]
 merge_pdfs(pdf_files, r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\tracab_report.pdf')
+
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch, cm
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import HexColor
+from PIL import Image
+import PyPDF2
+from io import BytesIO
+
+
+def images_to_2x3_page_pdf_new(league: str, image_paths: list[str], output_filename: str, top_heading: str,
+                           image_headings: list[str], template_path: str, spacing=20, lower_amount_cm=1.5):
+    if len(image_paths) != 5:
+        raise ValueError("Exactly 5 image paths are required for this layout.")
+
+    # Convert cm to points
+    cm_to_points = 28.35
+    lower_amount_points = lower_amount_cm * cm_to_points
+    heading_spacing_points = 5  # Spacing between heading and image
+    shift_down = 4 * cm  # Shift everything 3 cm lower
+
+    # Read the template PDF
+    template_pdf = PyPDF2.PdfReader(template_path)
+    output_pdf = PyPDF2.PdfWriter()
+
+    # Get the dimensions of the first page of the template
+    template_page = template_pdf.pages[0]
+    page_width = float(template_page.mediabox.width)
+    page_height = float(template_page.mediabox.height)
+
+    # Create a PDF canvas with A4 page size on an in-memory buffer
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=(page_width, page_height))
+
+    # # Process the right logo image with Pillow and draw it directly
+    # logo_right = Image.open(fr'\\10.49.0.250\tracab_neu\07_QC\Alex\{league}_logo.png')
+    # logo_right_width = 100  # Adjust the width of the logo
+    # logo_right_height = int((logo_right_width / logo_right.width) * logo_right.height)  # Maintain aspect ratio
+#
+    # with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as logo_right_tempfile:
+    #     logo_right.save(logo_right_tempfile, format='PNG')
+    #     logo_right_tempfile_path = logo_right_tempfile.name
+#
+    # # Add right company logo to the top right corner
+    # c.drawImage(logo_right_tempfile_path, page_width - logo_right_width - 10,
+    #             page_height - logo_right_height - 10,
+    #             width=logo_right_width, height=logo_right_height, mask='auto')
+
+    # Set up fonts for headings
+    heading_font = 'Helvetica-Bold'
+    heading_size = 20 # Font size in points
+    c.setFont(heading_font, heading_size)
+
+    # Set the color for headings
+    heading_fill_color = HexColor('#2F6054')
+    c.setFillColor(heading_fill_color)
+
+    # Set up fonts for subheadings
+    sub_heading_font = 'Helvetica-Bold'
+    sub_heading_size = 16  # Font size in points
+    c.setFont(sub_heading_font, sub_heading_size)
+
+    # Calculate top heading position
+    top_heading_width = c.stringWidth(top_heading, heading_font, heading_size)
+    top_heading_x = (page_width - top_heading_width) / 2
+    top_heading_y = page_height - heading_size - 0.5 * inch - shift_down  # Adjust position from the top
+
+    # Draw top heading
+    c.drawString(top_heading_x, top_heading_y, top_heading)
+
+    # Calculate image sizes
+    large_image_width = page_width / 1.9
+    large_image_height = (page_height - spacing) / 1.9
+    small_image_width = page_width / 2.9
+    small_image_height = (page_height - spacing) / 3.9
+
+    # Position for headings and images
+    y_positions_large_images = [
+        page_height - large_image_height - lower_amount_points - heading_size - heading_spacing_points - 0.5 * inch - shift_down,
+        page_height - large_image_height - lower_amount_points - heading_size - heading_spacing_points - 0.5 * inch - shift_down
+    ]
+    y_positions_small_images = [
+        page_height - large_image_height - 40 - small_image_height - lower_amount_points - heading_size - heading_spacing_points - 0.5 * inch - shift_down,
+        page_height - large_image_height - 40 - small_image_height - lower_amount_points - heading_size - heading_spacing_points - 0.5 * inch - shift_down,
+        page_height - large_image_height - 40 - small_image_height - lower_amount_points - heading_size - heading_spacing_points - 0.5 * inch - shift_down
+    ]
+
+    # Draw headings and images
+    for i in range(2):
+        heading = image_headings[i]
+        image_x = i * large_image_width
+        image_y = y_positions_large_images[i]
+        heading_width = c.stringWidth(heading, heading_font, heading_size)
+        heading_x = image_x + (large_image_width - heading_width) / 2
+        c.drawString(heading_x, image_y + large_image_height + heading_spacing_points, heading)
+        c.drawImage(image_paths[i], image_x, image_y, width=large_image_width, height=large_image_height)
+
+    for i in range(0, 3):
+        heading = image_headings[i + 2]
+        image_x = i * small_image_width
+        image_y = y_positions_small_images[i]
+        sub_heading_width = c.stringWidth(heading, sub_heading_font, sub_heading_size)
+        sub_heading_x = image_x + (small_image_width - sub_heading_width) / 2
+        c.drawString(sub_heading_x, image_y + small_image_height + heading_spacing_points, heading)
+        c.drawImage(image_paths[i + 2], image_x, image_y, width=small_image_width, height=small_image_height)
+
+    # Finish the canvas drawing
+    c.save()
+
+    # Move the buffer to the beginning
+    buffer.seek(0)
+
+    # Merge the drawn canvas with the template
+    template_page = template_pdf.pages[0]
+    new_pdf = PyPDF2.PdfReader(buffer)
+    overlay_page = new_pdf.pages[0]
+
+    # Merge the overlay with the template page
+    template_page.merge_page(overlay_page)
+
+    # Add the merged page to the output
+    output_pdf.add_page(template_page)
+
+    # Write the output PDF to a file
+    with open(output_filename, "wb") as output_file:
+        output_pdf.write(output_file)
+
+
+for league in leagues:
+    season = 2024 if league == 'mls' or league == 'ekstraklasa' else 2023
+    # for kpi in kpis:
+    #     if kpi != 'HighSpeed':
+    #         club_stats_to_google(league=league, season=season, kpi=kpi)
+    #     top_ten_players_to_google(league=league, season=season, kpi=kpi)
+
+    # Report creation
+    image_paths = [
+        fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}.png",
+        fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Total Distance_{season}.png",
+        fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Total Distance_{season}_players.png",
+        fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_HighSpeed_{season}_players.png",
+        fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}_players.png"]
+
+    output_filename = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league}_report.pdf'
+
+    image_headings = [
+        "Number of Sprints",
+        "Total Distance [km]",
+        "Total Distance - Players [km]",
+        "Top 10 Highspeeds [km/h]",
+        "Number of Sprints - Players"
+    ]
+
+    top_heading = f'{LEAGUE_MAPPING[league]} Season {season}'
+    template_path = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\PDF_templates\{league}_template.pdf'
+    images_to_2x3_page_pdf_new(league, image_paths, output_filename, top_heading, image_headings, template_path)
+    print(f'\n {league}: DONE')
+
