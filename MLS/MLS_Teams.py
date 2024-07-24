@@ -30,4 +30,6 @@ LeaguesCup = {'New York Red Bulls': 'RBNY', 'Charlotte FC': 'CLT', 'Sporting Kan
               'Toluca FC': 'TOL', 'Pumas': 'PUM'}
 
 competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehearsals', '6': 'LeaguesCup',
-                '7': 'CampeonesCup'}
+                '7': 'CampeonesCup', '102': 'AllStarGame'}
+
+AllStar = {'MLS All-Stars': 'MLS', 'LIGA MX All-Stars': 'LMX'}

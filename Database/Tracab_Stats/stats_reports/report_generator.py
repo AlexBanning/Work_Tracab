@@ -198,12 +198,6 @@ def club_stats_to_table(league: str, season: int, kpi: str) -> None:
     logo_path = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\TeamLogos\{league.upper()}_Logos\{season}'
     create_team_table(df_sorted, kpi, filename, logo_path)
 
-    # kpi_sheet = kpi.replace(' ', '_')
-    # push_df_to_google(df=df_sorted, spreadsheet_id='1eb58QR0kt8S_zTzkc9w3f-infU_wU_Pnero4WjdEn9s',
-    #                   worksheet=f'{league}_{kpi_sheet}')
-
-
-# club_stats_to_google(league='mls', season=2024, kpi='Total Distance')
 
 
 # Top 10 Players to Google --------------------------------------------------------------------------------------------
@@ -288,12 +282,6 @@ def top_ten_players_to_table(league: str, season: int, kpi: str) -> None:
         top_10_with_names['Name'] = top_10_with_names['Name'].apply(shorten_name)  # shorten names
         create_table(top_10_with_names, 'Speed', filename)
 
-    # kpi_sheet = kpi.replace(' ', '_')
-    # push_df_to_google(df=top_10_with_names, spreadsheet_id='1eb58QR0kt8S_zTzkc9w3f-infU_wU_Pnero4WjdEn9s',
-    #                   worksheet=f'{league}_{kpi_sheet}_players')
-
-
-# top_ten_players_to_google(league='bl2', season=2023, kpi='Num. Sprints')
 
 def tables_to_pdf(image_paths: list[str], output_filename: str, top_heading: str,
                   image_headings: list[str], template_path: str, spacing=20, lower_amount_cm=1.5):
@@ -446,7 +434,7 @@ def main() -> None:
             fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_HighSpeed_{season}_players.png",
             fr"\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league.upper()}\{league}_Num. Sprints_{season}_players.png"]
 
-        output_filename = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league}_report.pdf'
+        output_filename = fr'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\{league}_report'
         pdf_files.append(output_filename)
 
         image_headings = [
