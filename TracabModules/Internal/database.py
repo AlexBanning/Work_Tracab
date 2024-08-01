@@ -45,7 +45,7 @@ def create_team_stats_table(league, match_folder):
     """
     # logging.basicConfig(filename=f'team_stats_log_{league}.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
-    db_path = f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db'
+    db_path = fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\{league}_stats.db'
     if league == 'eredivisie':
         observed_path = Path(match_folder) / 'Validated'
     else:
@@ -142,7 +142,7 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
     def calculate_avg_stats(team_id, league, season):
         if league not in valid_leagues:
             raise ValueError("results: league must be one of %r." % valid_leagues)
-        with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+        with sql.connect(fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
             query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
             try:
                 team_stats = pd.read_sql_query(query, conn)
@@ -169,7 +169,7 @@ def create_avg_stats_table(club_mapping, league, season, db_update=True, data=Fa
             league_stats = pd.concat([league_stats, avg_stats])
 
     if db_update:
-        with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+        with sql.connect(fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
             league_stats.to_sql(f'league_overview_{season}', conn, if_exists='replace', index=False)
 
     if data:
@@ -186,7 +186,7 @@ def print_stats_table(league, season, kpi, logo_path):
     logo_path (str): The path to the directory containing team logos.
     :return:
     """
-    db_path = Path(f'N:/07_QC/Alex/Databases/{league}_stats.db')
+    db_path = Path(fr'\\10.49.0.250\tracab_neu/07_QC/Alex/Databases/{league}_stats.db')
     try:
         with sql.connect(db_path) as conn:
             query = f"SELECT * FROM 'league_overview_{season}'"
@@ -243,7 +243,7 @@ def print_stats_table(league, season, kpi, logo_path):
     # plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 
     # Save the figure
-    output_path = Path(f'N:\\07_QC\\Alex\\StatsReports\\{league.upper()}') / f'{league}_{kpi.lower()}_{season}_table.png'
+    output_path = Path(fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\StatsReports\\{league.upper()}') / f'{league}_{kpi.lower()}_{season}_table.png'
     fig.savefig(
         output_path,
         facecolor=ax.get_facecolor(),
@@ -415,7 +415,7 @@ class DataFetcher:
         self.season = season
 
     def get_stats_tables(self, league, matchday):
-        db_path = Path(f'N:/07_QC/Alex/Databases/{league}_stats.db')
+        db_path = Path(fr'\\10.49.0.250\tracab_neu/07_QC/Alex/Databases/{league}_stats.db')
         try:
             with sql.connect(db_path) as conn:
                 team_query = (

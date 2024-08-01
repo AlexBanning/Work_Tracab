@@ -450,7 +450,7 @@ def main() -> None:
         tables_to_pdf(image_paths, output_filename, top_heading, image_headings, template_path)
         print(f'\n {league}: DONE')
 
-    merge_pdfs(pdf_files, r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\tracab_report.pdf')
+    merge_pdfs(pdf_files, r'\\10.49.0.250\tracab_neu\07_QC\Alex\StatsReports\tracab_report')
     print(f'\n Final Report: DONE')
 
 

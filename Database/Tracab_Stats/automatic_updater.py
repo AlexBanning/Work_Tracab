@@ -9,11 +9,11 @@ import logging.handlers
 from pathlib import Path
 
 LEAGUE_MAPPING = {
-    'mls': r'N:\01_Tracking-Data\Season_23-24\1 - MLS',
-    'bl1': r'N:\01_Tracking-Data\Season_24-25\51 - Bundesliga 1_BL',
-    'bl2': r'N:\01_Tracking-Data\Season_24-25\52 - 2.Bundesliga 2_BL',
-    'eredivisie': r'N:\01_Tracking-Data\Season_24-25\9 - Eredivisie',
-    'ekstraklasa': r'N:\01_Tracking-Data\Season_24-25\55 - Ekstraklasa'
+    'mls': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_23-24\1 - MLS',
+    'bl1': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\51 - Bundesliga 1_BL',
+    'bl2': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\52 - 2.Bundesliga 2_BL',
+    'eredivisie': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\9 - Eredivisie',
+    'ekstraklasa': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\55 - Ekstraklasa'
 }
 
 logger = logging.getLogger("update_logger")  # __name__ is a common choice
@@ -31,7 +31,7 @@ def setup_logging(config_file: Path):
 
 
 def update_team_stats_table(data_path: Path, league: str):
-    setup_logging(Path(r"N:/07_QC/Scripts/logging_configs/automatic_updater.json"))
+    setup_logging(Path(r'\\10.49.0.250\tracab_neu/07_QC/Scripts/logging_configs/automatic_updater.json'))
     logging.basicConfig(level="ERROR")
 
     start_time = time.time()
@@ -64,8 +64,6 @@ def main() -> None:
         logger.critical(message)
 
         create_avg_stats(league, season=2024)
-
-
 
 
 if __name__ == '__main__':
