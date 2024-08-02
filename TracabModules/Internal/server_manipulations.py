@@ -74,10 +74,13 @@ def rename_htf_files(source_path, destination_path, new_filename):
     try:
         logging.info(f"Renaming {source_path} to {destination_path}\\{new_filename}")
         os.rename(source_path, f"{destination_path}\\{new_filename}")
+        display_popup("Renaming HTFs", f"{new_filename} has been successfully renamed!")
     except FileNotFoundError:
         logging.error(f"File not found: {source_path}")
+        display_popup("Renaming HTFs", f"File not found: {source_path}")
     except Exception as e:
         logging.error(f"Error renaming file: {e}")
+        display_popup("Renaming HTFs", "Error renaming file: {e}")
 
 
 def get_source_folder(feed_type, date, mobile=False, nsh=False):
