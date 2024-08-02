@@ -434,7 +434,11 @@ class DataFetcher:
     def get_match_path(self):
         league_code = '51' if self.league == 'bl1' else '52'
         base_path = Path(fr'\\10.49.0.250\deltatre\MatchInfo') / league_code / str(self.season) / 'match_facts'
-        return next(x for x in base_path.iterdir() if self.game_id in x.name)
+        try:
+            return next(x for x in base_path.iterdir() if self.game_id in x.name)
+        except StopIteration:
+
+            return
 
     def parse_match_file(self, match_file):
         tree = etree.parse(str(match_file))
@@ -498,7 +502,8 @@ class DataFetcher:
 
     def bundesliga(self):
         match_file = self.get_match_path()
-        matchday, home_name, away_name, home_players, away_players = self.parse_match_file(match_file)
+        if match_file:
+            matchday, home_name, away_name, home_players, away_players = self.parse_match_file(match_file)
         avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday)
 
         if avg_stats_table is None or players is None:

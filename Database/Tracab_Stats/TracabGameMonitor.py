@@ -18,6 +18,10 @@ from tkinter import ttk, messagebox, font as tkfont
 from TracabModules.Internal.database import DataFetcher
 import logging
 
+class DataFetchError(Exception):
+    """Custom exception for errors in data fetching."""
+    pass
+
 
 class TracabGameMonitor:
     def __init__(self):
@@ -84,7 +88,12 @@ class TracabGameMonitor:
         # Replace with your function to fetch highspeed dataframes based on home_team and away_team
         try:
             fetcher = DataFetcher(game_id=game_id, league=league, season=season)
-            home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = fetcher.fetch_data()
+            result = fetcher.fetch_data()
+
+            if not result:
+                raise DataFetchError("No data available. Please check again once lineups are available.")
+
+            home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = result
 
             # Test labels for team values
             tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
