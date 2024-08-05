@@ -18,6 +18,7 @@ from tkinter import ttk, messagebox, font as tkfont
 from TracabModules.Internal.database import DataFetcher
 import logging
 
+
 class DataFetchError(Exception):
     """Custom exception for errors in data fetching."""
     pass
@@ -196,10 +197,16 @@ class TracabGameMonitor:
             else:
                 treeview.column(col, width=len(col) * 10)  # Adjust width based on column name length
 
-        # Insert the data
+        treeview.tag_configure('red', background='red', foreground='white')
+
+        # Insert the data and recolour rows if the player's high speed is above 35 km/h
         for index, row in dataframe.iterrows():
             values = list(row)
-            treeview.insert('', 'end', text='', values=values)
+            # Display dataframe rows
+            if row['Speed'] >= 35:
+                treeview.insert('', 'end', text='', values=values, tags=('red',))
+            else:
+                treeview.insert('', 'end', text='', values=values)
 
         # Remove the first column completely
         treeview["show"] = "headings"
