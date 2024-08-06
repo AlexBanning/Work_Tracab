@@ -121,7 +121,7 @@ def get_bl_club_mapping(team_info_dir):
         return pd.DataFrame()
 
 
-def get_bl_player_mapping(league_id, team_id):
+def get_bl_player_mapping(league_id, season, team_id):
     """
     Create a ShirtNumber-ObjectID mapping for Bundesliga teams from an XML file.
 
@@ -131,7 +131,7 @@ def get_bl_player_mapping(league_id, team_id):
     Returns:
     pd.DataFrame: A DataFrame containing the mapping of team IDs to team names.
     """
-    team_info_file = fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\2023\team_players\team_players_{team_id}.xml'
+    team_info_file = fr'\\10.49.0.250\deltatre\MatchInfo\{league_id}\{season}\team_players\team_players_{team_id}.xml'
     xml_doc = parse(team_info_file)
 
     player_elements = xml_doc.getElementsByTagName('player')
@@ -180,7 +180,7 @@ def get_dfl_player_mapping(league_id: int, season: int, team_id: int = None) -> 
     return df
 
 
-def get_mls_player_mapping(season_id: int, team_id: int = None) -> pd.DataFrame:
+def get_mls_player_mapping(season_id: str, team_id: int = None) -> pd.DataFrame:
     info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch')
     clubs_file = info_path / f'Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
 
@@ -208,7 +208,7 @@ def get_mls_player_mapping(season_id: int, team_id: int = None) -> pd.DataFrame:
     return df
 
 
-def get_opta_player_mapping(season_id: int, league_id: int, team_id: int = None) -> pd.DataFrame:
+def get_opta_player_mapping(season_id: int, league_id: str, team_id: int = None) -> pd.DataFrame:
     info_path = Path(fr'//10.49.0.250/Opta/MatchInfo/srml-{league_id}-{season_id}-squads.xml')
     xml_doc = etree.parse(str(info_path))
 

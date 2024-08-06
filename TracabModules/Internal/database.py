@@ -6,7 +6,7 @@ from plottable import ColumnDefinition, Table
 from plottable.plots import image
 from TracabModules.Internal.gamelog_functions import get_gamelog_info
 from TracabModules.Internal.tracab_output import get_observed_stats, get_validated_stats
-from TracabModules.Internal.tools import get_bl_player_mapping, get_mls_player_mapping, get_opta_player_mapping, get_ekstra_player_mapping
+from TracabModules.Internal.tools import get_dfl_player_mapping, get_mls_player_mapping, get_opta_player_mapping, get_ekstra_player_mapping
 from pathlib import Path
 import sqlite3 as sql
 from lxml import etree
@@ -89,7 +89,7 @@ def create_team_stats_table(league, match_folder):
                 ['Matchday', 'Season', 'Total Distance', 'Num. Sprints', 'Num. '
                                                                          'SpeedRuns']]
             with sql.connect(db_path) as conn:
-                update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
+                update_team_stats_table(team_stats=team_stats, team_ids=team_ids,
                                         conn=conn)
 
                 update_player_stats_tables(league=league, player_stats=player_stats,
@@ -124,7 +124,7 @@ def create_team_stats_table(league, match_folder):
                                                                          'SpeedRuns']]
 
             with sql.connect(db_path) as conn:
-                update_team_stats_table(teams_stats=team_stats, team_ids=team_ids,
+                update_team_stats_table(team_stats=team_stats, team_ids=team_ids,
                                         conn=conn)
 
                 update_player_stats_tables(league=league, player_stats=player_stats,
@@ -258,7 +258,7 @@ def print_stats_table(league, season, kpi, logo_path):
     logger.info(f'The table for "{kpi}" in the {league.upper()} has been created and saved here: {output_path}')
 
 
-def update_team_stats_table(teams_stats, team_ids, conn):
+def update_team_stats_table(team_stats, team_ids, conn):
     """
     Update the team statistics table in the database for a specific team.
 
@@ -288,8 +288,8 @@ def update_team_stats_table(teams_stats, team_ids, conn):
     """
 
     # Convert DataFrame columns to tuples
-    home_stats_tuples = teams_stats['HomeStats'].values.tolist()
-    away_stats_tuples = teams_stats['AwayStats'].values.tolist()
+    home_stats_tuples = team_stats['HomeStats'].values.tolist()
+    away_stats_tuples = team_stats['AwayStats'].values.tolist()
 
     # Execute SQL statements
     with conn:
@@ -333,36 +333,40 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
         for _, row in stats_df.iterrows():
             try:
-                if league == 'mls':
-                    object_id = player_mapping[row['ShirtNumber']]['ObjectId']
-                    provider_id = player_mapping[row['ShirtNumber']]['DlProviderId']
-                else:
-                    provider_id = player_mapping[row['ShirtNumber']]['ID']
-            except KeyError:
+                # if league == 'mls':
+                #     matching_row = player_mapping[player_mapping['uniform_number'] == row['ShirtNumber']].iloc[0]
+                #     provider_id = matching_row['DlProviderID']
+                #     object_id = matching_row['ObjectId']
+                # else:
+                # Filter the playermapping DataFrame to get the row where 'uniform_number' matches 'shirt_number'
+                matching_row = player_mapping[player_mapping['uniform_number'] == row['ShirtNumber']].iloc[0]
+                provider_id = matching_row['DlProviderID']
+                # provider_id = player_mapping[row['ShirtNumber']]['DlProviderID']
+            except IndexError:
                 logger.error(
                     f"Number {row['ShirtNumber']} is not part of the team anymore. Please check to update manually.")
                 continue
-            if league == 'mls':
-                player_stats_list.append({
-                    'ObjectID': object_id,
-                    'DlProviderID': provider_id,
-                    'Matchday': matchday,
-                    'Season': season,
-                    'Total Distance': row['Total Distance'],
-                    'HighSpeed': row['HighSpeed'],
-                    'Num. Sprints': row['Num. Sprints'],
-                    'Num. SpeedRuns': row['Num. SpeedRuns']
-                })
-            else:
-                player_stats_list.append({
-                    'DlProviderID': provider_id,
-                    'Matchday': matchday,
-                    'Season': season,
-                    'Total Distance': row['Total Distance'],
-                    'HighSpeed': row['HighSpeed'],
-                    'Num. Sprints': row['Num. Sprints'],
-                    'Num. SpeedRuns': row['Num. SpeedRuns']
-                })
+            # if league == 'mls':
+            #     player_stats_list.append({
+            #         'ObjectID': object_id,
+            #         'DlProviderID': provider_id,
+            #         'Matchday': matchday,
+            #         'Season': season,
+            #         'Total Distance': row['Total Distance'],
+            #         'HighSpeed': row['HighSpeed'],
+            #         'Num. Sprints': row['Num. Sprints'],
+            #         'Num. SpeedRuns': row['Num. SpeedRuns']
+            #     })
+            # else:
+            player_stats_list.append({
+                'DlProviderID': provider_id,
+                'Matchday': matchday,
+                'Season': season,
+                'Total Distance': row['Total Distance'],
+                'HighSpeed': row['HighSpeed'],
+                'Num. Sprints': row['Num. Sprints'],
+                'Num. SpeedRuns': row['Num. SpeedRuns']
+            })
 
         return pd.DataFrame(player_stats_list)
 
@@ -371,17 +375,17 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
     # Get player mappings for both teams
     if league == 'bl1' or league == 'bl2':
-        home_player_mapping = get_bl_player_mapping(league_id, team_ids[0])
-        away_player_mapping = get_bl_player_mapping(league_id, team_ids[1])
+        home_player_mapping = get_dfl_player_mapping(int(league_id), season, int(team_ids[0]))
+        away_player_mapping = get_dfl_player_mapping(int(league_id), season, int(team_ids[1]))
     elif league == 'mls':
-        home_player_mapping = get_mls_player_mapping(league_id, team_ids[0])
-        away_player_mapping = get_mls_player_mapping(league_id, team_ids[1])
+        home_player_mapping = get_mls_player_mapping(league_id, int(team_ids[0]))
+        away_player_mapping = get_mls_player_mapping(league_id, int(team_ids[1]))
     elif league == 'eredivisie':
-        home_player_mapping = get_opta_player_mapping(season, league_id, team_ids[0])
-        away_player_mapping = get_opta_player_mapping(season, league_id, team_ids[1])
+        home_player_mapping = get_opta_player_mapping(season, league_id, int(team_ids[0]))
+        away_player_mapping = get_opta_player_mapping(season, league_id, int(team_ids[1]))
     elif league == 'ekstraklasa':
-        home_player_mapping = get_ekstra_player_mapping(team_ids[0], league)
-        away_player_mapping = get_ekstra_player_mapping(team_ids[1], league)
+        home_player_mapping = get_ekstra_player_mapping(int(team_ids[0]))
+        away_player_mapping = get_ekstra_player_mapping(int(team_ids[1]))
 
     # Process player stats for both teams
     if not home_player_mapping is None:
@@ -414,17 +418,20 @@ class DataFetcher:
         self.league = league.lower()
         self.season = season
 
-    def get_stats_tables(self, league, matchday):
+    def get_stats_tables(self, league, matchday, season):
         db_path = Path(fr'\\10.49.0.250\tracab_neu/07_QC/Alex/Databases/{league}_stats.db')
         try:
             with sql.connect(db_path) as conn:
+                # team_query = (
+                #     f"SELECT * FROM 'league_overview_{int(self.season) - 1}'"
+                #     if matchday == '1' else
+                #     f"SELECT * FROM 'league_overview_{self.season}'"
+                # )
                 team_query = (
-                    f"SELECT * FROM 'league_overview_{int(self.season) - 1}'"
-                    if matchday == '1' else
                     f"SELECT * FROM 'league_overview_{self.season}'"
                 )
                 avg_stats_table = pd.read_sql_query(team_query, conn)
-                player_query = f"SELECT * FROM 'player_stats'"
+                player_query = f"SELECT * FROM 'player_stats' WHERE SEASON = {season}"
                 players = pd.read_sql_query(player_query, conn)
                 return avg_stats_table, players
         except sql.Error as e:
@@ -462,9 +469,9 @@ class DataFetcher:
         }
 
     def fill_missing_players_mls(self, filtered_df, players_dict):
-        missing_players = set(players_dict.keys()) - set(filtered_df['ObjectID'])
+        missing_players = set(players_dict.keys()) - set(filtered_df['DlProviderID'])
         missing_df = pd.DataFrame({
-            'ObjectID': list(missing_players),
+            'DlProviderID': list(missing_players),
             'HighSpeed': [np.nan] * len(missing_players)
         })
         return pd.concat([filtered_df, missing_df], ignore_index=True)
@@ -478,9 +485,9 @@ class DataFetcher:
         return pd.concat([filtered_df, missing_df], ignore_index=True)
 
     def calculate_highspeeds_mls(self, filtered_df, players_dict):
-        highspeeds = filtered_df.groupby('ObjectID')['HighSpeed'].max().reset_index()
-        highspeeds['Name'] = highspeeds['ObjectID'].map(lambda x: players_dict[x]['Name'])
-        highspeeds['ShirtNumber'] = highspeeds['ObjectID'].map(lambda x: players_dict[x]['ShirtNumber'])
+        highspeeds = filtered_df.groupby('DlProviderID')['HighSpeed'].max().reset_index()
+        highspeeds['Name'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['Name'])
+        highspeeds['ShirtNumber'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['ShirtNumber'])
         return highspeeds[['Name', 'ShirtNumber', 'HighSpeed']].sort_values(by='ShirtNumber')
 
     def calculate_highspeeds_dfl(self, filtered_df, players_dict):
@@ -504,7 +511,7 @@ class DataFetcher:
         match_file = self.get_match_path()
         if match_file:
             matchday, home_name, away_name, home_players, away_players = self.parse_match_file(match_file)
-        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday)
+        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday, season=self.season)
 
         if avg_stats_table is None or players is None:
             return None
@@ -570,12 +577,12 @@ class DataFetcher:
         }
 
         matchday = gamestats_root.findall('.//General')[0].get('MatchDay')
-        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday)
+        avg_stats_table, players = self.get_stats_tables(league=self.league, matchday=matchday, season=self.season)
         if avg_stats_table is None or players is None:
             return None
 
-        home_filtered_df = players[players['ObjectID'].isin(home_players.keys())]
-        away_filtered_df = players[players['ObjectID'].isin(away_players.keys())]
+        home_filtered_df = players[players['DlProviderID'].isin(home_players.keys())]
+        away_filtered_df = players[players['DlProviderID'].isin(away_players.keys())]
 
         home_filtered_df = self.fill_missing_players_mls(home_filtered_df, home_players)
         away_filtered_df = self.fill_missing_players_mls(away_filtered_df, away_players)

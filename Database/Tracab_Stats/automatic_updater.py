@@ -59,11 +59,13 @@ def create_avg_stats(league: str, season: int) -> None:
 
 def main() -> None:
     for league in LEAGUE_MAPPING:
-        update_team_stats_table(data_path=Path(LEAGUE_MAPPING[league]), league=league)
-        message = f"All databases have been updated."
+        message = f"STARTING TO UPDATE {league}"
         logger.critical(message)
-
+        update_team_stats_table(data_path=Path(LEAGUE_MAPPING[league]), league=league)
         create_avg_stats(league, season=2024)
+
+    message = f"All databases have been updated."
+    logger.critical(message)
 
 
 if __name__ == '__main__':
