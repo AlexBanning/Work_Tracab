@@ -333,40 +333,22 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
 
         for _, row in stats_df.iterrows():
             try:
-                # if league == 'mls':
-                #     matching_row = player_mapping[player_mapping['uniform_number'] == row['ShirtNumber']].iloc[0]
-                #     provider_id = matching_row['DlProviderID']
-                #     object_id = matching_row['ObjectId']
-                # else:
-                # Filter the playermapping DataFrame to get the row where 'uniform_number' matches 'shirt_number'
                 matching_row = player_mapping[player_mapping['uniform_number'] == row['ShirtNumber']].iloc[0]
                 provider_id = matching_row['DlProviderID']
-                # provider_id = player_mapping[row['ShirtNumber']]['DlProviderID']
+
+                player_stats_list.append({
+                    'DlProviderID': provider_id,
+                    'Matchday': matchday,
+                    'Season': season,
+                    'Total Distance': row['Total Distance'],
+                    'HighSpeed': row['HighSpeed'],
+                    'Num. Sprints': row['Num. Sprints'],
+                    'Num. SpeedRuns': row['Num. SpeedRuns']
+                })
             except IndexError:
                 logger.error(
                     f"Number {row['ShirtNumber']} is not part of the team anymore. Please check to update manually.")
-                continue
-            # if league == 'mls':
-            #     player_stats_list.append({
-            #         'ObjectID': object_id,
-            #         'DlProviderID': provider_id,
-            #         'Matchday': matchday,
-            #         'Season': season,
-            #         'Total Distance': row['Total Distance'],
-            #         'HighSpeed': row['HighSpeed'],
-            #         'Num. Sprints': row['Num. Sprints'],
-            #         'Num. SpeedRuns': row['Num. SpeedRuns']
-            #     })
-            # else:
-            player_stats_list.append({
-                'DlProviderID': provider_id,
-                'Matchday': matchday,
-                'Season': season,
-                'Total Distance': row['Total Distance'],
-                'HighSpeed': row['HighSpeed'],
-                'Num. Sprints': row['Num. Sprints'],
-                'Num. SpeedRuns': row['Num. SpeedRuns']
-            })
+
 
         return pd.DataFrame(player_stats_list)
 
@@ -378,8 +360,8 @@ def update_player_stats_tables(league, player_stats, team_ids, matchday, season,
         home_player_mapping = get_dfl_player_mapping(int(league_id), season, int(team_ids[0]))
         away_player_mapping = get_dfl_player_mapping(int(league_id), season, int(team_ids[1]))
     elif league == 'mls':
-        home_player_mapping = get_mls_player_mapping(league_id, int(team_ids[0]))
-        away_player_mapping = get_mls_player_mapping(league_id, int(team_ids[1]))
+        home_player_mapping  = get_mls_player_mapping(league_id,  return_type='player_ids', team_id=int(team_ids[0]))
+        away_player_mapping  = get_mls_player_mapping(league_id,  return_type='player_ids', team_id=int(team_ids[1]))
     elif league == 'eredivisie':
         home_player_mapping = get_opta_player_mapping(season, league_id, int(team_ids[0]))
         away_player_mapping = get_opta_player_mapping(season, league_id, int(team_ids[1]))
@@ -484,17 +466,12 @@ class DataFetcher:
         })
         return pd.concat([filtered_df, missing_df], ignore_index=True)
 
-    def calculate_highspeeds_mls(self, filtered_df, players_dict):
+    def calculate_highspeeds(self, filtered_df, players_dict):
         highspeeds = filtered_df.groupby('DlProviderID')['HighSpeed'].max().reset_index()
         highspeeds['Name'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['Name'])
         highspeeds['ShirtNumber'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['ShirtNumber'])
         return highspeeds[['Name', 'ShirtNumber', 'HighSpeed']].sort_values(by='ShirtNumber')
 
-    def calculate_highspeeds_dfl(self, filtered_df, players_dict):
-        highspeeds = filtered_df.groupby('DlProviderID')['HighSpeed'].max().reset_index()
-        highspeeds['Name'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['Name'])
-        highspeeds['ShirtNumber'] = highspeeds['DlProviderID'].map(lambda x: players_dict[x]['ShirtNumber'])
-        return highspeeds[['Name', 'ShirtNumber', 'HighSpeed']].sort_values(by='ShirtNumber')
 
     def handle_team_row(self, avg_stats_table, team_name, columns_to_keep):
         try:
@@ -522,8 +499,8 @@ class DataFetcher:
         home_filtered_df = self.fill_missing_players_dfl(home_filtered_df, home_players)
         away_filtered_df = self.fill_missing_players_dfl(away_filtered_df, away_players)
 
-        home_highspeeds = self.calculate_highspeeds_dfl(home_filtered_df, home_players)
-        away_highspeeds = self.calculate_highspeeds_dfl(away_filtered_df, away_players)
+        home_highspeeds = self.calculate_highspeeds(home_filtered_df, home_players)
+        away_highspeeds = self.calculate_highspeeds(away_filtered_df, away_players)
 
         columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
         home_row = self.handle_team_row(avg_stats_table, home_name, columns_to_keep)
@@ -543,9 +520,9 @@ class DataFetcher:
                 {
                     'STS-ID': obj.get("MatchId"),
                     'Home': obj.get("HomeTeamName"),
-                    'Home-ID': obj.get("HomeTeamName"),
+                    'Home-ID': obj.get("HomeTeamId"),
                     'Away': obj.get("GuestTeamName"),
-                    'Away-ID': obj.get("HomeTeamName"),
+                    'Away-ID': obj.get("GuestTeamId"),
                 }
                 for obj in root.findall('.//Fixture') if obj.get('DlProviderId') == self.game_id
             ),
@@ -559,13 +536,15 @@ class DataFetcher:
         lineup_file = base_path / f'Feed_02_01_matchinformation_MLS-COM-000001_{match["STS-ID"]}.xml'
         gamestats_tree = etree.parse(lineup_file)
         gamestats_root = gamestats_tree.getroot()
+        home_doc = gamestats_root.xpath('.//Team[@Role="home"]')[0]
+        away_doc = gamestats_root.xpath('.//Team[@Role="guest"]')[0]
 
         home_players = {
             obj.get('PersonId'): {
                 'ShirtNumber': int(obj.get('ShirtNumber')),
                 'Name': f'{obj.get('Shortname')}'
             }
-            for obj in gamestats_root.findall('.//Team')[0].findall('.//Player')
+            for obj in home_doc.findall('.//Player')
         }
 
         away_players = {
@@ -573,7 +552,7 @@ class DataFetcher:
                 'ShirtNumber': int(obj.get('ShirtNumber')),
                 'Name': f'{obj.get('Shortname')}'
             }
-            for obj in gamestats_root.findall('.//Team')[1].findall('.//Player')
+            for obj in away_doc.findall('.//Player')
         }
 
         matchday = gamestats_root.findall('.//General')[0].get('MatchDay')
@@ -581,14 +560,39 @@ class DataFetcher:
         if avg_stats_table is None or players is None:
             return None
 
-        home_filtered_df = players[players['DlProviderID'].isin(home_players.keys())]
-        away_filtered_df = players[players['DlProviderID'].isin(away_players.keys())]
+        club_mapping = get_mls_player_mapping(season_id='8', return_type='club_ids')
+        home_id = next(key for key, val in club_mapping.items() if val == match['Home-ID'])
+        away_id = next(key for key, val in club_mapping.items() if val == match['Away-ID'])
 
-        home_filtered_df = self.fill_missing_players_mls(home_filtered_df, home_players)
-        away_filtered_df = self.fill_missing_players_mls(away_filtered_df, away_players)
+        home_mapping = get_mls_player_mapping(season_id='8', return_type='player_ids', team_id=home_id)
+        away_mapping = get_mls_player_mapping(season_id='8', return_type='player_ids', team_id=away_id)
 
-        home_highspeeds = self.calculate_highspeeds_mls(home_filtered_df, home_players)
-        away_highspeeds = self.calculate_highspeeds_mls(away_filtered_df, away_players)
+        # Convert to dictionary with 'DlProviderID' as keys and 'ObjectID' as values
+        home_dict = home_mapping.set_index('DlProviderID')['ObjectID'].to_dict()
+        away_dict = away_mapping.set_index('DlProviderID')['ObjectID'].to_dict()
+
+        new_dict_home = {}
+        for player in home_dict:
+            try:
+                new_dict_home.update({player: home_players[home_dict[player]]})
+            except KeyError:
+                continue
+
+        new_dict_away = {}
+        for player in away_dict:
+            try:
+                new_dict_away.update({player: away_players[away_dict[player]]})
+            except KeyError:
+                continue
+
+        home_filtered_df = players[players['DlProviderID'].isin(new_dict_home.keys())]
+        away_filtered_df = players[players['DlProviderID'].isin(new_dict_away.keys())]
+
+        home_filtered_df = self.fill_missing_players_mls(home_filtered_df, new_dict_home)
+        away_filtered_df = self.fill_missing_players_mls(away_filtered_df, new_dict_away)
+
+        home_highspeeds = self.calculate_highspeeds(home_filtered_df, new_dict_home)
+        away_highspeeds = self.calculate_highspeeds(away_filtered_df, new_dict_away)
 
         columns_to_keep = ['Total Distance', 'Num. Sprints', 'Num. SpeedRuns']
         home_row = self.handle_team_row(avg_stats_table, match['Home'], columns_to_keep)

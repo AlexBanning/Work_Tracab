@@ -5,6 +5,7 @@ from xml.dom.minidom import parse
 from pathlib import Path
 from lxml import etree
 import logging
+from typing import Union, Tuple, Dict
 
 logger = logging.getLogger('reports_logger')
 
@@ -161,26 +162,28 @@ def get_dfl_player_mapping(league_id: int, season: int, team_id: int = None) -> 
 
     # Iterate over all files in the directory
     for filename in files:
-            xml_doc = etree.parse(filename)
-            player_elements = xml_doc.xpath('//player')
-            for player_element in player_elements:
-                metadata = player_element.xpath('player-metadata')[0]
-                player_key = metadata.get('player-key')
-                uniform_number = metadata.get('uniform-number')
-                nickname = metadata.xpath('name/@nickname')[0]
+        xml_doc = etree.parse(filename)
+        player_elements = xml_doc.xpath('//player')
+        for player_element in player_elements:
+            metadata = player_element.xpath('player-metadata')[0]
+            player_key = metadata.get('player-key')
+            uniform_number = metadata.get('uniform-number')
+            nickname = metadata.xpath('name/@nickname')[0]
 
-                data.append({
-                    'uniform_number': uniform_number,
-                    'DlProviderID': player_key,
-                    'Name': nickname
-                })
+            data.append({
+                'uniform_number': uniform_number,
+                'DlProviderID': player_key,
+                'Name': nickname
+            })
 
     # Create a DataFrame from the collected data
     df = pd.DataFrame(data)
     return df
 
 
-def get_mls_player_mapping(season_id: str, team_id: int = None) -> pd.DataFrame:
+def get_mls_player_mapping(season_id: str, return_type: str, team_id: int = None) -> Union[
+    pd.DataFrame, Dict[int, str], Tuple[pd.DataFrame, Dict[int, str]]
+]:
     info_path = Path(r'\\10.49.0.250\d3_mls\MatchInfo\STS-DataFetch')
     clubs_file = info_path / f'Feed_01_04_basedata_clubs_MLS-SEA-0001K{season_id}_MLS-COM-000001.xml'
 
@@ -188,6 +191,9 @@ def get_mls_player_mapping(season_id: str, team_id: int = None) -> pd.DataFrame:
 
     club_docs = xml_doc.findall('Clubs')[0].findall('Club')
     id_mapping = {int(x.get('DlProviderId')): x.get('ClubId') for x in club_docs}
+
+    if return_type == 'club_ids':
+        return id_mapping
 
     if team_id:
         player_files = [x for x in info_path.iterdir() if 'MLS-SEA-0001K8_player.xml' in x.name and
@@ -201,11 +207,15 @@ def get_mls_player_mapping(season_id: str, team_id: int = None) -> pd.DataFrame:
         xml_doc_players = etree.parse(club)
         players = xml_doc_players.findall('.//Object')
         club_data = pd.DataFrame([{'uniform_number': x.get('ShirtNumber'),
+                                   'ObjectID': x.get('ObjectId'),
                                    'DlProviderID': x.get('DlProviderId'),
                                    'Name': x.get('ShortName')} for x in players if x.get('Type') == 'player'])
         df = pd.concat([df, club_data])
 
-    return df
+    if return_type == 'player_ids':
+        return df
+
+    return df, id_mapping
 
 
 def get_opta_player_mapping(season_id: int, league_id: str, team_id: int = None) -> pd.DataFrame:
@@ -272,7 +282,8 @@ def get_ekstra_player_mapping(team_id: int = None) -> pd.DataFrame:
         players = club.findall('.//player')
         club_data = pd.DataFrame([{'uniform_number': x.get('nr'),
                                    'DlProviderID': x.get('id'),
-                                   'Name': f'{x.get('fname')[0]}. {x.get('sname')}' if x.get('fname') else x.get('sname')} for
+                                   'Name': f'{x.get('fname')[0]}. {x.get('sname')}' if x.get('fname') else x.get(
+                                       'sname')} for
                                   x in players])
         df = pd.concat([df, club_data])
 

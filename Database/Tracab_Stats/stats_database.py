@@ -22,7 +22,7 @@ import pstats
 Club Mappings
 """
 
-club_mapping = get_club_id_mapping(league='ekstraklasa', season=2023)
+club_mapping = get_club_id_mapping(league='mls', season=2024)
 
 """
 Database cunstruction
@@ -60,14 +60,15 @@ else:
 """
 Single league update
 """
-data_path = Path(fr'N:\01_Tracking-Data\Season_23-24\51 - Bundesliga 1_BL')
-league = 'bl1'
+data_path = Path(fr'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_23-24\1 - MLS\MD1')
+league = 'mls'
 start_time = time.time()
 for md in data_path.iterdir():
     if md.is_dir() and 'MD' in md.name:
         print(md)
-    for match in md.iterdir():
+    for match in data_path.iterdir():
         if match.is_dir():
+            print(match)
             start_time_match = time.time()
             create_team_stats_table(league, match)
             # # Construct the profile output file path
@@ -94,7 +95,7 @@ print(f"DB has been updated in {time.time() - start_time:.2f} seconds\n")
 """
 Construction of league-wide stats overviews 
 """
-avg_stats = create_avg_stats_table(club_mapping, league='ekstraklasa', season=2023, db_update=True, data=True)
+avg_stats = create_avg_stats_table(club_mapping, league='mls', season=2024, db_update=True, data=True)
 
 """
 Get League Stats to create printable tables
@@ -105,10 +106,10 @@ print_stats_table(league='mls', kpi='Num. SpeedRuns', season=2024,
 """
 Get stats from a team
 """
-league = 'mls'
+league = 'bl2'
 season = 2024
-team_id = 1
-with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+team_id = 15
+with sql.connect(fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM 'team_stats{team_id}' WHERE Season = {season}"
     team_stats = pd.read_sql_query(query, conn).sort_values(by='Matchday', ascending=True)
 
@@ -116,9 +117,9 @@ with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
 Get stats from a player
 """
 league = 'mls'
-season = 2023
-player_id = 13526
-with sql.connect(f'N:\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
+season = 2024
+player_id = 4353
+with sql.connect(fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\{league}_stats.db') as conn:
     query = f"SELECT * FROM 'player_stats'"
     player_stats = pd.read_sql_query(query, conn).sort_values(by=['DlProviderID', 'Matchday'], ascending=True)
 
@@ -143,7 +144,10 @@ def delete_table(db_path, table_name):
 
 
 # Example usage:
-db_path = 'N:\\07_QC\\Alex\\Databases\\bl2_stats.db'
-table_name = 'league_overview'
+db_path = fr'\\10.49.0.250\tracab_neu\\07_QC\\Alex\\Databases\\ekstraklasa_stats.db'
+table_name = 'team_stats2192'
 delete_table(db_path, table_name)
 
+from TracabModules.Internal.database import DataFetcher
+fetcher = DataFetcher(game_id='6197', league='mls', season='2024')
+result = fetcher.fetch_data()
