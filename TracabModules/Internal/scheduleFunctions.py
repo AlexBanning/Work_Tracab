@@ -64,7 +64,7 @@ def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
 
             return filename, print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
     except:
-        print(f'The schedule fur competition {str(comp_id)} of {str(vendor)} is not available!')
+        print(f'The schedule for competition {str(comp_id)} of {str(vendor)} is not available!')
         pass
 
     try:
