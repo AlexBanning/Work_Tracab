@@ -28,17 +28,13 @@ from tkinter import Tk, messagebox
 import sys
 
 # Constants
-DEFAULT_PATH_HTF1 = r'D:\B'
+DEFAULT_PATH_HTF1 = r'E:\B'
 DEFAULT_PATH_HTF2 = r'E:\D'
-BL1_SCHEDULE_PATH = os.getcwd() + '\\BL1_HTF_Schedule.xlsx'
+BL1_SCHEDULE_PATH = os.getcwd() + '\\BL2_HTF_Schedule.xlsx'
 ALLOWED_FILE_TYPES = ("MP4 files", "*.mp4")
 
 # Add this at the beginning of your script
 logging.basicConfig(level=logging.INFO)
-
-# Initialize Tkinter root window
-root = Tk()
-root.withdraw()  # Hide the root window
 
 latest_htf1 = choose_file(DEFAULT_PATH_HTF1, title="HTF_1", allowed_types=("MP4 files", "*.mp4"), keyword='_1.mp4')
 latest_htf2 = choose_file(DEFAULT_PATH_HTF2, title="HTF_2", allowed_types=("MP4 files", "*.mp4"), keyword='_2.mp4')
@@ -56,14 +52,12 @@ try:
 except IndexError:
     messagebox.showwarning('Invalid 3LC in selected file/-s',
                            f'Please select the correct file/-s and check the 3LC!')
-    root.destroy()  # Destroy the Tkinter root window
     sys.exit()
 try:
     new_htf1 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Right'].values[0]
 except IndexError:
     messagebox.showwarning('Invalid 3LC in selected file/-s',
                            f'Please select the correct file/-s and check the 3LC!')
-    root.destroy()  # Destroy the Tkinter root window
     sys.exit()
 # Rename the available HTFs
 if latest_htf1:
@@ -71,5 +65,4 @@ if latest_htf1:
 if latest_htf2:
     rename_htf_files(latest_htf2, DEFAULT_PATH_HTF2, new_htf2)
 
-root.destroy()
 sys.exit()
