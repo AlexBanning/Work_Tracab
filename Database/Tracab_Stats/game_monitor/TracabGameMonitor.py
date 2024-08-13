@@ -17,6 +17,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, font as tkfont
 from TracabModules.Internal.database import DataFetcher
 import logging
+import sys, os
 
 
 class DataFetchError(Exception):
@@ -29,10 +30,10 @@ class TracabGameMonitor:
         self.leagues = ['BL1', 'BL2', 'MLS', 'Eredivisie', 'Ekstraklasa']
 
         self.root = tk.Tk()
-        self.root.title("Tracab GameMonitor")
+        self.root.title("Tracab Stats-Monitor")
         # Load Tracab Icon
-        # exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
-        # self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
+        exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
+        self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
         # Set Background colour
         self.root.configure(bg='#2F4F4F')
 
@@ -96,21 +97,44 @@ class TracabGameMonitor:
 
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = result
 
-            # Test labels for team values
-            tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
-                     ).grid(row=4, column=0, padx=5, pady=2, sticky="nw")
-            tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
-                     ).grid(row=4, column=1, padx=5, pady=2, sticky="nw")
+            # Check and update or create label for home team name
+            if hasattr(self, 'home_name_label') and self.home_name_label is not None:
+                self.home_name_label.config(text=home_name)
+            else:
+                self.home_name_label = tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F",
+                                                font=("Helvetica", 10, "bold"))
+                self.home_name_label.grid(row=4, column=0, padx=5, pady=2, sticky="nw")
 
-            # Center the label horizontally
+            # Check and update or create label for away team name
+            if hasattr(self, 'away_name_label') and self.away_name_label is not None:
+                self.away_name_label.config(text=away_name)
+            else:
+                self.away_name_label = tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F",
+                                                font=("Helvetica", 10, "bold"))
+                self.away_name_label.grid(row=4, column=1, padx=5, pady=2, sticky="nw")
+
+            # Check and update or create label for home total distance
+            if hasattr(self, 'home_distance_label') and self.home_distance_label is not None:
+                self.home_distance_label.config(text=f'Avg. Distance: {home_row["Total Distance"].iloc[0]}km')
+            else:
+                self.home_distance_label = tk.Label(self.center_frame,
+                                                    text=f'Avg. Distance: {home_row["Total Distance"].iloc[0]}km',
+                                                    fg="#98FB98", bg="#2F4F4F")
+                self.home_distance_label.grid(row=5, column=0, padx=5, pady=2, sticky="nw")
+
+            # Check and update or create label for away total distance
+            if hasattr(self, 'away_distance_label') and self.away_distance_label is not None:
+                self.away_distance_label.config(text=f'Avg. Distance: {away_row["Total Distance"].iloc[0]}km')
+            else:
+                self.away_distance_label = tk.Label(self.center_frame,
+                                                    text=f'Avg. Distance: {away_row["Total Distance"].iloc[0]}km',
+                                                    fg="#98FB98", bg="#2F4F4F")
+                self.away_distance_label.grid(row=5, column=1, padx=5, pady=2, sticky="nw")
+
+            # Center the labels horizontally
             self.center_frame.grid_columnconfigure(0, weight=1)
             self.center_frame.grid_columnconfigure(1, weight=1)
 
-            # Display total distance
-            tk.Label(self.center_frame, text=f'Avg. Distance: {home_row['Total Distance'].iloc[0]}km',
-                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=0, padx=5, pady=2, sticky="nw")
-            tk.Label(self.center_frame, text=f'Avg. Distance: {away_row['Total Distance'].iloc[0]}km',
-                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=1, padx=5, pady=2, sticky="nw")
 
             # Check if Treeview widgets already exist, if not, create new ones
             if not hasattr(self, 'home_treeview') or not hasattr(self, 'away_treeview'):
