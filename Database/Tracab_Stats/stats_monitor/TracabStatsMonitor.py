@@ -24,12 +24,12 @@ class DataFetchError(Exception):
     pass
 
 
-class TracabGameMonitor:
+class TracabStatsMonitor:
     def __init__(self):
         self.leagues = ['BL1', 'BL2', 'MLS', 'Eredivisie', 'Ekstraklasa']
 
         self.root = tk.Tk()
-        self.root.title("Tracab GameMonitor")
+        self.root.title("Tracab Statsmonitor")
         # Load Tracab Icon
         # exe_dir = getattr(sys, '_MEIPASS', os.getcwd())
         # self.root.iconbitmap(os.path.join(exe_dir, "Tracab.ico"))
@@ -213,7 +213,7 @@ class TracabGameMonitor:
 
 
 def main() -> None:
-    TracabGameMonitor()
+    TracabStatsMonitor()
 
 
 if __name__ == '__main__':
