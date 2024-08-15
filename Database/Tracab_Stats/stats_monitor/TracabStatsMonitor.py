@@ -96,21 +96,66 @@ class TracabStatsMonitor:
 
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = result
 
-            # Test labels for team values
-            tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
-                     ).grid(row=4, column=0, padx=5, pady=2, sticky="nw")
-            tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F", font=("Helvetica", 10, "bold")
-                     ).grid(row=4, column=1, padx=5, pady=2, sticky="nw")
+            # Check and update or create label for home team name
+            if hasattr(self, 'home_name_label'):
+                self.home_name_label.config(text=home_name)
+            else:
+                self.home_name_label = tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F",
+                                                font=("Helvetica", 10, "bold"))
+                self.home_name_label.grid(row=4, column=0, columnspan=2, padx=5, pady=2, sticky="w")
+
+            # Check and update or create label for away team name
+            if hasattr(self, 'away_name_label'):
+                self.away_name_label.config(text=away_name)
+            else:
+                self.away_name_label = tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F",
+                                                font=("Helvetica", 10, "bold"))
+                self.away_name_label.grid(row=4, column=2, columnspan=2, padx=5, pady=2, sticky="w")
 
             # Center the label horizontally
             self.center_frame.grid_columnconfigure(0, weight=1)
             self.center_frame.grid_columnconfigure(1, weight=1)
 
-            # Display total distance
-            tk.Label(self.center_frame, text=f'Avg. Distance: {home_row['Total Distance'].iloc[0]}km',
-                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=0, padx=5, pady=2, sticky="nw")
-            tk.Label(self.center_frame, text=f'Avg. Distance: {away_row['Total Distance'].iloc[0]}km',
-                     fg="#98FB98", bg="#2F4F4F").grid(row=5, column=1, padx=5, pady=2, sticky="nw")
+            # Assuming the values are already extracted from your data
+            home_distance = home_row['Total Distance'].iloc[0]
+            away_distance = away_row['Total Distance'].iloc[0]
+            home_sprints = home_row['Num. Sprints'].iloc[0]
+            away_sprints = away_row['Num. Sprints'].iloc[0]
+            home_speedruns = home_row['Num. SpeedRuns'].iloc[0]
+            away_speedruns = away_row['Num. SpeedRuns'].iloc[0]
+
+            # Define the labels with mixed fonts
+            def create_stat_row(label_attr_prefix, label_text, home_value, away_value, row):
+                # Home Team Label
+                home_label_name = f'{label_attr_prefix}_home_label'
+                if hasattr(self, home_label_name):
+                    getattr(self, home_label_name).config(text=f"{home_value}")
+                else:
+                    setattr(self, home_label_name,
+                            tk.Label(self.center_frame, text=f"{home_value}", fg="#98FB98", bg="#2F4F4F",
+                                     font=("Helvetica", 10, "bold")))
+                    getattr(self, home_label_name).grid(row=row, column=1, sticky="w")
+
+                # Away Team Label
+                away_label_name = f'{label_attr_prefix}_away_label'
+                if hasattr(self, away_label_name):
+                    getattr(self, away_label_name).config(text=f"{away_value}")
+                else:
+                    setattr(self, away_label_name,
+                            tk.Label(self.center_frame, text=f"{away_value}", fg="#98FB98", bg="#2F4F4F",
+                                     font=("Helvetica", 10, "bold")))
+                    getattr(self, away_label_name).grid(row=row, column=3, sticky="w")
+
+                # Static Labels
+                tk.Label(self.center_frame, text=f"{label_text}: ", fg="#98FB98", bg="#2F4F4F",
+                         font=("Helvetica", 10)).grid(row=row, column=0, sticky="w")
+                tk.Label(self.center_frame, text=f"{label_text}: ", fg="#98FB98", bg="#2F4F4F",
+                         font=("Helvetica", 10)).grid(row=row, column=2, sticky="w")
+
+            # Create rows for each stat
+            create_stat_row("distance", "Distance", f"{home_distance}km", f"{away_distance}km", 5)
+            create_stat_row("sprints", "Sprints", home_sprints, away_sprints, 6)
+            create_stat_row("speedruns", "SpeedRuns", home_speedruns, away_speedruns, 7)
 
             # Check if Treeview widgets already exist, if not, create new ones
             if not hasattr(self, 'home_treeview') or not hasattr(self, 'away_treeview'):
