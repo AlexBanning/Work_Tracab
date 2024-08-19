@@ -69,7 +69,7 @@ class TracabStatsMonitor:
 
         # Button to fetch team and player data
         self.fetch_button = tk.Button(self.center_frame, text="Get Data", command=self.fetch_data)
-        self.fetch_button.grid(row=3, column=0, columnspan=2, pady=5, sticky="nw")
+        self.fetch_button.grid(row=3, column=0, pady=5, sticky="nw")
 
         # Create a frame to contain the TreeView for displaying dataframes
         self.dataframe_frame = tk.Frame(self.root)
@@ -79,7 +79,7 @@ class TracabStatsMonitor:
         # Adjust the window geometry
         self.adjust_window_size()
 
-        self.root.mainloop()
+        # self.root.mainloop()
 
     def fetch_data(self):
         league = self.league_var.get()
@@ -256,6 +256,25 @@ class TracabStatsMonitor:
         # Remove the first column completely
         treeview["show"] = "headings"
 
+    def get_game_id(self):
+        return self.game_id_var.get()
+
+    def get_vendor(self):
+        if self.league_var.get() == 'BL2' or self.league_var.get() == 'BL1' or self.league_var.get() == 'MLS':
+            vendor = '4'
+            return vendor
+
+
+class StatsMonitor:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Tracab StatsMonitor")
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.league_label = tk.Label(self.root, text="Select League:")
+        self.league_label.grid(row=0, column=0)
+        # No call to mainloop() here, so the subclass can control it
 
 def main() -> None:
     TracabStatsMonitor()
@@ -263,3 +282,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
+

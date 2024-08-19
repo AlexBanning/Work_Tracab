@@ -45,7 +45,7 @@ app = FeedStatusGUI(DATA_QUALITY, EXTR_VERS)
 Live Stream Data
 """
 if __name__ == "__main__":
-    processor = FootballDataProcessor(game_id=185106, vendor_id=4, protocol='ASCII')
+    processor = FootballDataProcessor(game_id=185101, vendor_id=4, protocol='JSON')
 
     # Start fetching data in a separate thread
     fetch_thread = threading.Thread(target=processor.fetch_data)
