@@ -25,7 +25,7 @@ class DataFetchError(Exception):
     pass
 
 
-class TracabGameMonitor:
+class TracabStatsMonitor:
     def __init__(self):
         self.leagues = ['BL1', 'BL2', 'MLS', 'Eredivisie', 'Ekstraklasa']
 
@@ -80,7 +80,7 @@ class TracabGameMonitor:
         # Adjust the window geometry
         self.adjust_window_size()
 
-        self.root.mainloop()
+        # self.root.mainloop()
 
     def fetch_data(self):
         league = self.league_var.get()
@@ -98,20 +98,20 @@ class TracabGameMonitor:
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = result
 
             # Check and update or create label for home team name
-            if hasattr(self, 'home_name_label') and self.home_name_label is not None:
+            if hasattr(self, 'home_name_label'):
                 self.home_name_label.config(text=home_name)
             else:
                 self.home_name_label = tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F",
                                                 font=("Helvetica", 10, "bold"))
-                self.home_name_label.grid(row=4, column=0, padx=5, pady=2, sticky="nw")
+                self.home_name_label.grid(row=4, column=0, columnspan=2, padx=5, pady=2, sticky="w")
 
             # Check and update or create label for away team name
-            if hasattr(self, 'away_name_label') and self.away_name_label is not None:
+            if hasattr(self, 'away_name_label'):
                 self.away_name_label.config(text=away_name)
             else:
                 self.away_name_label = tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F",
                                                 font=("Helvetica", 10, "bold"))
-                self.away_name_label.grid(row=4, column=1, padx=5, pady=2, sticky="nw")
+                self.away_name_label.grid(row=4, column=2, columnspan=2, padx=5, pady=2, sticky="w")
 
             # Check and update or create label for home total distance
             if hasattr(self, 'home_distance_label') and self.home_distance_label is not None:
@@ -135,6 +135,46 @@ class TracabGameMonitor:
             self.center_frame.grid_columnconfigure(0, weight=1)
             self.center_frame.grid_columnconfigure(1, weight=1)
 
+            # Assuming the values are already extracted from your data
+            home_distance = home_row['Total Distance'].iloc[0]
+            away_distance = away_row['Total Distance'].iloc[0]
+            home_sprints = home_row['Num. Sprints'].iloc[0]
+            away_sprints = away_row['Num. Sprints'].iloc[0]
+            home_speedruns = home_row['Num. SpeedRuns'].iloc[0]
+            away_speedruns = away_row['Num. SpeedRuns'].iloc[0]
+
+            # Define the labels with mixed fonts
+            def create_stat_row(label_attr_prefix, label_text, home_value, away_value, row):
+                # Home Team Label
+                home_label_name = f'{label_attr_prefix}_home_label'
+                if hasattr(self, home_label_name):
+                    getattr(self, home_label_name).config(text=f"{home_value}")
+                else:
+                    setattr(self, home_label_name,
+                            tk.Label(self.center_frame, text=f"{home_value}", fg="#98FB98", bg="#2F4F4F",
+                                     font=("Helvetica", 10, "bold")))
+                    getattr(self, home_label_name).grid(row=row, column=1, sticky="w")
+
+                # Away Team Label
+                away_label_name = f'{label_attr_prefix}_away_label'
+                if hasattr(self, away_label_name):
+                    getattr(self, away_label_name).config(text=f"{away_value}")
+                else:
+                    setattr(self, away_label_name,
+                            tk.Label(self.center_frame, text=f"{away_value}", fg="#98FB98", bg="#2F4F4F",
+                                     font=("Helvetica", 10, "bold")))
+                    getattr(self, away_label_name).grid(row=row, column=3, sticky="w")
+
+                # Static Labels
+                tk.Label(self.center_frame, text=f"{label_text}: ", fg="#98FB98", bg="#2F4F4F",
+                         font=("Helvetica", 10)).grid(row=row, column=0, sticky="w")
+                tk.Label(self.center_frame, text=f"{label_text}: ", fg="#98FB98", bg="#2F4F4F",
+                         font=("Helvetica", 10)).grid(row=row, column=2, sticky="w")
+
+            # Create rows for each stat
+            create_stat_row("distance", "Distance", f"{home_distance}km", f"{away_distance}km", 5)
+            create_stat_row("sprints", "Sprints", home_sprints, away_sprints, 6)
+            create_stat_row("speedruns", "SpeedRuns", home_speedruns, away_speedruns, 7)
 
             # Check if Treeview widgets already exist, if not, create new ones
             if not hasattr(self, 'home_treeview') or not hasattr(self, 'away_treeview'):
@@ -235,9 +275,28 @@ class TracabGameMonitor:
         # Remove the first column completely
         treeview["show"] = "headings"
 
+    def get_game_id(self):
+        return self.game_id_var.get()
+
+    def get_vendor(self):
+        if self.league_var.get() == 'BL2' or self.league_var.get() == 'BL1' or self.league_var.get() == 'MLS':
+            vendor = '4'
+            return vendor
+
+
+class StatsMonitor:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Tracab StatsMonitor")
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.league_label = tk.Label(self.root, text="Select League:")
+        self.league_label.grid(row=0, column=0)
+        # No call to mainloop() here, so the subclass can control it
 
 def main() -> None:
-    TracabGameMonitor()
+    TracabStatsMonitor()
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ import pandas as pd
 from TracabModules.Internal.gateway import GatewayDownloader
 import numpy as np
 
-game_id = '2374222'
+game_id = '2445451'
 vendor_id = '5'
 extr_vers = '4'
 data_quality = '1'
@@ -19,9 +19,9 @@ tf09_data, tf09_success = downloader.download_tf09_feed()
 tf08_data, tf08_success = downloader.download_tf08_feed()
 
 
-ft = tf08_data[0]['Periods'][0]
-firsthalf = tf08_data[0]['Periods'][1]
-secondhalf = tf08_data[0]['Periods'][2]
+ft = tf08_data['Periods'][0]
+firsthalf = tf08_data['Periods'][1]
+secondhalf = tf08_data['Periods'][2]
 
 # Get all KPIs for the PDFs frontpage
 pdf_frontpage = pd.DataFrame(columns=["HomeTeam", "KPIs", "AwayTeam"])
@@ -68,4 +68,47 @@ for team in ['HomeTeam', 'AwayTeam']:
 
     pdf_frontpage[team] = team_values
 
+
+"""
+Physical Overview
+"""
+# Get players' names with an extra check for players with only a single name
+physical_overview = {}
+for team in ['HomeTeam', 'AwayTeam']:
+    players = [
+        f"{name_parts[0][0]}. {' '.join(name_parts[1:])}" if len(name_parts) > 1 else name_parts[0]
+        for x in ft[team]['Players']
+        if (name_parts := x['PlayerName'].split())
+    ]
+
+    total_distance = [x['Distance'] for x in ft[team]['Players']]
+    top_speed = [x['TopSpeed'] for x in ft[team]['Players']]
+    avg_speed = [x['AvgSpeed'] for x in ft[team]['Players']]
+    n_sprints = [x['Sprints'] for x in ft[team]['Players']]
+    n_speedruns = [x['SpeedRuns'] for x in ft[team]['Players']]
+    n_hia = [x + y for x,y in zip(n_sprints,n_speedruns)]
+    sprint_distance = [np.round(((x['PercentDistanceHighSpeedSprinting'] + x['PercentDistanceLowSpeedSprinting']) / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    speedrun_distance = [np.round((x['PercentDistanceHighSpeedRunning'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    lowspeedrun_distance = [np.round((x['PercentDistanceLowSpeedRunning'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    jogging_distance = [np.round((x['PercentDistanceJogging'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    walking_distance = [np.round((x['PercentDistanceWalking'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    standing_distance = [np.round((x['PercentDistanceStanding'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+
+    df = pd.DataFrame({
+        'Player Name': players,
+        'Total Distance (m)': total_distance,
+        'Top Speed (km/h)': top_speed,
+        'Avg Speed (km/h)': avg_speed,
+        'High Intensity Activity': n_hia,
+        'Sprint Distance (m)': sprint_distance,
+        'Num. Sprints': n_sprints,
+        'HSR Distance (m)': speedrun_distance,
+        'Num. HSR': n_speedruns,
+        'LSR Distance (m)': lowspeedrun_distance,
+        'Jogging Distance (m)': jogging_distance,
+        'Walking Distance (m)': walking_distance,
+        'Standing Distance (m)': standing_distance
+    })
+    df = df[df['Total Distance (m)'] != 0]
+    physical_overview.update({team: df})
 

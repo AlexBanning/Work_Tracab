@@ -249,7 +249,7 @@ def top_ten_players_to_table(league: str, season: int, kpi: str) -> None:
         # Get player mapping
         player_mapping = get_dfl_player_mapping(league_id=LEAGUE_ID_MAPPING[league], season=season)
     elif league == 'mls':
-        player_mapping = get_mls_player_mapping(season_id=season - 2016)
+        player_mapping = get_mls_player_mapping(season_id=str(season - 2016), return_type='player_ids')
     elif league == 'eredivisie':
         player_mapping = get_opta_player_mapping(season_id=season, league_id=LEAGUE_ID_MAPPING[league])
     elif league == 'ekstraklasa':
@@ -420,7 +420,7 @@ pdf_files = [r'\\10.49.0.250\tracab_neu\07_QC\Alex\PDF_templates\deckblatt.pdf']
 
 def main() -> None:
     for league in leagues:
-        season = 2024 if league == 'mls' or league == 'ekstraklasa' else 2023
+        season = 2023 if league == 'bl1' else 2024
         for kpi in kpis:
             if kpi != 'HighSpeed':
                 club_stats_to_table(league=league, season=season, kpi=kpi)
