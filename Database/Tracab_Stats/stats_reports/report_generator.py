@@ -75,7 +75,7 @@ def shorten_name(name):
 def create_table(df: pd.DataFrame, kpi: str, filename: str) -> None:
     # Define table characteristics
     bg_color = "#212121"
-    text_color = "#2F6054"
+    text_color = "#7ed957"
     plt.rcParams["text.color"] = text_color
     plt.rcParams["font.family"] = "monospace"
 
@@ -128,7 +128,7 @@ def create_team_table(df: pd.DataFrame, kpi: str, filename: str, logo_path) -> N
 
     # Define table characteristics
     bg_color = "#212121"  # White background color
-    text_color = "#2F6054"  # Black text color
+    text_color = "#7ed957"  # Black text color
     plt.rcParams["text.color"] = text_color
     plt.rcParams["font.family"] = "monospace"
 
@@ -249,7 +249,7 @@ def top_ten_players_to_table(league: str, season: int, kpi: str) -> None:
         # Get player mapping
         player_mapping = get_dfl_player_mapping(league_id=LEAGUE_ID_MAPPING[league], season=season)
     elif league == 'mls':
-        player_mapping = get_mls_player_mapping(season_id=str(season - 2016), return_type='player_ids')
+        player_mapping = get_mls_player_mapping(season_id=season - 2016, return_type='player_ids')
     elif league == 'eredivisie':
         player_mapping = get_opta_player_mapping(season_id=season, league_id=LEAGUE_ID_MAPPING[league])
     elif league == 'ekstraklasa':
@@ -313,7 +313,7 @@ def tables_to_pdf(image_paths: list[str], output_filename: str, top_heading: str
     c.setFont(heading_font, heading_size)
 
     # Set the color for headings
-    heading_fill_color = HexColor('#2F6054')
+    heading_fill_color = HexColor('#7ed957')
     c.setFillColor(heading_fill_color)
 
     # Set up fonts for subheadings
