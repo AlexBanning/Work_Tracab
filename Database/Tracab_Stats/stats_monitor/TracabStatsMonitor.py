@@ -80,7 +80,7 @@ class TracabStatsMonitor:
         # Adjust the window geometry
         self.adjust_window_size()
 
-        # self.root.mainloop()
+        self.root.mainloop()
 
     def fetch_data(self):
         league = self.league_var.get()
@@ -97,39 +97,21 @@ class TracabStatsMonitor:
 
             home_row, away_row, home_name, away_name, home_highspeeds, away_highspeeds = result
 
-            # Check and update or create label for home team name
+            # # Check and update or create label for home team name
             if hasattr(self, 'home_name_label'):
                 self.home_name_label.config(text=home_name)
             else:
                 self.home_name_label = tk.Label(self.center_frame, text=home_name, fg="#98FB98", bg="#2F4F4F",
                                                 font=("Helvetica", 10, "bold"))
                 self.home_name_label.grid(row=4, column=0, columnspan=2, padx=5, pady=2, sticky="w")
-
-            # Check and update or create label for away team name
+#
+            # # Check and update or create label for away team name
             if hasattr(self, 'away_name_label'):
                 self.away_name_label.config(text=away_name)
             else:
                 self.away_name_label = tk.Label(self.center_frame, text=away_name, fg="#98FB98", bg="#2F4F4F",
                                                 font=("Helvetica", 10, "bold"))
                 self.away_name_label.grid(row=4, column=2, columnspan=2, padx=5, pady=2, sticky="w")
-
-            # Check and update or create label for home total distance
-            if hasattr(self, 'home_distance_label') and self.home_distance_label is not None:
-                self.home_distance_label.config(text=f'Avg. Distance: {home_row["Total Distance"].iloc[0]}km')
-            else:
-                self.home_distance_label = tk.Label(self.center_frame,
-                                                    text=f'Avg. Distance: {home_row["Total Distance"].iloc[0]}km',
-                                                    fg="#98FB98", bg="#2F4F4F")
-                self.home_distance_label.grid(row=5, column=0, padx=5, pady=2, sticky="nw")
-
-            # Check and update or create label for away total distance
-            if hasattr(self, 'away_distance_label') and self.away_distance_label is not None:
-                self.away_distance_label.config(text=f'Avg. Distance: {away_row["Total Distance"].iloc[0]}km')
-            else:
-                self.away_distance_label = tk.Label(self.center_frame,
-                                                    text=f'Avg. Distance: {away_row["Total Distance"].iloc[0]}km',
-                                                    fg="#98FB98", bg="#2F4F4F")
-                self.away_distance_label.grid(row=5, column=1, padx=5, pady=2, sticky="nw")
 
             # Center the labels horizontally
             self.center_frame.grid_columnconfigure(0, weight=1)
@@ -283,17 +265,6 @@ class TracabStatsMonitor:
             vendor = '4'
             return vendor
 
-
-class StatsMonitor:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Tracab StatsMonitor")
-        self.setup_ui()
-
-    def setup_ui(self):
-        self.league_label = tk.Label(self.root, text="Select League:")
-        self.league_label.grid(row=0, column=0)
-        # No call to mainloop() here, so the subclass can control it
 
 def main() -> None:
     TracabStatsMonitor()
