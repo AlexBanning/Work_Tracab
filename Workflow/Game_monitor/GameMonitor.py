@@ -3,7 +3,7 @@ Combine stats monitor and gateway monitor to be able to check the team's previou
 the running match
 """
 
-from Database.Tracab_Stats.stats_monitor.TracabStatsMonitor import TracabStatsMonitor, StatsMonitor # Import the original StatsMonitor class
+from Database.Tracab_Stats.stats_monitor.TracabStatsMonitor import TracabStatsMonitor # Import the original StatsMonitor class
 import tkinter as tk
 from TracabModules.Internal.gateway import FeedStatusGUI
 

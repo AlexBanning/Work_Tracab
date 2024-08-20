@@ -23,14 +23,14 @@ import os
 
 import pandas as pd
 import logging
-from TracabModules.Internal.server_manipulations import choose_file, display_popup, rename_htf_files
+from TracabModules.Internal.server_manipulations import choose_file, rename_htf_files
 from tkinter import Tk, messagebox
 import sys
 
 # Constants
 DEFAULT_PATH_HTF1 = r'D:\B'
 DEFAULT_PATH_HTF2 = r'E:\D'
-BL1_SCHEDULE_PATH = os.getcwd() + '\\BL1_HTF_Schedule.xlsx'
+BL1_SCHEDULE_PATH = os.getcwd() + '\\BL2_HTF_Schedule.xlsx'
 ALLOWED_FILE_TYPES = ("MP4 files", "*.mp4")
 
 # Add this at the beginning of your script
