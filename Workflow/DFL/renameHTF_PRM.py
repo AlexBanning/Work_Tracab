@@ -47,7 +47,7 @@ if latest_htf1:
 bl1_schedule = pd.read_excel(BL1_SCHEDULE_PATH, header=1)
 
 try:
-    new_htf1 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Left'].values[0]
+    new_htf1 = bl1_schedule.loc[bl1_schedule['3LC'] == match]['High Behind Right'].values[0]
 except IndexError:
     messagebox.showwarning('Invalid 3LC in selected file/-s',
                            f'Please select the correct file/-s and check the 3LC!')

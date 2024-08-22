@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import timedelta, datetime, date
 from gspread.exceptions import WorksheetNotFound
-from TracabModules.Internal.tools import is_date_in_current_week
+# from TracabModules.Internal.tools import is_date_in_current_week
 import gspread
 import os
 import xml.etree.ElementTree as ET
@@ -63,9 +63,13 @@ def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
                     ftp_host.download(filename, filename)
 
             return filename, print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
-    except:
+    except FileNotFoundError:
         print(f'The schedule for competition {str(comp_id)} of {str(vendor)} is not available!')
         pass
+    except IOError:
+        print(f'The schedule for competition {str(comp_id)} of {str(vendor)} has been downloaded \n')
+        pass
+
 
     try:
         if vendor == 'opta':
@@ -340,7 +344,7 @@ def push_df_to_google(df: pd.DataFrame, spreadsheet_id: str, worksheet: str) -> 
     :return:
     """
 
-    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\Season24-25\MatchInfo")
+    os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\Season24-25")
     gc = gspread.oauth(credentials_filename=
                        'schedule_push_authentification.json'
                        )
@@ -353,17 +357,17 @@ def push_df_to_google(df: pd.DataFrame, spreadsheet_id: str, worksheet: str) -> 
     except WorksheetNotFound:
         # If worksheet doesn't exist, create it
         worksheet = spreadsheet.add_worksheet(title=worksheet, rows=1000, cols=15)
-
+#
     # Replace NaN values with empty strings to avoid serialization issues
     df = df.fillna(0)
-
+#
     # Prepare data for update: convert DataFrame to list of lists
     data_to_update = [df.columns.values.tolist()] + df.values.tolist()
-
+#
     # Update or append data to the worksheet
     # worksheet.clear()  # Clear existing content before updating
     worksheet.update(data_to_update)
-
+#
     return logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
 
 

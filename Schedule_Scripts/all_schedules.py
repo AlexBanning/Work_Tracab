@@ -76,24 +76,29 @@ ktq_schedule = sf.get_keytoq_schedule(filename, season_dir='Season24-25')
 Push MLS Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(mls_schedule, league=mls_schedule['League'].iloc[0], season_dir='Season24-25')
+sf.push_df_to_google(mls_schedule, spreadsheet_id='1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw',
+                     worksheet=mls_schedule['League'].iloc[0])
 """
 Push BL1 Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(bl_schedule, league=bl_schedule['League'].iloc[0], season_dir='Season24-25')
+sf.push_df_to_google(bl_schedule, spreadsheet_id='1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw',
+                     worksheet=bl_schedule['League'].iloc[0])
 """
 Push BL2 Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(blt_schedule, league=blt_schedule['League'].iloc[0], season_dir='Season24-25')
+sf.push_df_to_google(blt_schedule, spreadsheet_id='1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw',
+                     worksheet=blt_schedule['League'].iloc[0])
 """
 Push Eredivisie Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(opta_schedule, league=opta_schedule['League'].iloc[0], season_dir='Season24-25')
+sf.push_df_to_google(opta_schedule, spreadsheet_id='1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw',
+                     worksheet=opta_schedule['League'].iloc[0])
 """
 Push Ekstraklasa Schedule
 """
 # Push schedule to Google Sheets
-sf.push_to_google(ktq_schedule, league=ktq_schedule['League'].iloc[0], season_dir='Season24-25')
+sf.push_df_to_google(ktq_schedule, spreadsheet_id='1f7KgwvUb4hzMmavsHP_vRb0nwPgt_wntbZKjgYE4HGw',
+                     worksheet=ktq_schedule['League'].iloc[0])
