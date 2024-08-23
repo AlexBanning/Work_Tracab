@@ -5,7 +5,7 @@ Generating a PDF out of Tracab's Gateway output.
 3. Generate the PDF
 """
 import pandas as pd
-
+import json
 from TracabModules.Internal.gateway import GatewayDownloader
 import numpy as np
 
@@ -17,7 +17,8 @@ data_quality = '1'
 downloader = GatewayDownloader(game_id, vendor_id, data_quality, extr_vers)
 tf09_data, tf09_success = downloader.download_tf09_feed()
 tf08_data, tf08_success = downloader.download_tf08_feed()
-
+metadata, metadata_sucess = downloader.download_metadata_file()
+metadata = metadata.json()
 
 ft = tf08_data['Periods'][0]
 firsthalf = tf08_data['Periods'][1]
@@ -111,4 +112,43 @@ for team in ['HomeTeam', 'AwayTeam']:
     })
     df = df[df['Total Distance (m)'] != 0]
     physical_overview.update({team: df})
+
+"""
+Player Distance Charts
+"""
+distances = {}
+for team in ['HomeTeam', 'AwayTeam']:
+    players = [
+        f"{name_parts[0][0]}. {' '.join(name_parts[1:])}" if len(name_parts) > 1 else name_parts[0]
+        for x in ft[team]['Players']
+        if (name_parts := x['PlayerName'].split())
+    ]
+    ft_total_distance = [x['Distance'] for x in ft[team]['Players']]
+    fh_total_distance = [x['Distance'] for x in firsthalf[team]['Players']]
+    sh_total_distance = [x['Distance'] for x in secondhalf[team]['Players']]
+
+    team_dict = {x: {'firstHalf': f, 'secondHalf': s, 'fullTime': t} for x,f,s,t in zip(players,fh_total_distance, sh_total_distance,
+                                                                                   ft_total_distance)}
+    distances.update({team: team_dict})
+
+"""
+Individual Possession Control --- Discuss necessety of implementation
+"""
+poss_control = {}
+for team in ['HomeTeam', 'AwayTeam']:
+    players = [
+        f"{name_parts[0][0]}. {' '.join(name_parts[1:])}" if len(name_parts) > 1 else name_parts[0]
+        for x in ft[team]['Players']
+        if (name_parts := x['PlayerName'].split())
+    ]
+    mins_played = [((x['EndFrameCount']-x['StartFrameCount']) -
+                   (metadata['Phase2StartFrame'] - metadata['Phase1EndFrame'])) / 25 / 60
+                    if x['EndFrameCount'] >= metadata['Phase2StartFrame']
+                    or x['StartFrameCount'] <= metadata['Phase2StartFrame']
+                   else ((x['EndFrameCount']-x['StartFrameCount']) / 25 / 60)
+                   for x in metadata[team]['Players']]
+
+    team_dict = {x: {'mins_playerd': np.round(m, 2)} for x,m in zip(players,mins_played)}
+
+    poss_control.update({team: team_dict}) ### Still missing all possession control related variables
 
