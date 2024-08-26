@@ -44,19 +44,34 @@ def api_lineups(token, match_id):
 
     try:
         # Changed to now check if a valid matchShirtNumber is available for the player before adding them to the pd.DF
+        # home = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
+        #                       'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
+        #                      zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
+        #                          lineups['homeTeam']['players'], lineups['homeTeam']['players'])
+        #                      if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+        #                     # and len(z['playerStatus']) != 0]
+        #                     ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
         home = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['homeTeam']['players'], lineups['homeTeam']['players'],
                                  lineups['homeTeam']['players'], lineups['homeTeam']['players'])
-                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+                             if z['playerStatus'] == 'BASE_PLAYER' or z['playerStatus'] == 'EXTRA_PLAYER']
                             # and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
+
+        # away = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
+        #                       'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
+        #                      zip(lineups['awayTeam']['players'], lineups['awayTeam']['players'],
+        #                          lineups['awayTeam']['players'], lineups['awayTeam']['players'])
+        #                      if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+        #                     # and len(z['playerStatus']) != 0]
+        #                     ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
 
         away = pd.DataFrame([{'Player': x['firstName'] + ' ' + w['infix'] + ' ' + y['lastName'],
                               'jerseyNumber': int(z['matchShirtNumber'])} for x, w, y, z in
                              zip(lineups['awayTeam']['players'], lineups['awayTeam']['players'],
                                  lineups['awayTeam']['players'], lineups['awayTeam']['players'])
-                             if len(z['matchShirtNumber']) != 0 and int(z['matchShirtNumber']) >= 1]
+                             if z['playerStatus'] == 'BASE_PLAYER' or z['playerStatus'] == 'EXTRA_PLAYER']
                             # and len(z['playerStatus']) != 0]
                             ).sort_values(by=['jerseyNumber'], axis=0, ascending=True)
     except KeyError:  # normally one should spefically call the exception one expects to occure and not leave it open
