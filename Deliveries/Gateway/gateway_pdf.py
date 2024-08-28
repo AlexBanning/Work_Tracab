@@ -31,13 +31,14 @@ pdf_frontpage['KPIs'] = ['POSSESSION', 'NET. POSS. TIME', 'DISTANCE', 'SPRINTS',
 for team in ['HomeTeam', 'AwayTeam']:
     home_dist = np.round(ft[team]['Distance'] / 10, decimals=2)
     home_possession = ft[team]['PossessionData']['PossessionPercentage']
-    home_net_possession_time_ft = np.round(ft[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60, decimals=2)
+    home_net_possession_time_ft = np.round(ft[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60,
+                                           decimals=2)
     home_net_possession_time_firstht = np.round(
-        firsthalf[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60,decimals=2
-                                                )
+        firsthalf[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60, decimals=2
+    )
     home_net_possession_time_secondht = np.round(
-        secondhalf[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60,decimals=2
-                                                )
+        secondhalf[team]['PossessionData']['OwnTeamPossession']['Time'] / 1000 / 60, decimals=2
+    )
 
     home_players = ft[team]['Players']
     home_num_sprints = np.sum([x['Sprints'] for x in home_players])
@@ -47,7 +48,7 @@ for team in ['HomeTeam', 'AwayTeam']:
             np.sum(
                 [y['Distance'] for y in x['Coordinates'] if y['Type'] == 'Sprint']),
             decimals=2
-                  ) for x in home_players]
+        ) for x in home_players]
     )
     home_top_speed = [x['TopSpeed'] for x in home_players]
     home_max_distance = [x['Distance'] for x in home_players]
@@ -62,13 +63,13 @@ for team in ['HomeTeam', 'AwayTeam']:
 
     max_num_sprints_home_players = max(home_max_num_sprints)
     max_num_sprints_home_players_name = home_names[home_max_num_sprints.index(max(home_max_num_sprints))]
-    team_values = [f'{home_possession}%', home_net_possession_time_ft, f'{home_dist}m', home_num_sprints, home_num_hsruns,
+    team_values = [f'{home_possession}%', home_net_possession_time_ft, f'{home_dist}m', home_num_sprints,
+                   home_num_hsruns,
                    f'{home_sprint_dist}m', f'{top_speed_home_players_name} ({top_speed_home_players}km/h)',
                    f'{max_distance_home_players_name} ({max_distance_home_players}m)',
                    f'{max_num_sprints_home_players_name} ({max_num_sprints_home_players})']
 
     pdf_frontpage[team] = team_values
-
 
 """
 Physical Overview
@@ -87,13 +88,17 @@ for team in ['HomeTeam', 'AwayTeam']:
     avg_speed = [x['AvgSpeed'] for x in ft[team]['Players']]
     n_sprints = [x['Sprints'] for x in ft[team]['Players']]
     n_speedruns = [x['SpeedRuns'] for x in ft[team]['Players']]
-    n_hia = [x + y for x,y in zip(n_sprints,n_speedruns)]
-    sprint_distance = [np.round(((x['PercentDistanceHighSpeedSprinting'] + x['PercentDistanceLowSpeedSprinting']) / 100 * x['Distance']),2) for x in ft[team]['Players']]
-    speedrun_distance = [np.round((x['PercentDistanceHighSpeedRunning'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
-    lowspeedrun_distance = [np.round((x['PercentDistanceLowSpeedRunning'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
-    jogging_distance = [np.round((x['PercentDistanceJogging'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
-    walking_distance = [np.round((x['PercentDistanceWalking'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
-    standing_distance = [np.round((x['PercentDistanceStanding'] / 100 * x['Distance']),2) for x in ft[team]['Players']]
+    n_hia = [x + y for x, y in zip(n_sprints, n_speedruns)]
+    sprint_distance = [np.round(
+        ((x['PercentDistanceHighSpeedSprinting'] + x['PercentDistanceLowSpeedSprinting']) / 100 * x['Distance']), 2) for
+                       x in ft[team]['Players']]
+    speedrun_distance = [np.round((x['PercentDistanceHighSpeedRunning'] / 100 * x['Distance']), 2) for x in
+                         ft[team]['Players']]
+    lowspeedrun_distance = [np.round((x['PercentDistanceLowSpeedRunning'] / 100 * x['Distance']), 2) for x in
+                            ft[team]['Players']]
+    jogging_distance = [np.round((x['PercentDistanceJogging'] / 100 * x['Distance']), 2) for x in ft[team]['Players']]
+    walking_distance = [np.round((x['PercentDistanceWalking'] / 100 * x['Distance']), 2) for x in ft[team]['Players']]
+    standing_distance = [np.round((x['PercentDistanceStanding'] / 100 * x['Distance']), 2) for x in ft[team]['Players']]
 
     df = pd.DataFrame({
         'Player Name': players,
@@ -127,28 +132,151 @@ for team in ['HomeTeam', 'AwayTeam']:
     fh_total_distance = [x['Distance'] for x in firsthalf[team]['Players']]
     sh_total_distance = [x['Distance'] for x in secondhalf[team]['Players']]
 
-    team_dict = {x: {'firstHalf': f, 'secondHalf': s, 'fullTime': t} for x,f,s,t in zip(players,fh_total_distance, sh_total_distance,
-                                                                                   ft_total_distance)}
+    team_dict = {x: {'firstHalf': f, 'secondHalf': s, 'fullTime': t} for x, f, s, t in
+                 zip(players, fh_total_distance, sh_total_distance,
+                     ft_total_distance)}
     distances.update({team: team_dict})
 
 """
 Individual Possession Control --- Discuss necessety of implementation
 """
 poss_control = {}
+
+
+def calculate_average_control_time(player):
+    sequences = [x for x in player['IndividualBallControlSequences'] if x['ControlType'] == 'PossessionControl']
+    total_time = sum((x['EndFramecount'] - x['StartFramecount']) / 25 for x in sequences)
+    count = len(sequences)
+    return np.round(total_time / count, 2) if count > 0 else 0
+
+
+def calculate_average_control_distance(player):
+    sequences = [x for x in player['IndividualBallControlSequences'] if x['ControlType'] == 'PossessionControl']
+    distance = np.round(sum((x['Distance'] for x in sequences)), 2)
+    count = len(sequences)
+    return np.round(distance / count, 2) if count > 0 else 0
+
+
 for team in ['HomeTeam', 'AwayTeam']:
     players = [
         f"{name_parts[0][0]}. {' '.join(name_parts[1:])}" if len(name_parts) > 1 else name_parts[0]
         for x in ft[team]['Players']
         if (name_parts := x['PlayerName'].split())
     ]
-    mins_played = [((x['EndFrameCount']-x['StartFrameCount']) -
-                   (metadata['Phase2StartFrame'] - metadata['Phase1EndFrame'])) / 25 / 60
-                    if x['EndFrameCount'] >= metadata['Phase2StartFrame']
-                    or x['StartFrameCount'] <= metadata['Phase2StartFrame']
-                   else ((x['EndFrameCount']-x['StartFrameCount']) / 25 / 60)
-                   for x in metadata[team]['Players']]
 
-    team_dict = {x: {'mins_playerd': np.round(m, 2)} for x,m in zip(players,mins_played)}
+    mins_played = [
+        ((x['EndFrameCount'] - x['StartFrameCount']) -
+         (metadata['Phase2StartFrame'] - metadata['Phase1EndFrame'])) / 25 / 60
+        if (x['EndFrameCount'] >= metadata['Phase2StartFrame'] >= x['StartFrameCount'])
+           and not (x['EndFrameCount'] == 0 and x[
+            'StartFrameCount'] == 0)  # Additional check to prevent negative values
+        else ((x['EndFrameCount'] - x['StartFrameCount']) / 25 / 60)
+        for x in metadata[team]['Players']
+    ]
 
-    poss_control.update({team: team_dict}) ### Still missing all possession control related variables
+    spc_count = [sum(1 for x in y['IndividualBallControlSequences'] if x['ControlType'] == 'SetPieceControl')
+                 for y in tf09_data[team]['Players']]
+    pc_count = [sum(1 for x in y['IndividualBallControlSequences'] if x['ControlType'] == 'PossessionControl')
+                for y in tf09_data[team]['Players']]
+    tc_count = [sum(1 for x in y['IndividualBallControlSequences'] if x['ControlType'] == 'TouchControl')
+                for y in tf09_data[team]['Players']]
 
+    pc_time = [
+        sum((x['EndFramecount'] - x['StartFramecount']) / 25
+            for x in y['IndividualBallControlSequences']
+            if x['ControlType'] == 'PossessionControl')
+        for y in tf09_data[team]['Players']
+    ]
+
+    pc_dist = [
+        np.round(sum(x['Distance']
+                     for x in y['IndividualBallControlSequences']
+                     if x['ControlType'] == 'PossessionControl'), 2)
+        for y in tf09_data[team]['Players']
+    ]
+
+    pc_avg_time = [calculate_average_control_time(y) for y in tf09_data[team]['Players']]
+    pc_avg_dist = [calculate_average_control_distance(y) for y in tf09_data[team]['Players']]
+
+    top_speed_pc = [
+        np.round(max((x['TopSpeed']
+                      for x in y['IndividualBallControlSequences']
+                      if x['ControlType'] == 'PossessionControl'),
+                     default=0), 2)  # Use default=0 to handle empty cases
+        for y in tf09_data[team]['Players']
+    ]
+
+    team_dict = {x: {'mins_playerd': np.round(m, 2), 'SPC': s, 'TC': t, 'PC': p, 'Total PC': i, 'Avg PC': a,
+                     'Total': d, 'Avg': v, 'Top Speed PC': k} for x, m, s, t, p, i, a, d, v, k in
+                 zip(players, mins_played, spc_count, tc_count,
+                     pc_count, pc_time, pc_avg_time, pc_dist, pc_avg_dist, top_speed_pc)}
+
+    poss_control.update({team: team_dict})  ### Still missing all possession control related variables
+
+"""
+Summary: Ball Control
+"""
+def calculate_sprint_distance(possession_data):
+    high_speed = possession_data.get('PercentDistanceHighSpeedSprinting', 0)
+    low_speed = possession_data.get('PercentDistanceLowSpeedSprinting', 0)
+    distance = possession_data.get('Distance', 0)
+    return np.round((high_speed + low_speed) * distance / 100, 2)
+
+ball_control_stats = {}
+for team in ['HomeTeam', 'AwayTeam']:
+    players = [
+        f"{name_parts[0][0]}. {' '.join(name_parts[1:])}" if len(name_parts) > 1 else name_parts[0]
+        for x in ft[team]['Players']
+        if (name_parts := x['PlayerName'].split())
+    ]
+
+    mins_played = [
+        ((x['EndFrameCount'] - x['StartFrameCount']) -
+         (metadata['Phase2StartFrame'] - metadata['Phase1EndFrame'])) / 25 / 60
+        if (x['EndFrameCount'] >= metadata['Phase2StartFrame'] >= x['StartFrameCount'])
+           and not (x['EndFrameCount'] == 0 and x[
+            'StartFrameCount'] == 0)  # Additional check to prevent negative values
+        else ((x['EndFrameCount'] - x['StartFrameCount']) / 25 / 60)
+        for x in metadata[team]['Players']
+    ]
+
+    own_dist = [x['PossessionData']['OwnTeamPossession']['Distance'] for x in ft[team]['Players']]
+    opo_dist = [x['PossessionData']['OpponentPossession']['Distance'] for x in ft[team]['Players']]
+    db_dist = [x['PossessionData']['DeadBall']['Distance'] for x in ft[team]['Players']]
+
+    own_sprint_dist = [
+        calculate_sprint_distance(x['PossessionData']['OwnTeamPossession'])
+        for x in ft[team]['Players']
+    ]
+    opo_sprint_dist = [
+         calculate_sprint_distance(x['PossessionData']['OpponentPossession'])
+         for x in ft[team]['Players']
+     ]
+    db_sprint_dist = [
+         calculate_sprint_distance(x['PossessionData']['DeadBall'])
+         for x in ft[team]['Players']
+     ]
+
+    own_hsr_dist = [np.round(x['PossessionData']['OwnTeamPossession']['PercentDistanceHighSpeedRunning'] *
+                                x['PossessionData']['OwnTeamPossession']['Distance'] / 100,2)
+                       for x in ft[team]['Players']]
+    opo_hsr_dist = [np.round(x['PossessionData']['OpponentPossession']['PercentDistanceHighSpeedRunning']*
+                                x['PossessionData']['OpponentPossession']['Distance'] / 100,2)
+                       for x in ft[team]['Players']]
+    db_hsr_dist = [np.round(x['PossessionData']['DeadBall']['PercentDistanceHighSpeedRunning']*
+                                x['PossessionData']['DeadBall']['Distance'] / 100,2)
+                       for x in ft[team]['Players']]
+
+    own_hi_runs = [x['PossessionData']['OwnTeamPossession']['Sprints'] +
+               x['PossessionData']['OwnTeamPossession']['SpeedRuns']
+               for x in ft[team]['Players']]
+    opo_hi_runs = [x['PossessionData']['OpponentPossession']['Sprints'] +
+               x['PossessionData']['OpponentPossession']['SpeedRuns']
+               for x in ft[team]['Players']]
+    db_hi_runs = [x['PossessionData']['DeadBall']['Sprints'] +
+               x['PossessionData']['DeadBall']['SpeedRuns']
+               for x in ft[team]['Players']]
+
+    sprint_distance = [np.round(
+        ((x['PercentDistanceHighSpeedSprinting'] + x['PercentDistanceLowSpeedSprinting']) / 100 * x['Distance']), 2) for
+                       x in ft[team]['Players']]
