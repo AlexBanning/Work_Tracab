@@ -70,10 +70,12 @@ def display_popup(title, message):
     #root.mainloop()
 
 
-def rename_htf_files(source_path, destination_path, new_filename):
+def rename_htf_files(source_path, new_filename):
     try:
+        destination_path = os.path.dirname(source_path)
+        full_destination_path = str(os.path.join(destination_path, new_filename))
         logging.info(f"Renaming {source_path} to {destination_path}\\{new_filename}")
-        os.rename(source_path, f"{destination_path}\\{new_filename}")
+        shutil.move(source_path, full_destination_path)
         display_popup("Renaming HTFs", f"{new_filename} has been successfully renamed!")
     except FileNotFoundError:
         logging.error(f"File not found: {source_path}")
