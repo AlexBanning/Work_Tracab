@@ -148,52 +148,134 @@ class Schedule:
         squad_root = squad_tree.getroot()
 
         # Create dictionary to link team_name and team_id
-        teams = squad_root[0].findall('Team')
-        team_names = [x.find('Name').text for x in teams]
-        team_ids = [x.get('uID') for x in teams]
-        team_dict = dict(zip(team_ids, team_names))
+        team_dict = {team.get('uID'): team.find('Name').text for team in squad_root[0].findall('Team')}
 
         # Create schedule
         matches = schedule_root[0].findall('MatchData')
-        md = [int(x.find('MatchInfo').get('MatchDay')) for x in matches]
-        match_ids = [x.get('uID')[1:] for x in matches]
-        # dates = [x.find('MatchInfo').find('Date').text[:-3] for x in matches]
-        dates = [
-            (parser.parse(x.find('MatchInfo').find('Date').text[:-3]) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M')
-            for x in matches
-        ]
-        stadiums = [x.find('Stat').text for x in matches]
-        home_teams = [team_dict[x.findall('TeamData')[0].get('TeamRef')] for x in matches]
-        away_teams = [team_dict[x.findall('TeamData')[1].get('TeamRef')] for x in matches]
-        if int(self.comp_id) == 9:
-            league = ['Eredivisie' for i in range(0, 306)]
-        elif int(self.comp_id) == 5:
-            league = ['CL' for i in range(0, 306)]
-        elif int(self.comp_id) == 6:
-            league = ['EL' for i in range(0, 306)]
-        elif int(self.comp_id) == 1125:
-            league = ['Conference League' for i in range(0, 306)]
-        elif int(self.comp_id) == 646:
-            league = ['W-CL' for i in range(0, 306)]
 
-        schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)),
-                                columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
+        match_days = []
+        match_ids = []
+        dates = []
+        home_teams = []
+        away_teams = []
+        stadiums = []
+
+        for match in matches:
+            match_info = match.find('MatchInfo')
+            match_day = int(match_info.get('MatchDay'))
+            match_id = match.get('uID')[1:]  # Remove the leading character
+
+            # Parse and adjust date
+            date_text = match_info.find('Date').text[:-3]
+            date = (parser.parse(date_text) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M')
+
+            stadium = match.find('Stat').text
+            home_team = team_dict[match.findall('TeamData')[0].get('TeamRef')]
+            away_team = team_dict[match.findall('TeamData')[1].get('TeamRef')]
+
+            # Append data to lists
+            match_days.append(match_day)
+            match_ids.append(match_id)
+            dates.append(date)
+            home_teams.append(home_team)
+            away_teams.append(away_team)
+            stadiums.append(stadium)
+        league_mapping = {
+            9: 'Eredivisie',
+            5: 'CL',
+            6: 'EL',
+            1125: 'Conference League',
+            646: 'W-CL'
+        }
+        league = league_mapping.get(int(self.comp_id), 'Unknown League')
+        leagues = [league] * len(matches)
+
+        # Create the DataFrame
+        schedule = pd.DataFrame({
+            'Matchday': match_days,
+            'MatchID': match_ids,
+            'KickOff': dates,
+            'Home': home_teams,
+            'Away': away_teams,
+            'League': leagues,
+            'Stadium': stadiums
+        })
+
         print(f"Parsed opta schedule for {self.comp_id}")
         return schedule
 
     def _parse_d3_mls(self):
         # Specific parsing logic for D3 MLS
-        with open(self.filename) as fp:
-            # Add parsing code here
-            pass
+        # Get all matches
+        schedule_path = self.info_dir / Path(self.filename)
+        tree = etree.parse(schedule_path)
+        root = tree.getroot()
+
+        fixtures = root[0].findall("Fixture")
+        # Parsing the DST start and end times using dateutil.parser.parse
+        dst_start = parser.parse('2024-03-31 02:00')
+        dst_end = parser.parse('2024-10-27 03:00')
+        # Define league
+        if self.comp_id == 1:
+            league = 'MLS'
+            # Current workaround as long as older seasons are also implemented in the schedule.xml
+        elif self.comp_id == 2:
+            league = 'MLS PlayOffs'
+        elif self.comp_id == 6:
+            league = 'MLS Leagues Cup'
+        elif self.comp_id == 102:
+            league = 'U.S. Open Cup'
+
+        # Create empty DF
+        schedule = pd.DataFrame(
+            columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium", "STS-ID"])
+        # Get info for all matches and update DF
+        for i, match in enumerate(fixtures):
+            date = match.get("PlannedKickoffTime")[0:10]
+            time = match.get("PlannedKickoffTime")[11:16]
+            kickoff = date + ' ' + time
+            ko_date_object = parser.parse(kickoff)
+            if dst_start < ko_date_object < dst_end:
+                ko_date_object = ko_date_object + timedelta(hours=2)
+            else:
+                ko_date_object = ko_date_object + timedelta(hours=1)
+            kickoff = ko_date_object.strftime('%Y-%m-%d %H:%M')
+            home = match.get("HomeTeamName")
+            away = match.get("GuestTeamName")
+            match_id = match.get("DlProviderId")
+            matchday = int(match.get("MatchDay"))
+            stadium = match.get("StadiumName").encode("latin").decode("utf-8")
+            sts_match_id = match.get("MatchId")
+
+            match_info = pd.DataFrame(
+                {"Matchday": matchday, "MatchID": match_id, "KickOff": kickoff, "Home": home, "Away": away,
+                 "League": league, "Stadium": stadium, "STS-ID": sts_match_id}, index=[0])
+
+            schedule = pd.concat([schedule, match_info])
         print(f"Parsed D3 MLS schedule for {self.comp_id}")
         return pd.DataFrame()
 
     def _parse_keytoq(self):
         # Specific parsing logic for keytoq
-        with open(self.filename) as fp:
-            # Add parsing code here
-            pass
+        schedule_path = self.info_dir / Path(self.filename)
+        tree = etree.parse(schedule_path)
+        root = tree.getroot()
+
+        matches = [x.findall('match') for x in root[0].findall('round')]
+
+        schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League"])
+        for i, md in enumerate(matches):
+            ko_date = [x.get('date') + ' ' + x.get('time') for x in md]
+            home = [x.get('team_a') for x in md]
+            away = [x.get('team_b') for x in md]
+            matchId = [x.get('id') for x in md]
+            league = ['Ekstraklasa' for x in md]
+            round_id = [(i + 1) for x in md]
+
+            match_info = pd.DataFrame(
+                {"Matchday": round_id, "MatchID": matchId, "KickOff": ko_date, "Home": home, "Away": away,
+                 "League": league})
+            schedule = pd.concat([schedule, match_info])
         print(f"Parsed keytoq schedule for {self.comp_id}")
         return pd.DataFrame()
 
