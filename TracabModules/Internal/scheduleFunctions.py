@@ -12,6 +12,7 @@ import logging
 
 logger = logging.getLogger('reports_logger')
 
+
 def get_schedule_xml(comp_id, vendor, season_dir, chdr=True, **kwargs):
     """
     Download all required xml-files for the schedule of specified competition
