@@ -1,6 +1,11 @@
 import os
 import ftputil
 from pathlib import Path
+import pandas as pd
+from lxml import etree
+from datetime import timedelta
+from dateutil import parser
+
 class Schedule:
     def __init__(self, comp_id: str, vendor: str, season_dir: str, server="213.168.127.130", user="Alex_Test", password="RobberyandLahm5%"):
         self.comp_id = comp_id
@@ -74,62 +79,107 @@ class Schedule:
             print(f"No parsing method available for vendor {self.vendor}")
             return None
 
-    def _parse_fifa(self):
-        # Specific parsing logic for FIFA
-        with open(self.filename) as fp:
-            data = BeautifulSoup(fp, features='html.parser')
-        # Parse data into a DataFrame
-        os.chdir(fr"N:\\07_QC\Scripts\Schedule_script\{season_dir}\MatchInfo")
-        with open(filename) as fp:
-            data = BeautifulSoup(fp, features='html.parser')
-
-        rounds = data.find_all('tournament-round')
-
-        # Create empty DF
-        schedule = pd.DataFrame(columns=["Matchday", "MatchID", "KickOff", "Home", "Away", "League", "Stadium"])
-        # Get info for all matches and update DF
-        for j, round in enumerate(rounds):
-            matchday = int(round["round-key"])
-            fixtures = round.find_all("sports-event")
-            for i, match in enumerate(fixtures):
-                date = match.find("event-metadata")["start-date-time"][0:10]
-                time = match.find("event-metadata")["start-date-time"][11:16]
-                ko_date = (datetime.strptime(date + ' ' + time, "%Y-%m-%d %H:%M") + timedelta(hours=2)
-                           ).strftime("%Y-%m-%d %H:%M")
-                home = match.find_all("team")[0].find("team-metadata").find("name")["full"].encode("latin").decode(
-                    "utf-8")
-                away = match.find_all("team")[1].find("team-metadata").find("name")["full"].encode("latin").decode(
-                    "utf-8")
-                match_id = match.find("event-metadata")["event-key"]
-                stadium = match.find("event-metadata").find("site").find("site-metadata").find("name")["full"].encode(
-                    "latin").decode("utf-8")
-                # Check which competition to add the accurate league. Info is missing in schedule.xml
-                if comp_id == '285026':
-                    league = 'FIFA Women WC'
-
-                match_info = pd.DataFrame(
-                    {"Matchday": matchday, "MatchID": match_id, "KickOff": ko_date, "Home": home, "Away": away,
-                     "League": league, "Stadium": stadium}, index=[0])
-
-                schedule = pd.concat([schedule, match_info])
-        print(f"Parsed FIFA schedule for {self.comp_id}")
-        return pd.DataFrame()  # Replace with actual parsed DataFrame
+    # def _parse_fifa(self):
+    #     # Specific parsing logic for FIFA
+    #     print(f"Parsed FIFA schedule for {self.comp_id}")
 
     def _parse_deltatre(self):
         # Specific parsing logic for deltatre
-        with open(self.filename) as fp:
-            # Add parsing code here
-            pass
+        schedule_path = self.info_dir / Path(self.filename)
+        tree = etree.parse(schedule_path)
+        root = tree.getroot()
+        # Get (if available) both halfs (all rounds) of a tournament, e.g. 'Hinrunde', 'Rückrunde'
+        divisions = root[1][1:]
+
+        # List to accumulate matchday DataFrames
+        matchday_data = []
+
+        # Iterate through divisions and match-days
+        for div in divisions:
+            match_days = div[1:]  # Get all match-days
+
+            for md in match_days:
+                # Determine the league based on comp_id
+                league = ['1.Bundesliga'] * len(md) if self.comp_id == '51' else [root[0][1][1].attrib[
+                                                                                      'code-name'].replace(
+                    ' ', '')] * len(md)
+
+                # Extract data for each match
+                round_ids = [int(md.attrib['round-number'])] * len(md)
+                match_ids = [match[0].attrib['event-key'] for match in md]
+                home_teams = [match[1][0][0].attrib['full'] for match in md]
+                away_teams = [match[2][0][0].attrib['full'] for match in md]
+                stadiums = [match[0][0][0][0].attrib['full'] for match in md]
+
+                # Parse dates using datetime for clarity
+                dates = [
+                    parser.parse(match[0].attrib['start-date-time']).strftime("%Y-%m-%d %H:%M")
+                    for match in md
+                ]
+
+                # Create a DataFrame for the current match-day
+                matchday_df = pd.DataFrame({
+                    'Matchday': round_ids,
+                    'MatchID': match_ids,
+                    'KickOff': dates,
+                    'Home': home_teams,
+                    'Away': away_teams,
+                    'League': league,
+                    'Stadium': stadiums
+                })
+
+                # Append to the list of DataFrames
+                matchday_data.append(matchday_df)
+
+        # Concatenate all matchday DataFrames once at the end
+        schedule = pd.concat(matchday_data, ignore_index=True)
+
         print(f"Parsed deltatre schedule for {self.comp_id}")
-        return pd.DataFrame()
+        return schedule
 
     def _parse_opta(self):
         # Specific parsing logic for opta
-        with open(self.schedule_filename) as fp:
-            # Add parsing code here
-            pass
+        schedule_path = self.info_dir / Path(self.schedule_filename)
+        schedule_tree = etree.parse(schedule_path)
+        schedule_root = schedule_tree.getroot()
+
+        squad_path = self.info_dir / Path(self.squads_filename)
+        squad_tree = etree.parse(squad_path)
+        squad_root = squad_tree.getroot()
+
+        # Create dictionary to link team_name and team_id
+        teams = squad_root[0].findall('Team')
+        team_names = [x.find('Name').text for x in teams]
+        team_ids = [x.get('uID') for x in teams]
+        team_dict = dict(zip(team_ids, team_names))
+
+        # Create schedule
+        matches = schedule_root[0].findall('MatchData')
+        md = [int(x.find('MatchInfo').get('MatchDay')) for x in matches]
+        match_ids = [x.get('uID')[1:] for x in matches]
+        # dates = [x.find('MatchInfo').find('Date').text[:-3] for x in matches]
+        dates = [
+            (parser.parse(x.find('MatchInfo').find('Date').text[:-3]) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M')
+            for x in matches
+        ]
+        stadiums = [x.find('Stat').text for x in matches]
+        home_teams = [team_dict[x.findall('TeamData')[0].get('TeamRef')] for x in matches]
+        away_teams = [team_dict[x.findall('TeamData')[1].get('TeamRef')] for x in matches]
+        if int(self.comp_id) == 9:
+            league = ['Eredivisie' for i in range(0, 306)]
+        elif int(self.comp_id) == 5:
+            league = ['CL' for i in range(0, 306)]
+        elif int(self.comp_id) == 6:
+            league = ['EL' for i in range(0, 306)]
+        elif int(self.comp_id) == 1125:
+            league = ['Conference League' for i in range(0, 306)]
+        elif int(self.comp_id) == 646:
+            league = ['W-CL' for i in range(0, 306)]
+
+        schedule = pd.DataFrame(list(zip(md, match_ids, dates, home_teams, away_teams, league, stadiums)),
+                                columns=['Matchday', 'MatchID', 'KickOff', 'Home', 'Away', 'League', 'Stadium'])
         print(f"Parsed opta schedule for {self.comp_id}")
-        return pd.DataFrame()
+        return schedule
 
     def _parse_d3_mls(self):
         # Specific parsing logic for D3 MLS
