@@ -11,8 +11,8 @@ logger = logging.getLogger('reports_logger')
 
 
 class Schedule:
-    def __init__(self, comp_id: str, vendor: str, season_id: str, season_dir: str,
-                 spreadsheet_id: str, server: str, user: str, password: str) :
+    def __init__(self,season_dir: str, spreadsheet_id: str, server: str, user: str, password: str,
+                 comp_id: str = None, vendor: str = None, season_id: str = None):
         self.comp_id = comp_id
         self.vendor = vendor
         self.season_id = season_id
