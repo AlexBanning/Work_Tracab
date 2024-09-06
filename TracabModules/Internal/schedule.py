@@ -5,45 +5,52 @@ import pandas as pd
 from lxml import etree
 from datetime import timedelta
 from dateutil import parser
+import logging
+import gspread
+logger = logging.getLogger('reports_logger')
+
 
 class Schedule:
-    def __init__(self, comp_id: str, vendor: str, season_dir: str, server="213.168.127.130", user="Alex_Test", password="RobberyandLahm5%"):
+    def __init__(self, comp_id: str, vendor: str, season_id: str, season_dir: str,
+                 spreadsheet_id: str, server: str, user: str, password: str) :
         self.comp_id = comp_id
         self.vendor = vendor
+        self.season_id = season_id
         self.season_dir = season_dir
-        self.info_dir = Path(fr"N:\\07_QC\Scripts\Schedule_script\{self.season_dir}\MatchInfo")
+        self.spreadsheet_id = spreadsheet_id
+        self.info_dir = Path(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\{self.season_dir}\MatchInfo")
         self.server = server
         self.user = user
         self.password = password
         self.filename = ''
         self.ftp_dir = ''
 
-    def _set_paths(self, season_id: str = None):
+    def _set_paths(self):
         """Set FTP directory and filename based on vendor."""
         if self.vendor == 'deltatre':
             self.filename = 'schedule.xml'
-            self.ftp_dir = f'deltatre/MatchInfo/{self.comp_id}/{season_id}/schedule'
+            self.ftp_dir = f'deltatre/MatchInfo/{self.comp_id}/{self.season_id}/schedule'
         elif self.vendor == 'FIFA':
             self.filename = f'{self.comp_id}_schedule.xml'
             self.ftp_dir = f'FIFA/{self.comp_id}/'
         elif self.vendor == 'opta':
-            self.schedule_filename = f'srml-{self.comp_id}-{season_id}-results.xml'
-            self.squads_filename = f'srml-{self.comp_id}-{season_id}-squads.xml'
+            self.schedule_filename = f'srml-{self.comp_id}-{self.season_id}-results.xml'
+            self.squads_filename = f'srml-{self.comp_id}-{self.season_id}-squads.xml'
             self.ftp_dir = 'Opta/MatchInfo'
         elif self.vendor == 'd3_mls':
             if self.comp_id == '102':
-                self.filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00002U.xml'
+                self.filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{self.season_id}_MLS-COM-00002U.xml'
             else:
-                self.filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{season_id}_MLS-COM-00000{self.comp_id}.xml'
+                self.filename = f'Feed_01_06_basedata_fixtures_MLS-SEA-0001K{self.season_id}_MLS-COM-00000{self.comp_id}.xml'
             self.ftp_dir = r'D3_MLS/MatchInfo/STS-DataFetch'
         elif self.vendor == 'keytoq':
             self.comp_id = '55'
             self.filename = 'main.xml'
             self.ftp_dir = 'Keytoq/MatchInfo/'
 
-    def download(self, season_id: str = None):
+    def _download(self):
         """Download schedule files based on vendor."""
-        self._set_paths(season_id)
+        self._set_paths()
         # os.makedirs(os.path.join(self.season_dir, "MatchInfo"), exist_ok=True)
         if Path.is_dir(self.info_dir):
             os.chdir(self.info_dir)
@@ -58,26 +65,31 @@ class Schedule:
                     # Download additional files for 'opta'
                     ftp_host.download(self.schedule_filename, self.schedule_filename)
                     ftp_host.download(self.squads_filename, self.squads_filename)
-        except FileNotFoundError:
-            print('error')
+        except FileNotFoundError as e:
+            logger.error(f"File not found: {e}")
+        except ftputil.error.FTPError as e:
+            logger.error(f"FTP error occurred: {e}")
         except Exception as e:
-            print('error')
+            logger.error(f"An unexpected error occurred: {e}")
 
     def parse(self):
         """Dispatch to the appropriate parsing method based on the vendor."""
-        if self.vendor == 'FIFA':
-            return self._parse_fifa()
-        elif self.vendor == 'deltatre':
-            return self._parse_deltatre()
-        elif self.vendor == 'opta':
-            return self._parse_opta()
-        elif self.vendor == 'd3_mls':
-            return self._parse_d3_mls()
-        elif self.vendor == 'keytoq':
-            return self._parse_keytoq()
+        self._download()
+
+        parsers = {
+            'deltatre': self._parse_deltatre,
+            'opta': self._parse_opta,
+            'd3_mls': self._parse_d3_mls,
+            'keytoq': self._parse_keytoq,
+        }
+
+        parser_function = parsers.get(self.vendor)
+
+        if parser_function:
+            df = parser_function()
+            self._push_schedule(df)
         else:
-            print(f"No parsing method available for vendor {self.vendor}")
-            return None
+            logger.error(f"No parsing method available for vendor {self.vendor}")
 
     # def _parse_fifa(self):
     #     # Specific parsing logic for FIFA
@@ -215,16 +227,14 @@ class Schedule:
         # Parsing the DST start and end times using dateutil.parser.parse
         dst_start = parser.parse('2024-03-31 02:00')
         dst_end = parser.parse('2024-10-27 03:00')
-        # Define league
-        if self.comp_id == 1:
-            league = 'MLS'
-            # Current workaround as long as older seasons are also implemented in the schedule.xml
-        elif self.comp_id == 2:
-            league = 'MLS PlayOffs'
-        elif self.comp_id == 6:
-            league = 'MLS Leagues Cup'
-        elif self.comp_id == 102:
-            league = 'U.S. Open Cup'
+        # Mapping comp_id to league names using a dictionary
+        league_mapping = {
+            '1': 'MLS',
+            '2': 'MLS PlayOffs',
+            '6': 'MLS Leagues Cup',
+            '102': 'U.S. Open Cup'
+        }
+        league = league_mapping.get(self.comp_id, 'Unknown League')
 
         # Create empty DF
         schedule = pd.DataFrame(
@@ -253,7 +263,7 @@ class Schedule:
 
             schedule = pd.concat([schedule, match_info])
         print(f"Parsed D3 MLS schedule for {self.comp_id}")
-        return pd.DataFrame()
+        return schedule
 
     def _parse_keytoq(self):
         # Specific parsing logic for keytoq
@@ -277,5 +287,47 @@ class Schedule:
                  "League": league})
             schedule = pd.concat([schedule, match_info])
         print(f"Parsed keytoq schedule for {self.comp_id}")
-        return pd.DataFrame()
+        return schedule
+
+    def _push_schedule(self, df: pd.DataFrame, worksheet: str = None) -> None:
+        """
+        Takes in a pd.DataFrame and pushes it into the Google Sheet '23/24 Schedule'.
+        :param df:
+        :param worksheet:
+        :param spreadsheet_id:
+        :return:
+        """
+        # Set the worksheet name based on the DataFrame if not provided
+        if worksheet is None:
+            worksheet = df['League'].iloc[0]  # Set to the first value of the 'League' column
+        try:
+            os.chdir(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\Season24-25")
+            gc = gspread.oauth(credentials_filename=
+                               'schedule_push_authentification.json'
+                               )
+
+            # schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
+            spreadsheet = gc.open_by_key(self.spreadsheet_id)
+            # Attempt to fetch the worksheet if it exists
+            try:
+                worksheet = spreadsheet.worksheet(worksheet)
+            except gspread.exceptions.WorksheetNotFound:
+                # If worksheet doesn't exist, create it
+                worksheet = spreadsheet.add_worksheet(title=worksheet, rows=1000, cols=15)
+            #
+            # Replace NaN values with empty strings to avoid serialization issues
+            df = df.fillna(0)
+            #
+            # Prepare data for update: convert DataFrame to list of lists
+            data_to_update = [df.columns.values.tolist()] + df.values.tolist()
+            #
+            # Update or append data to the worksheet
+            # worksheet.clear()  # Clear existing content before updating
+            worksheet.update(data_to_update)
+            #
+            logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
+        except gspread.exceptions.APIError as e:
+            logger.error(f"Failed to update Google Sheet: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred while pushing data to Google Sheets: {e}")
 
