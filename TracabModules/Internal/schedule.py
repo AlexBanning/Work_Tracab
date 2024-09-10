@@ -101,7 +101,9 @@ class Schedule:
         tree = etree.parse(schedule_path)
         root = tree.getroot()
         # Get (if available) both halfs (all rounds) of a tournament, e.g. 'Hinrunde', 'Rückrunde'
-        divisions = root[1][1:]
+        tournament = root.find('.//tournament')
+        if tournament is not None:
+            divisions = tournament.findall('.//tournament-division')
 
         # List to accumulate matchday DataFrames
         matchday_data = []
@@ -112,9 +114,8 @@ class Schedule:
 
             for md in match_days:
                 # Determine the league based on comp_id
-                league = ['1.Bundesliga'] * len(md) if self.comp_id == '51' else [root[0][1][1].attrib[
-                                                                                      'code-name'].replace(
-                    ' ', '')] * len(md)
+                league = ['1.Bundesliga'] * len(md) if self.comp_id == '51' else [root.find(
+                    ".//sports-content-code[@code-name]").attrib['code-name'].replace(' ', '')] * len(md)
 
                 # Extract data for each match
                 round_ids = [int(md.attrib['round-number'])] * len(md)
@@ -160,7 +161,7 @@ class Schedule:
         squad_root = squad_tree.getroot()
 
         # Create dictionary to link team_name and team_id
-        team_dict = {team.get('uID'): team.find('Name').text for team in squad_root[0].findall('Team')}
+        team_dict = {team.get('uID'): team.find('Name').text for team in squad_root.find(".//SoccerDocument").findall('Team')}
 
         # Create schedule
         matches = schedule_root[0].findall('MatchData')
