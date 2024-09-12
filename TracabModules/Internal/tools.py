@@ -6,6 +6,8 @@ from pathlib import Path
 from lxml import etree
 import logging
 from typing import Union, Tuple, Dict
+import os
+import gspread
 
 logger = logging.getLogger('reports_logger')
 
@@ -288,3 +290,43 @@ def get_ekstra_player_mapping(team_id: int = None) -> pd.DataFrame:
         df = pd.concat([df, club_data])
 
     return df
+
+
+
+def push_df_to_google(df: pd.DataFrame, spreadsheet_id: str, worksheet: str = None) -> None:
+    """
+    Takes in a pd.DataFrame and pushes it into the Google Sheet '23/24 Schedule'.
+    :param df:
+    :param worksheet:
+    :param spreadsheet_id:
+    :return:
+    """
+    # Set the worksheet name based on the DataFrame if not provided
+    if worksheet is None:
+        worksheet = df['League'].iloc[0]  # Set to the first value of the 'League' column
+
+    os.chdir(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\Season24-25")
+    gc = gspread.oauth(credentials_filename=
+                       'schedule_push_authentification.json'
+                       )
+
+    # schedule_sheet = gc.open_by_key("14Dx1un2S9USaZX_5OyL2JALvxW4Fg18_OzJXaSuwYmc")
+    spreadsheet = gc.open_by_key(spreadsheet_id)
+    # Attempt to fetch the worksheet if it exists
+    try:
+        worksheet = spreadsheet.worksheet(worksheet)
+    except gspread.WorksheetNotFound:
+        # If worksheet doesn't exist, create it
+        worksheet = spreadsheet.add_worksheet(title=worksheet, rows=1000, cols=15)
+    #
+    # Replace NaN values with empty strings to avoid serialization issues
+    df = df.fillna(0)
+    #
+    # Prepare data for update: convert DataFrame to list of lists
+    data_to_update = [df.columns.values.tolist()] + df.values.tolist()
+    #
+    # Update or append data to the worksheet
+    # worksheet.clear()  # Clear existing content before updating
+    worksheet.update(data_to_update)
+    #
+    return logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
