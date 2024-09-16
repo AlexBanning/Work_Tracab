@@ -9,7 +9,6 @@ import sys, os
 import sqlite3
 from TracabModules.Internal.tools import is_date_in_current_week
 
-
 BL1 = [
     "FC Bayern München",
     "RB Leipzig",
@@ -30,7 +29,6 @@ BL1 = [
     "VfL Bochum 1848",
     "SV Werder Bremen"
 ]
-
 
 BL2 = [
     "FC St. Pauli",
@@ -53,13 +51,14 @@ BL2 = [
     "Fortuna Düsseldorf"
 ]
 
+
 class DataHub:
     def __init__(self):
         self.client_id = 'ChyronHego-2fac-9065-53ed'
 
     def season_id(self):
         logging.basicConfig(level=logging.INFO)
-        url=(
+        url = (
             f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/{self.client_id}/'
             f'DFL-01.07-BaseData-Season')
         # Sending a GET request
@@ -70,13 +69,13 @@ class DataHub:
             xml_data = response.text
             # Parse XML data with BeautifulSoup
             soup = BeautifulSoup(xml_data, 'xml')
-            current_season_id = [x['SeasonId'] for x in soup.find_all('Season') if x['Season'] == '2023/2024'][0]
+            current_season_id = [x['SeasonId'] for x in soup.find_all('Season') if x['Season'] == '2024/2025'][0]
 
             return current_season_id
 
     def sts_competition_id(self, tracab_id):
         logging.basicConfig(level=logging.INFO)
-        url=(
+        url = (
             f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/{self.client_id}/'
             f'DFL-01.01-BaseData-Competition')
         # Sending a GET request
@@ -104,32 +103,36 @@ class DataHub:
             xml_data = response.text
             soup = BeautifulSoup(xml_data, 'xml')
             matchday_ids = {
-                x['MatchDay']: {'MatchDayId': x['MatchDayId'],'Date': x['StartDate'][:10]}
+                x['MatchDay']: {'MatchDayId': x['MatchDayId'], 'Date': x['StartDate'][:10]}
                 for x in soup.find_all('Fixtures')[0].contents[1::2]
                 if x['CompetitionId'] == comp_id
-                }
+            }
 
         return matchday_ids
 
     def positionalfeed(self, season_id, comp_id, matchday_id):
         logging.basicConfig(level=logging.INFO)
-        url = (f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/{self.client_id}/'
-                    f'DFL-07.03.01-Ranglisten-Saison_Spieler_Positionsdaten/{season_id}_{comp_id}_{matchday_id}')
+        url = (
+            f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/{self.client_id}/'
+            f'DFL-07.03.01-Ranglisten-Saison_Spieler_Positionsdaten/{season_id}_{comp_id}_{matchday_id}')
         response = requests.get(url)
         if response.status_code != 200:
             return logging.info(f'Error: {response.status_code}: {response.reason}')
         else:
             stats_xml_data = response.text
             soup = BeautifulSoup(stats_xml_data, 'xml')
-
-            speeds = [x for x in soup.find_all('Ranking') if x['Type'] == 'MaximumSpeed'][0]
-
+            try:
+                speeds = [x for x in soup.find_all('Ranking') if x['Type'] == 'MaximumSpeed'][0]
+            except IndexError:
+                print(f'Highspeed Feed probably not available. \n'
+                      f'Please check this url in your browser: \n'
+                      f'{url}')
+                input('Press Enter to exit!')
         return speeds
 
 
 def get_dfl_highspeeds(league, home, away):
     logging.basicConfig(level=logging.INFO)
-
 
     try:
         # Connect to the SQLite database
@@ -141,14 +144,18 @@ def get_dfl_highspeeds(league, home, away):
     query = "SELECT * FROM DFLPlayerStats"
     data = pd.read_sql_query(query, conn)
 
-    home_data = data[data['Team'] == home].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+    home_data = data[data['Team'] == home].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed',
+                                                                                             ascending=False)
     home_data = home_data.rename(columns={'ShirtNumber': '#'})
-    away_data = data[data['Team'] == away].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+    away_data = data[data['Team'] == away].drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed',
+                                                                                             ascending=False)
     away_data = away_data.rename(columns={'ShirtNumber': '#'})
     if league == '1.Bundesliga':
-        top_ten = data[data['League'] == '1.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+        top_ten = data[data['League'] == '1.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(
+            by='Speed', ascending=False)
     elif league == '2.Bundesliga':
-        top_ten = data[data['League'] == '2.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(by='Speed', ascending=False)
+        top_ten = data[data['League'] == '2.Bundesliga'].head(10).drop(columns=data.columns[[0, 1, 3]]).sort_values(
+            by='Speed', ascending=False)
 
     # Close the database connection
     conn.close()
@@ -186,10 +193,12 @@ class HighSpeedGUI:
         self.dataframe_frame.configure(bg='#2F4F4F')
 
         # Dropdown list for selecting the league
-        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
-                                                                                        sticky="nw")
+        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5,
+                                                                                            pady=2,
+                                                                                            sticky="nw")
         self.league_var = tk.StringVar(self.root)
-        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues, state='readonly')
+        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues,
+                                            state='readonly')
         self.league_dropdown.grid(row=0, column=1, padx=5, pady=2, sticky="nw")
 
         # Dropdown lists for selecting home and away teams
@@ -211,8 +220,8 @@ class HighSpeedGUI:
 
         # Dataframes to display highspeeds
         self.home_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=50, relief='flat')
-        self.home_df_text.grid(row=1, column=2, padx=(5,0), pady=0, sticky="nsew", columnspan=2)
-        self.home_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
+        self.home_df_text.grid(row=1, column=2, padx=(5, 0), pady=0, sticky="nsew", columnspan=2)
+        self.home_df_text.config(state=tk.DISABLED, fg="#98FB98", bg=self.root.cget("bg"))
         self.home_df_text.grid_remove()
 
         # Vertical Scrollbar for home_df_text
@@ -223,7 +232,7 @@ class HighSpeedGUI:
 
         self.away_df_text = tk.Text(self.dataframe_frame, wrap=tk.WORD, height=10, width=50, relief='flat')
         self.away_df_text.grid(row=1, column=4, padx=0, pady=0, sticky="nsew", columnspan=2)
-        self.away_df_text.config(state=tk.DISABLED, fg="#98FB98" , bg=self.root.cget("bg"))
+        self.away_df_text.config(state=tk.DISABLED, fg="#98FB98", bg=self.root.cget("bg"))
         self.away_df_text.grid_remove()
 
         # Vertical Scrollbar for away_df_text
@@ -294,13 +303,15 @@ class HighSpeedGUI:
 
     def update_headers(self, home_team, away_team):
         bold_font = tkfont.Font(weight='bold')
-        self.home_df_text_header = tk.Label(self.dataframe_frame, text=home_team, font=bold_font, fg="white", bg="#2F4F4F",
+        self.home_df_text_header = tk.Label(self.dataframe_frame, text=home_team, font=bold_font, fg="white",
+                                            bg="#2F4F4F",
                                             anchor='center')
-        self.home_df_text_header.grid(row=0, column=2, padx=5, pady=(0,5), sticky="nsew")
+        self.home_df_text_header.grid(row=0, column=2, padx=5, pady=(0, 5), sticky="nsew")
 
-        self.away_df_text_header = tk.Label(self.dataframe_frame, text=away_team, font=bold_font, fg="white", bg="#2F4F4F",
+        self.away_df_text_header = tk.Label(self.dataframe_frame, text=away_team, font=bold_font, fg="white",
+                                            bg="#2F4F4F",
                                             anchor='center')
-        self.away_df_text_header.grid(row=0, column=4, padx=5, pady=(0,5), sticky="nsew")
+        self.away_df_text_header.grid(row=0, column=4, padx=5, pady=(0, 5), sticky="nsew")
 
 
 class DFLDatabase:
@@ -339,7 +350,6 @@ class DFLDatabase:
 
         return data
 
-
     def HighSpeeds(self, season_id):
         data = pd.DataFrame(columns=['League', 'Team', 'Name', 'ObjectId', 'Speed'])
         for league in ['51', '52']:
@@ -353,7 +363,7 @@ class DFLDatabase:
             speeds_df = pd.DataFrame(
                 [{'ObjectId': str(x['PlayerId']),
                   'Name': f"{x['PlayerAlias']}" if 'PlayerAlias' in x.attrs else f"{x['PlayerFirstName'][0]}. {x['PlayerLastName']}",
-                  'Speed': np.round(float(x['Absolute']),2),
+                  'Speed': np.round(float(x['Absolute']), 2),
                   'Team': str(x.contents[1]['TeamName'])}
                  for x in speeds.find_all('ListEntry') if x.contents[1]['TeamName']]
             )
@@ -364,7 +374,6 @@ class DFLDatabase:
             data = pd.concat([data, speeds_df], axis=0)
 
         return data
-
 
 
 class HighSpeedGUItest:
@@ -392,10 +401,12 @@ class HighSpeedGUItest:
         self.center_frame.configure(bg='#2F4F4F')
 
         # Dropdown list for selecting the league
-        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5, pady=2,
-                                                                                        sticky="nw")
+        tk.Label(self.center_frame, text="Select League:", fg="#98FB98", bg="#2F4F4F").grid(row=0, column=0, padx=5,
+                                                                                            pady=2,
+                                                                                            sticky="nw")
         self.league_var = tk.StringVar(self.root)
-        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues, state='readonly')
+        self.league_dropdown = ttk.Combobox(self.center_frame, textvariable=self.league_var, values=self.leagues,
+                                            state='readonly')
         self.league_dropdown.grid(row=0, column=1, padx=5, pady=2, sticky="nw")
 
         # Dropdown lists for selecting home and away teams
@@ -504,7 +515,7 @@ class HighSpeedGUItest:
         height = self.root.winfo_reqheight()  # Get the required height of the GUI
         self.root.geometry(f"{width}x{height}")  # Set the GUI window size
 
-    def display_dataframe(self,dataframe, treeview, top_ten_dataframe):
+    def display_dataframe(self, dataframe, treeview, top_ten_dataframe):
         # Clear previous data
         treeview.delete(*treeview.get_children())
 
