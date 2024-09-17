@@ -114,8 +114,9 @@ class Schedule:
 
             for md in match_days:
                 # Determine the league based on comp_id
-                league = ['1.Bundesliga'] * len(md) if self.comp_id == '51' else [root.find(
-                    ".//sports-content-code[@code-name]").attrib['code-name'].replace(' ', '')] * len(md)
+                league = ['1.Bundesliga'] * len(md) if self.comp_id == '51' else [root[0][1][1].attrib[
+                                                                                      'code-name'].replace(
+                    ' ', '')] * len(md)
 
                 # Extract data for each match
                 round_ids = [int(md.attrib['round-number'])] * len(md)
@@ -326,9 +327,9 @@ class Schedule:
             # worksheet.clear()  # Clear existing content before updating
             worksheet.update(data_to_update)
             #
-            logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}')
+            logger.critical(f'\nThe data has been successfully pushed to the worksheet {worksheet}')
         except gspread.exceptions.APIError as e:
-            logger.error(f"Failed to update Google Sheet: {e}")
+            logger.error(f"\nFailed to update Google Sheet: {e}")
         except Exception as e:
-            logger.error(f"An unexpected error occurred while pushing data to Google Sheets: {e}")
+            logger.error(f"\nAn unexpected error occurred while pushing data to Google Sheets: {e}")
 
