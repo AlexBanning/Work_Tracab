@@ -17,7 +17,7 @@ ALLOWED_FILE_TYPES = ("MP4 files", "*.mp4")
 logging.basicConfig(level=logging.INFO)
 
 # latest_htf1 = choose_file(DEFAULT_PATH_HTF1, title="HTF_1", allowed_types=("MP4 files", "*.mp4"), keyword='_1.mp4')
-latest_htf2 = choose_file(DEFAULT_PATH_HTF2, title="HTF_2", allowed_types=("MP4 files", "*.mp4"), keyword='_2.mp4')
+latest_htf2 = choose_file(DEFAULT_PATH_HTF2, title="Select HTF_2", allowed_types=("MP4 files", "*.mp4"), keyword='_2.mp4')
 
 match = latest_htf2[-13:-6].replace('_', '-')
 
