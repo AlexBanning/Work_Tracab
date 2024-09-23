@@ -33,3 +33,5 @@ competitions = {'1': 'MLSRegularSeason', '2': 'MLSCupPlayoffs', '2S': 'MLSRehear
                 '7': 'CampeonesCup', '102': 'AllStarGame'}
 
 AllStar = {'MLS All-Stars': 'MLS', 'LIGA MX All-Stars': 'LMX'}
+
+Campeones = {'Columbus Crew': 'CLB', 'Club América': 'CF'}
