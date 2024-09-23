@@ -72,7 +72,7 @@ move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date
 # Upload folder after all videos have been moved and renamed
 if comp == str(1):
     command = ('aws s3 cp "' + filepath_new +
-               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/' + md + '/'
                + folder_new + '" --recursive')
 elif comp == str(6):
     command = ('aws s3 cp "' + filepath_new +
