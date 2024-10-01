@@ -130,6 +130,27 @@ class DataHub:
                 input('Press Enter to exit!')
         return speeds
 
+    def match_events(self, match_id: str, event: str):
+        logging.basicConfig(level=logging.INFO)
+        url = (f'https://httpget.distribution.production.datahub-sts.de/DeliveryPlatform/REST/PullOnce/'
+               f'STS1-PROD-UCT1-TEST/DFL-03.05-Ereignisdaten-Spiel-Basic-Erweitert/{match_id}')
+        print(url)
+        response = requests.get(url)
+        if response.status_code != 200:
+            return logging.info(f'Error: {response.status_code}: {response.reason}')
+        else:
+            stats_xml_data = response.text
+            soup = BeautifulSoup(stats_xml_data, 'xml')
+            try:
+                events = [(x['MinuteOfPlay'], x['PlayerLastName'], x['ThreeLetterCode']) for x in soup.find_all(event)]
+                df = pd.DataFrame(events).rename(columns={0: 'Minute', 1: 'Player', 2: 'Team'})
+            except IndexError:
+                print(f'Highspeed Feed probably not available. \n'
+                      f'Please check this url in your browser: \n'
+                      f'{url}')
+                input('Press Enter to exit!')
+        return df
+
 
 def get_dfl_highspeeds(league, home, away):
     logging.basicConfig(level=logging.INFO)
