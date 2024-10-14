@@ -80,28 +80,13 @@ move_and_rename_feed(filepath_new=filepath_new, sts_id=sts_id, match=match, date
 formatted_command = config['commands'][comp].format(filepath_new=filepath_new, md=md, folder_new=folder_new)
 # Command still f-string, not in correct format for aws command
 
-# if comp == str(1):
-#     command = ('aws s3 cp "' + filepath_new +
-#                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/Matchweek ' + md + '/'
-#                + folder_new + '" --recursive')
-# elif comp == str(6):
-#     command = ('aws s3 cp "' + filepath_new +
-#                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/LeaguesCup/' + md + '/'
-#                + folder_new + '" --recursive')
-# elif comp == str(102):
-#     command = ('aws s3 cp "' + filepath_new +
-#                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/USOpenCup/' + md + '/'
-#                + folder_new + '" --recursive')
-#
-# elif comp == str(5):
-#     command = ('aws s3 cp "' + filepath_new +
-#                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/AllStarGame/' + md + '/'
-#                + folder_new + '" --recursive')
-
+competition = config['competitions'][comp]
+command = (fr'aws s3 cp {filepath_new} s3://mah-s3-download-section-mls-331812868623/Video/2024/'
+           fr'{competition}/{md}/{folder_new} --recursive')
 
 print(f'\nExecuting S3 Command: {formatted_command}\n')
 try:
-    os.system(formatted_command)
+    os.system(command)
     input('Upload has finished. Press enter to exit')
 except:
     input('Upload was not successful. Please try again and submit the error code!')

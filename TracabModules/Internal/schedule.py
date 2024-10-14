@@ -11,14 +11,13 @@ logger = logging.getLogger('reports_logger')
 
 
 class Schedule:
-    def __init__(self,season_dir: str, spreadsheet_id: str, server: str, user: str, password: str,
+    def __init__(self,spreadsheet_id: str, server: str, user: str, password: str,
                  comp_id: str = None, vendor: str = None, season_id: str = None):
         self.comp_id = comp_id
         self.vendor = vendor
         self.season_id = season_id
-        self.season_dir = season_dir
         self.spreadsheet_id = spreadsheet_id
-        self.info_dir = Path(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\{self.season_dir}\MatchInfo")
+        self.info_dir = Path(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\MatchInfo")
         self.server = server
         self.user = user
         self.password = password
@@ -148,7 +147,7 @@ class Schedule:
         # Concatenate all matchday DataFrames once at the end
         schedule = pd.concat(matchday_data, ignore_index=True)
 
-        print(f"Parsed deltatre schedule for {self.comp_id}")
+        print(f"Parsed deltatre schedule for {self.comp_id}\n")
         return schedule
 
     def _parse_opta(self):
@@ -215,7 +214,7 @@ class Schedule:
             'Stadium': stadiums
         })
 
-        print(f"Parsed opta schedule for {self.comp_id}")
+        print(f"Parsed opta schedule for {self.comp_id}\n ")
         return schedule
 
     def _parse_d3_mls(self):
@@ -264,7 +263,7 @@ class Schedule:
                  "League": league, "Stadium": stadium, "STS-ID": sts_match_id}, index=[0])
 
             schedule = pd.concat([schedule, match_info])
-        print(f"Parsed D3 MLS schedule for {self.comp_id}")
+        print(f"Parsed D3 MLS schedule for {self.comp_id}\n")
         return schedule
 
     def _parse_keytoq(self):
@@ -288,7 +287,7 @@ class Schedule:
                 {"Matchday": round_id, "MatchID": matchId, "KickOff": ko_date, "Home": home, "Away": away,
                  "League": league})
             schedule = pd.concat([schedule, match_info])
-        print(f"Parsed keytoq schedule for {self.comp_id}")
+        print(f"Parsed keytoq schedule for {self.comp_id}\n")
         return schedule
 
     def _push_schedule(self, df: pd.DataFrame, worksheet: str = None) -> None:
@@ -303,7 +302,7 @@ class Schedule:
         if worksheet is None:
             worksheet = df['League'].iloc[0]  # Set to the first value of the 'League' column
         try:
-            os.chdir(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\Season24-25")
+            os.chdir(fr"\\10.49.0.250\\tracab_neu\07_QC\Scripts\Schedule_script\auth")
             gc = gspread.oauth(credentials_filename=
                                'schedule_push_authentification.json'
                                )
@@ -327,9 +326,9 @@ class Schedule:
             # worksheet.clear()  # Clear existing content before updating
             worksheet.update(data_to_update)
             #
-            logger.critical(f'\nThe data has been successfully pushed to the worksheet {worksheet}')
+            logger.critical(f'The data has been successfully pushed to the worksheet {worksheet}\n')
         except gspread.exceptions.APIError as e:
-            logger.error(f"\nFailed to update Google Sheet: {e}")
+            logger.error(f"Failed to update Google Sheet: {e}\n")
         except Exception as e:
-            logger.error(f"\nAn unexpected error occurred while pushing data to Google Sheets: {e}")
+            logger.error(f"An unexpected error occurred while pushing data to Google Sheets: {e}\n")
 
