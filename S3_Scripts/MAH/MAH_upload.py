@@ -21,7 +21,7 @@ match_folder = newest_folder(r'\\192.168.7.72\Rec')
 print(f'Matchfolder: {match_folder} \n')
 home, away, md, comp, match_id = get_match_info(match_folder)
 # Define team-dictionary
-if comp == '1':
+if comp == '1' or comp == '2':
     teams = MLS
 elif comp == '6':
     teams = LeaguesCup
@@ -74,6 +74,12 @@ if comp == str(1):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSRegularSeason/' + md + '/'
                + folder_new + '" --recursive')
+
+if comp == str(2):
+    command = ('aws s3 cp "' + filepath_new +
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSCupPlayOffs/' + md + '/'
+               + folder_new + '" --recursive')
+
 elif comp == str(6):
     command = ('aws s3 cp "' + filepath_new +
                '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/LeaguesCup/' + md + '/'
