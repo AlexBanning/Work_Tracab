@@ -77,7 +77,7 @@ if comp == str(1):
 
 if comp == str(2):
     command = ('aws s3 cp "' + filepath_new +
-               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSCupPlayOffs/' + md + '/'
+               '" "s3://mah-s3-download-section-mls-331812868623/Video/2024/MLSCupPlayoffs/' + md + '/'
                + folder_new + '" --recursive')
 
 elif comp == str(6):
