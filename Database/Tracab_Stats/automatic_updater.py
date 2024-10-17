@@ -10,8 +10,8 @@ from pathlib import Path
 
 LEAGUE_MAPPING = {
     'mls': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_23-24\1 - MLS',
-    'bl1': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\51 - Bundesliga 1_BL',
-    'bl2': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\52 - 2.Bundesliga 2_BL',
+    'bl1': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\51 - Bundesliga1_BL',
+    'bl2': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\52 - 2.Bundesliga2_BL',
     'eredivisie': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\9 - Eredivisie',
     'ekstraklasa': r'\\10.49.0.250\tracab_neu\01_Tracking-Data\Season_24-25\55 - Ekstraklasa'
 }
